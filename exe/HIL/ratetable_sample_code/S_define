@@ -1,0 +1,88 @@
+/************************TRICK HEADER*************************
+PURPOSE:
+    (This S_define works with the RUN_analytic input file)
+LIBRARY DEPENDENCIES:
+    (
+    )
+*************************************************************/
+
+#include "sim_objects/default_trick_sys.sm"
+##include "ExternalSourceClock.hh"
+##include "icf_trx_ctrl.h"
+##include "ratetable.h"
+##include "sdt_imu.h"
+class RatetableSimObject : public Trick::SimObject {
+    public:
+        struct icf_ctrlblk_t   icf_ctrl;
+        ExternalSourceClock ext_clk;
+        FILE *ratetable_stream;
+        struct ratetable_eqmt_info_t rt_dev_info;
+        struct sdt_imu_dev_t adis16488_dev;
+        double int_step = 0.005;
+        double rt_feedback_period = 0.002;
+        void trick_heartbeat(void) {
+            char date_buf[80];
+            char currentTime[84] = "";
+            static struct timespec ts;
+            uint32_t milli;
+            clock_gettime(CLOCK_MONOTONIC, &ts);
+            ts.tv_sec = time(NULL);
+            milli = ts.tv_nsec / 1000000;
+            strftime(date_buf, (size_t) 20, "%Y/%m/%d,%H:%M:%S", localtime(&ts.tv_sec));
+            snprintf(currentTime, sizeof(currentTime), "%s.%03d", date_buf, milli);
+            fprintf(stderr, "[%s] sim_time = %f\n", currentTime, exec_get_sim_time());
+        };
+
+        void wait_for_1st_pps(void) {
+            fprintf(stderr, "Wainting for the 1st PPS...");
+            ioctl(EXT_CLK_IOCTL_FD_NUM, IOCTL_DIO_TISPACE_CUSTOMIZED_WAIT_GPIO_INT, 0);
+            fprintf(stderr, "Go !!\n");
+        };
+
+        void ratetable_feedback_group(struct icf_ctrlblk_t *C) {
+            icf_rx_ctrl_job(C, HW_PORT2, 4);
+            icf_rx_ctrl_job(C, HW_PORT3, 4);
+            icf_rx_ctrl_job(C, HW_PORT4, 4);
+        }
+
+        RatetableSimObject()
+        {
+        	/* [C<#>] [{job_tag}] [P<#>] ([<cycle_time>, [<start_time>, [<stop_time>,]]] <job_class>) <module>([args]) ; */
+            ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
+            ("initialization") ratetable_init(&rt_dev_info);
+            ("initialization") imu_adis16488_init(&adis16488_dev);
+            ("initialization") ratetable_init_input_file(&ratetable_stream);
+            ("initialization") wait_for_1st_pps();
+            P1 (5, "scheduled") trick_heartbeat();
+            /* Log File Input*/
+            P1 (int_step, "scheduled") ratetable_convert_csv_to_motdata(&rt_dev_info, ratetable_stream);
+            /****  Step Check Input ****/
+            // P2 (int_step, 0.0, 4.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0); // Warm up
+            // P2 (int_step, 5.0, 5.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0);
+            // P2 (int_step, 6.0, 6.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 1.0);
+            // P2 (int_step, 7.0, 7.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 2.0);
+            // P2 (int_step, 8.0, 8.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 7.0);
+            // P2 (int_step, 9.0, 9.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 22.0);
+            // P2 (int_step, 10.0, 10.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 7.0);
+            // P2 (int_step, 11.0, 11.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 2.0);
+            // P2 (int_step, 12.0, 12.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 1.0);
+            // P2 (int_step, 13.0, 13.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0);
+
+            /****  SIN Check Block  ****/
+            /* sin() Check Input Case Wg = 2, f = 1*/
+            /* sin() Check Input Case Wg = 2, f = 10*/
+            /* sin() Check Input Case Wg = 5, f = 1*/
+            /* sin() Check Input Case Wg = 5, f = 10*/
+            // P2 (int_step, 0.0, 4.995, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0); // Warm up
+            // P2 (int_step, 5.0, 14.995, "scheduled") ratetable_cmd_sine_check(&rt_dev_info, 2, 1, int_step);
+            // P2 (int_step, 15.0, "scheduled") ratetable_cmd_step_check(&rt_dev_info, 0.0); // END sin check
+            /* Routine Job */
+            P4 (int_step, "scheduled") ratetable_layer2_frame_direct_transfer(&icf_ctrl, &rt_dev_info);
+            P4 (rt_feedback_period, 0.001, "scheduled") ratetable_feedback_group(&icf_ctrl);
+            P4 (rt_feedback_period, 0.001, "scheduled") ratetable_layer2_frame_received(&icf_ctrl, &rt_dev_info);
+            P4 (rt_feedback_period, 0.001, "scheduled") imu_adis16488_receive(&icf_ctrl, &adis16488_dev);
+            ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
+        }
+} ;
+
+RatetableSimObject rkt ;
