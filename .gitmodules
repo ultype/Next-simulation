@@ -1,0 +1,6 @@
+[submodule "third-party/armadillo"]
+	path = third-party/armadillo
+	url = git@gitlab.com:conradsnicta/armadillo-code.git
+[submodule "third-party/trick"]
+	path = third-party/trick
+	url = git@github.com:nasa/trick.git
