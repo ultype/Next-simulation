@@ -1,4 +1,4 @@
-Sirius is a Simulation of rocket
+Next is a Simulation Platform of 6Dof
 From version 0.1.0, it is ported form Rocket Simulation in 6DOF.
 The aim is to provide high fidelity of Rocket Launch and In-flight Dynamics.
 
