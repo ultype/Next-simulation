@@ -22,7 +22,7 @@ args = parser.parse_args()
 error_threshold = toFloat(args.threshold);
 
 try:
-    with open(args.result, 'rb') as resultFile:
+    with open(args.result, 'rt') as resultFile:
 
         resultData = csv.reader(resultFile, delimiter=',', quotechar='\n')
 

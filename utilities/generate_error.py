@@ -25,9 +25,9 @@ parser.add_argument('-l', '--last',
 args = parser.parse_args()
 
 try:
-    with open(args.golden, 'rb') as goldenFile, \
-         open(args.target, 'rb') as targetFile, \
-         open('result.csv','wb') as outputFile:
+    with open(args.golden, "rt", encoding="utf-8") as goldenFile, \
+         open(args.target, "rt", encoding="utf-8") as targetFile, \
+         open('result.csv','w') as outputFile:
 
         goldenData = csv.reader(goldenFile, delimiter=',', quotechar='\n')
         targetData = csv.reader(targetFile, delimiter=',', quotechar='\n')

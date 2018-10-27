@@ -57,7 +57,7 @@ extern "C" int event_separation_1() {
     double fuel_flow_rate = 29.63;
     rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate);
 
-    rkt.aerodynamics.load_aerotable("../../../auxiliary/aero_table_slv2.txt");
+    rkt.aerodynamics.load_aerotable("../../../tables/aero_table_slv2.txt");
 
     // speration_2.set_cycle(0.001)
     jit_add_read(350.001, "event_separation_2");
@@ -93,7 +93,7 @@ extern "C" int event_separation_3() {
         double fuel_flow_rate = 3.33;
         rkt.propulsion.set_input_thrust(xcg_0, xcg_1, moi_roll_0, moi_roll_1, moi_trans_0, moi_trans_1, spi, fuel_flow_rate);
 
-        rkt.aerodynamics.load_aerotable("../../../auxiliary/aero_table_slv1.txt");
+        rkt.aerodynamics.load_aerotable("../../../tables/aero_table_slv1.txt");
 
         event_manager_get_event("event_separation_3")->deactivate();
         jit_add_event("event_MECO", "event_MECO", 0.05);
@@ -157,7 +157,7 @@ extern "C" int run_me() {
     rkt.env.set_no_wind();
     rkt.env.set_no_wind_turbulunce();
     // aerodynamics
-    rkt.aerodynamics.load_aerotable("../../../auxiliary/aero_table_slv3.txt");
+    rkt.aerodynamics.load_aerotable("../../../tables/aero_table_slv3.txt");
     rkt.aerodynamics.set_xcg_ref(9.632);   // Reference cg location from nose - m
     rkt.aerodynamics.set_refa(2.36);       // Reference area for aero coefficients - m^2
     rkt.aerodynamics.set_refd(1.7334);     // Reference length for aero coefficients - m
@@ -217,7 +217,7 @@ extern "C" int run_me() {
     rkt.rcs.set_rcs_pos(1.66507);       // rcs thruster's postion from nose - m  module rcs
     rkt.rcs.set_rocket_r(0.68);         // rocket's radius - m  module rcs
 
-    rkt.gps_con.readfile("../../../auxiliary/brdc0810.17n");
+    rkt.gps_con.readfile("../../../tables/brdc0810.17n");
 
     /* events */
     jit_add_read(180.001, "event_start");

@@ -138,7 +138,7 @@ extern "C" int event_separation_1() {
 
     rkt.aerodynamics.set_refa(0.8659);
     rkt.aerodynamics.set_refd(1.05);
-    rkt.aerodynamics.load_aerotable("../../../auxiliary/Aero_20180629_S3.txt");
+    rkt.aerodynamics.load_aerotable("../../../tables/Aero_20180629_S3.txt");
 
     rkt.propulsion.set_aexit(0.040115);
     rkt.propulsion.set_vmass0(S3_vmass0);
@@ -206,14 +206,14 @@ extern "C" void master_init_time(Rocket_SimObject *rkt) {
 extern "C" void master_init_environment(Rocket_SimObject *rkt) {
     /***************************************environment*************************************************************/
     rkt->env.dm_RNP();
-    // rkt->env.atmosphere_use_weather_deck("../../../auxiliary/weather_table.txt");
+    // rkt->env.atmosphere_use_weather_deck("../../../tables/weather_table.txt");
     // rkt->env.atmosphere_use_public();
     rkt->env.atmosphere_use_nasa();
     rkt->env.set_no_wind();
     rkt->env.set_no_wind_turbulunce();
     // rkt->env.set_constant_wind(3.0, 0.0, 1.0, 0.0);
     // rkt->env.set_wind_turbulunce(0.5, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-    rkt->gps_con.readfile("../../../auxiliary/brdc0810.17n");
+    rkt->gps_con.readfile("../../../tables/brdc0810.17n");
 }
 
 extern "C" void master_init_slv(Rocket_SimObject *rkt) {
@@ -241,7 +241,7 @@ extern "C" void master_init_slv(Rocket_SimObject *rkt) {
 
 extern "C" void master_init_aerodynamics(Rocket_SimObject *rkt) {
     /************************************aerodynamics*******************************************************/
-    rkt->aerodynamics.load_aerotable("../../../auxiliary/Aero_20180629_S2+S3.txt");
+    rkt->aerodynamics.load_aerotable("../../../tables/Aero_20180629_S2+S3.txt");
     rkt->aerodynamics.set_refa(1.65046);       // Reference area for aero coefficients - m^2
     rkt->aerodynamics.set_refd(1.45);     // Reference length for aero coefficients - m
     /********************************************************************************************************/
@@ -261,7 +261,7 @@ extern "C" void master_init_propulsion(Rocket_SimObject *rkt) {
     rkt->propulsion.set_S2_spi(S2_SPI);
     rkt->propulsion.set_S3_spi(S3_SPI);
 
-    rkt->propulsion.load_proptable("../../../auxiliary/Prop_0521_S2+S3.txt");
+    rkt->propulsion.load_proptable("../../../tables/Prop_0521_S2+S3.txt");
     rkt->propulsion.get_input_file_var(S2_XCG_0, S2_XCG_1, S2_MOI_ROLL_0, S2_MOI_ROLL_1, S2_MOI_PITCH_0, S2_MOI_PITCH_1, S2_MOI_YAW_0, S2_MOI_YAW_1, S2_SPI, S2_FUEL_FLOW_RATE);
     // rkt->propulsion.get_input_file_var(S2_RBODY_XCG_0, S2_RBODY_XCG_1, S2_RBODY_MOI_ROLL_0, S2_RBODY_MOI_ROLL_1, S2_RBODY_MOI_PITCH_0, S2_RBODY_MOI_PITCH_1, S2_RBODY_MOI_YAW_0, S2_RBODY_MOI_YAW_1, S2_SPI, S2_FUEL_FLOW_RATE);
     rkt->propulsion.set_aexit(0.03333 * 4.0);  // nozzle exhaust area
