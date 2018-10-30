@@ -15,6 +15,8 @@ LIBRARY DEPENDENCIES:
 ##include "GPS_constellation.hh"
 ##include "Rocket_Flight_DM.hh"
 ##include "Environment.hh"
+##include "Vehicle.hh"
+##include "Module.hh"
 
 ##include "env/atmosphere.hh"
 ##include "env/atmosphere_nasa2002.hh"
@@ -246,7 +248,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") link();
             ("initialization") aerodynamics.initialize();
             ("initialization") dynamics.initialize();
-            ("initialization") env.initialize();
+            ("initialization") env.init();
             ("initialization") tvc.initialize();
             ("initialization") propulsion.initialize();
             ("initialization") forces.initialize();
@@ -254,7 +256,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_SIL_EGSE);
 
             P1 (int_step, "scheduled") time->dm_time(int_step);
-	        P1 (int_step, "scheduled") env.propagate(int_step);
+	        P1 (int_step, "scheduled") env.algorithm(int_step);
             P1 (int_step, "scheduled") propulsion.propagate(int_step);
             P1 (int_step, "scheduled") aerodynamics.calculate_aero(int_step);
             P1 (0.05, "scheduled") gps_con.compute();

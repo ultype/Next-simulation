@@ -205,7 +205,7 @@ extern "C" void master_init_time(Rocket_SimObject *rkt) {
 
 extern "C" void master_init_environment(Rocket_SimObject *rkt) {
     /***************************************environment*************************************************************/
-    rkt->env.dm_RNP();
+    rkt->env.set_RNP();
     // rkt->env.atmosphere_use_weather_deck("../../../tables/weather_table.txt");
     // rkt->env.atmosphere_use_public();
     rkt->env.atmosphere_use_nasa();
