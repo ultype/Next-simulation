@@ -31,3 +31,7 @@
 *.out
 *.app
 .tags*
+
+# Folder
+RUN_golden/
+DP_Product/
