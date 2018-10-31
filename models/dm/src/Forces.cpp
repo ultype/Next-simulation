@@ -315,7 +315,7 @@ void Forces::collect_forces_and_propagate() {
     ff = new double[13];
     x = new double[13];
     /*****************input from another module*******************/
-    rhoC_1 = grab_structure_XCG();
+    rhoC_1 = grab_xcg();
     dang_1 = grab_WBIB();
     arma::mat33 TBI = grab_TBI();
     arma::vec3 FSPB = grab_FSPB();
@@ -715,50 +715,11 @@ void Forces::Gravity_Q() {
     double vmass = grab_vmass();
     double thrust = grab_thrust();
     unsigned int liftoff = grab_liftoff();
-    double e1_mass = grab_e1_mass();
-    double e2_mass = grab_e2_mass();
-    double e3_mass = grab_e3_mass();
-    double e4_mass = grab_e4_mass();
+
     arma::vec3 Fg;
     Fg = vmass * GRAVG;
 
     if (liftoff == 1) {
-        if (Slosh_flag == 1) {
-            Fg = (vmass - slosh_mass) * GRAVG;
-            Q_G_slosh(0) = dot(slosh_mass * (GRAVG), gamma_b1_q1);
-            Q_G_slosh(1) = dot(slosh_mass * (GRAVG), gamma_b1_q2);
-            Q_G_slosh(2) = dot(slosh_mass * (GRAVG), gamma_b1_q3);
-            Q_G_slosh(3) = dot(slosh_mass * (GRAVG), -trans(TBI) * cross_matrix(r_slosh) * beta_b1_q4) + dot(slosh_mass * (GRAVG), -trans(TBSLOSH_I) * cross_matrix(rhoC_slosh) * beta_slosh_q4);
-            Q_G_slosh(4) = dot(slosh_mass * (GRAVG), -trans(TBI) * cross_matrix(r_slosh) * beta_b1_q5) + dot(slosh_mass * (GRAVG), -trans(TBSLOSH_I) * cross_matrix(rhoC_slosh) * beta_slosh_q5);
-            Q_G_slosh(5) = dot(slosh_mass * (GRAVG), -trans(TBI) * cross_matrix(r_slosh) * beta_b1_q6) + dot(slosh_mass * (GRAVG), -trans(TBSLOSH_I) * cross_matrix(rhoC_slosh) * beta_slosh_q6);
-            Q_G_slosh(6) = dot(slosh_mass * (GRAVG), -trans(TBSLOSH_I) * cross_matrix(rhoC_slosh) * beta_slosh_q7);
-            Q_G_slosh(7) = dot(slosh_mass * (GRAVG), -trans(TBSLOSH_I) * cross_matrix(rhoC_slosh) * beta_slosh_q8);
-        }
-        if (TWD_flag == 1) {
-            Q_G_S2_E(0) = dot(e1_mass * GRAVG, gamma_b1_q1) + dot(e2_mass * GRAVG, gamma_b1_q1) + dot(e3_mass * GRAVG, gamma_b1_q1) + dot(e4_mass * GRAVG, gamma_b1_q1);
-            Q_G_S2_E(1) = dot(e1_mass * GRAVG, gamma_b1_q2) + dot(e2_mass * GRAVG, gamma_b1_q2) + dot(e3_mass * GRAVG, gamma_b1_q2) + dot(e4_mass * GRAVG, gamma_b1_q2);
-            Q_G_S2_E(2) = dot(e1_mass * GRAVG, gamma_b1_q3) + dot(e2_mass * GRAVG, gamma_b1_q3) + dot(e3_mass * GRAVG, gamma_b1_q3) + dot(e4_mass * GRAVG, gamma_b1_q3);
-            Q_G_S2_E(3) = dot(e1_mass * GRAVG, -trans(TBI) * cross_matrix(e1_d) * beta_b1_q4) + dot(e1_mass * GRAVG, -trans(TE1_I) * cross_matrix(rhoC_e1) * beta_S2_e1_q4)
-                            + dot(e2_mass * GRAVG, -trans(TBI) * cross_matrix(e2_d) * beta_b1_q4) + dot(e2_mass * GRAVG, -trans(TE2_I) * cross_matrix(rhoC_e2) * beta_S2_e2_q4)
-                            + dot(e3_mass * GRAVG, -trans(TBI) * cross_matrix(e3_d) * beta_b1_q4) + dot(e3_mass * GRAVG, -trans(TE3_I) * cross_matrix(rhoC_e3) * beta_S2_e3_q4)
-                            + dot(e4_mass * GRAVG, -trans(TBI) * cross_matrix(e4_d) * beta_b1_q4) + dot(e4_mass * GRAVG, -trans(TE4_I) * cross_matrix(rhoC_e4) * beta_S2_e4_q4);
-            Q_G_S2_E(4) = dot(e1_mass * GRAVG, -trans(TBI) * cross_matrix(e1_d) * beta_b1_q5) + dot(e1_mass * GRAVG, -trans(TE1_I) * cross_matrix(rhoC_e1) * beta_S2_e1_q5)
-                            + dot(e2_mass * GRAVG, -trans(TBI) * cross_matrix(e2_d) * beta_b1_q5) + dot(e2_mass * GRAVG, -trans(TE2_I) * cross_matrix(rhoC_e2) * beta_S2_e2_q5)
-                            + dot(e3_mass * GRAVG, -trans(TBI) * cross_matrix(e3_d) * beta_b1_q5) + dot(e3_mass * GRAVG, -trans(TE3_I) * cross_matrix(rhoC_e3) * beta_S2_e3_q5)
-                            + dot(e4_mass * GRAVG, -trans(TBI) * cross_matrix(e4_d) * beta_b1_q5) + dot(e4_mass * GRAVG, -trans(TE4_I) * cross_matrix(rhoC_e4) * beta_S2_e4_q5);
-            Q_G_S2_E(5) = dot(e1_mass * GRAVG, -trans(TBI) * cross_matrix(e1_d) * beta_b1_q6) + dot(e1_mass * GRAVG, -trans(TE1_I) * cross_matrix(rhoC_e1) * beta_S2_e1_q6)
-                            + dot(e2_mass * GRAVG, -trans(TBI) * cross_matrix(e2_d) * beta_b1_q6) + dot(e2_mass * GRAVG, -trans(TE2_I) * cross_matrix(rhoC_e2) * beta_S2_e2_q6)
-                            + dot(e3_mass * GRAVG, -trans(TBI) * cross_matrix(e3_d) * beta_b1_q6) + dot(e3_mass * GRAVG, -trans(TE3_I) * cross_matrix(rhoC_e3) * beta_S2_e3_q6)
-                            + dot(e4_mass * GRAVG, -trans(TBI) * cross_matrix(e4_d) * beta_b1_q6) + dot(e4_mass * GRAVG, -trans(TE4_I) * cross_matrix(rhoC_e4) * beta_S2_e4_q6);
-            Q_G_S2_E(6) = dot(e1_mass * GRAVG, -trans(TE1_I) * cross_matrix(rhoC_e1) * beta_S2_e1_q_theta);
-            Q_G_S2_E(7) = dot(e2_mass * GRAVG, -trans(TE2_I) * cross_matrix(rhoC_e2) * beta_S2_e2_q_psi);
-            Q_G_S2_E(8) = dot(e3_mass * GRAVG, -trans(TE3_I) * cross_matrix(rhoC_e3) * beta_S2_e3_q_theta);
-            Q_G_S2_E(9) = dot(e4_mass * GRAVG, -trans(TE4_I) * cross_matrix(rhoC_e4) * beta_S2_e4_q_psi);
-            Fg = (vmass - e1_mass - e2_mass - e3_mass - e4_mass) * GRAVG;
-        }
-        if (Slosh_flag == 1 && TWD_flag == 1) {
-            Fg = (vmass - e1_mass - e2_mass - e3_mass - e4_mass - slosh_mass) * GRAVG;
-        }
         Q_G(0) = dot(Fg, gamma_b1_q1);
         Q_G(1) = dot(Fg, gamma_b1_q2);
         Q_G(2) = dot(Fg, gamma_b1_q3);
@@ -766,42 +727,6 @@ void Forces::Gravity_Q() {
         Q_G(4) = dot(Fg, -trans(TBI) * cross_matrix(rhoC_1) * beta_b1_q5);
         Q_G(5) = dot(Fg, -trans(TBI) * cross_matrix(rhoC_1) * beta_b1_q6);
     } else {
-        if (Slosh_flag == 1) {
-            Q_G_slosh(0) = dot(slosh_mass * (NEXT_ACC), gamma_b1_q1);
-            Q_G_slosh(1) = dot(slosh_mass * (NEXT_ACC), gamma_b1_q2);
-            Q_G_slosh(2) = dot(slosh_mass * (NEXT_ACC), gamma_b1_q3);
-            Q_G_slosh(3) = dot(slosh_mass * (NEXT_ACC), -trans(TBI) * cross_matrix(r_slosh) * beta_b1_q4) + dot(slosh_mass * (NEXT_ACC), -trans(TBSLOSH_I) * cross_matrix(rhoC_slosh) * beta_slosh_q4);
-            Q_G_slosh(4) = dot(slosh_mass * (NEXT_ACC), -trans(TBI) * cross_matrix(r_slosh) * beta_b1_q5) + dot(slosh_mass * (NEXT_ACC), -trans(TBSLOSH_I) * cross_matrix(rhoC_slosh) * beta_slosh_q5);
-            Q_G_slosh(5) = dot(slosh_mass * (NEXT_ACC), -trans(TBI) * cross_matrix(r_slosh) * beta_b1_q6) + dot(slosh_mass * (NEXT_ACC), -trans(TBSLOSH_I) * cross_matrix(rhoC_slosh) * beta_slosh_q6);
-            Q_G_slosh(6) = dot(slosh_mass * (NEXT_ACC), -trans(TBSLOSH_I) * cross_matrix(rhoC_slosh) * beta_slosh_q7);
-            Q_G_slosh(7) = dot(slosh_mass * (NEXT_ACC), -trans(TBSLOSH_I) * cross_matrix(rhoC_slosh) * beta_slosh_q8);
-            Fg = (vmass - slosh_mass) * NEXT_ACC;
-        }
-        if (TWD_flag == 1) {
-            Q_G_S2_E(0) = dot(e1_mass * NEXT_ACC, gamma_b1_q1) + dot(e2_mass * NEXT_ACC, gamma_b1_q1) + dot(e3_mass * NEXT_ACC, gamma_b1_q1) + dot(e4_mass * NEXT_ACC, gamma_b1_q1);
-            Q_G_S2_E(1) = dot(e1_mass * NEXT_ACC, gamma_b1_q2) + dot(e2_mass * NEXT_ACC, gamma_b1_q2) + dot(e3_mass * NEXT_ACC, gamma_b1_q2) + dot(e4_mass * NEXT_ACC, gamma_b1_q2);
-            Q_G_S2_E(2) = dot(e1_mass * NEXT_ACC, gamma_b1_q3) + dot(e2_mass * NEXT_ACC, gamma_b1_q3) + dot(e3_mass * NEXT_ACC, gamma_b1_q3) + dot(e4_mass * NEXT_ACC, gamma_b1_q3);
-            Q_G_S2_E(3) = dot(e1_mass * NEXT_ACC, -trans(TBI) * cross_matrix(e1_d) * beta_b1_q4) + dot(e1_mass * NEXT_ACC, -trans(TE1_I) * cross_matrix(rhoC_e1) * beta_S2_e1_q4)
-                            + dot(e2_mass * NEXT_ACC, -trans(TBI) * cross_matrix(e2_d) * beta_b1_q4) + dot(e2_mass * NEXT_ACC, -trans(TE2_I) * cross_matrix(rhoC_e2) * beta_S2_e2_q4)
-                            + dot(e3_mass * NEXT_ACC, -trans(TBI) * cross_matrix(e3_d) * beta_b1_q4) + dot(e3_mass * NEXT_ACC, -trans(TE3_I) * cross_matrix(rhoC_e3) * beta_S2_e3_q4)
-                            + dot(e4_mass * NEXT_ACC, -trans(TBI) * cross_matrix(e4_d) * beta_b1_q4) + dot(e4_mass * NEXT_ACC, -trans(TE4_I) * cross_matrix(rhoC_e4) * beta_S2_e4_q4);
-            Q_G_S2_E(4) = dot(e1_mass * NEXT_ACC, -trans(TBI) * cross_matrix(e1_d) * beta_b1_q5) + dot(e1_mass * NEXT_ACC, -trans(TE1_I) * cross_matrix(rhoC_e1) * beta_S2_e1_q5)
-                            + dot(e2_mass * NEXT_ACC, -trans(TBI) * cross_matrix(e2_d) * beta_b1_q5) + dot(e2_mass * NEXT_ACC, -trans(TE2_I) * cross_matrix(rhoC_e2) * beta_S2_e2_q5)
-                            + dot(e3_mass * NEXT_ACC, -trans(TBI) * cross_matrix(e3_d) * beta_b1_q5) + dot(e3_mass * NEXT_ACC, -trans(TE3_I) * cross_matrix(rhoC_e3) * beta_S2_e3_q5)
-                            + dot(e4_mass * NEXT_ACC, -trans(TBI) * cross_matrix(e4_d) * beta_b1_q5) + dot(e4_mass * NEXT_ACC, -trans(TE4_I) * cross_matrix(rhoC_e4) * beta_S2_e4_q5);
-            Q_G_S2_E(5) = dot(e1_mass * NEXT_ACC, -trans(TBI) * cross_matrix(e1_d) * beta_b1_q6) + dot(e1_mass * NEXT_ACC, -trans(TE1_I) * cross_matrix(rhoC_e1) * beta_S2_e1_q6)
-                            + dot(e2_mass * NEXT_ACC, -trans(TBI) * cross_matrix(e2_d) * beta_b1_q6) + dot(e2_mass * NEXT_ACC, -trans(TE2_I) * cross_matrix(rhoC_e2) * beta_S2_e2_q6)
-                            + dot(e3_mass * NEXT_ACC, -trans(TBI) * cross_matrix(e3_d) * beta_b1_q6) + dot(e3_mass * NEXT_ACC, -trans(TE3_I) * cross_matrix(rhoC_e3) * beta_S2_e3_q6)
-                            + dot(e4_mass * NEXT_ACC, -trans(TBI) * cross_matrix(e4_d) * beta_b1_q6) + dot(e4_mass * NEXT_ACC, -trans(TE4_I) * cross_matrix(rhoC_e4) * beta_S2_e4_q6);
-            Q_G_S2_E(6) = dot(e1_mass * NEXT_ACC, -trans(TE1_I) * cross_matrix(rhoC_e1) * beta_S2_e1_q_theta);
-            Q_G_S2_E(7) = dot(e2_mass * NEXT_ACC, -trans(TE2_I) * cross_matrix(rhoC_e2) * beta_S2_e2_q_psi);
-            Q_G_S2_E(8) = dot(e3_mass * NEXT_ACC, -trans(TE3_I) * cross_matrix(rhoC_e3) * beta_S2_e3_q_theta);
-            Q_G_S2_E(9) = dot(e4_mass * NEXT_ACC, -trans(TE4_I) * cross_matrix(rhoC_e4) * beta_S2_e4_q_psi);
-            Fg = (vmass - e1_mass - e2_mass - e3_mass - e4_mass) * NEXT_ACC;
-        }
-        if (Slosh_flag == 1 && TWD_flag == 1) {
-            Fg = (vmass - e1_mass - e2_mass - e3_mass - e4_mass - slosh_mass) * NEXT_ACC;
-        }
         Q_G(0) = dot(Fg, gamma_b1_q1);
         Q_G(1) = dot(Fg, gamma_b1_q2);
         Q_G(2) = dot(Fg, gamma_b1_q3);
@@ -814,32 +739,15 @@ void Forces::Gravity_Q() {
 void Forces::calculate_I1() {
     double vmass = grab_vmass();
     arma::mat33 IBBB = grab_IBBB();
-    double e1_mass = grab_e1_mass();
-    double e2_mass = grab_e2_mass();
-    double e3_mass = grab_e3_mass();
-    double e4_mass = grab_e4_mass();
-
-    if (TWD_flag == 1) {
-        I1(0, 0) = IBBB(0, 0) + (vmass - e1_mass - e2_mass - e3_mass - e4_mass) * (rhoC_1(1) * rhoC_1(1) + rhoC_1(2) * rhoC_1(2));
-        I1(0, 1) = IBBB(0, 1) - (vmass - e1_mass - e2_mass - e3_mass - e4_mass) * rhoC_1(0) * rhoC_1(1);
-        I1(0, 2) = IBBB(0, 2) - (vmass - e1_mass - e2_mass - e3_mass - e4_mass) * rhoC_1(0) * rhoC_1(2);
-        I1(1, 0) = IBBB(1, 0) - (vmass - e1_mass - e2_mass - e3_mass - e4_mass) * rhoC_1(1) * rhoC_1(0);
-        I1(1, 1) = IBBB(1, 1) + (vmass - e1_mass - e2_mass - e3_mass - e4_mass) * (rhoC_1(2) * rhoC_1(2) + rhoC_1(0) * rhoC_1(0));
-        I1(1, 2) = IBBB(1, 2) - (vmass - e1_mass - e2_mass - e3_mass - e4_mass) * rhoC_1(1) * rhoC_1(2);
-        I1(2, 0) = IBBB(2, 0) - (vmass - e1_mass - e2_mass - e3_mass - e4_mass) * rhoC_1(2) * rhoC_1(0);
-        I1(2, 1) = IBBB(2, 1) - (vmass - e1_mass - e2_mass - e3_mass - e4_mass) * rhoC_1(2) * rhoC_1(1);
-        I1(2, 2) = IBBB(2, 2) + (vmass - e1_mass - e2_mass - e3_mass - e4_mass) * (rhoC_1(0) * rhoC_1(0) + rhoC_1(1) * rhoC_1(1));
-    } else {
-        I1(0, 0) = IBBB(0, 0) + (vmass) * (rhoC_1(1) * rhoC_1(1) + rhoC_1(2) * rhoC_1(2));
-        I1(0, 1) = IBBB(0, 1) - (vmass) * rhoC_1(0) * rhoC_1(1);
-        I1(0, 2) = IBBB(0, 2) - (vmass) * rhoC_1(0) * rhoC_1(2);
-        I1(1, 0) = IBBB(1, 0) - (vmass) * rhoC_1(1) * rhoC_1(0);
-        I1(1, 1) = IBBB(1, 1) + (vmass) * (rhoC_1(2) * rhoC_1(2) + rhoC_1(0) * rhoC_1(0));
-        I1(1, 2) = IBBB(1, 2) - (vmass) * rhoC_1(1) * rhoC_1(2);
-        I1(2, 0) = IBBB(2, 0) - (vmass) * rhoC_1(2) * rhoC_1(0);
-        I1(2, 1) = IBBB(2, 1) - (vmass) * rhoC_1(2) * rhoC_1(1);
-        I1(2, 2) = IBBB(2, 2) + (vmass) * (rhoC_1(0) * rhoC_1(0) + rhoC_1(1) * rhoC_1(1));
-    }
+    I1(0, 0) = IBBB(0, 0) + (vmass) * (rhoC_1(1) * rhoC_1(1) + rhoC_1(2) * rhoC_1(2));
+    I1(0, 1) = IBBB(0, 1) - (vmass) * rhoC_1(0) * rhoC_1(1);
+    I1(0, 2) = IBBB(0, 2) - (vmass) * rhoC_1(0) * rhoC_1(2);
+    I1(1, 0) = IBBB(1, 0) - (vmass) * rhoC_1(1) * rhoC_1(0);
+    I1(1, 1) = IBBB(1, 1) + (vmass) * (rhoC_1(2) * rhoC_1(2) + rhoC_1(0) * rhoC_1(0));
+    I1(1, 2) = IBBB(1, 2) - (vmass) * rhoC_1(1) * rhoC_1(2);
+    I1(2, 0) = IBBB(2, 0) - (vmass) * rhoC_1(2) * rhoC_1(0);
+    I1(2, 1) = IBBB(2, 1) - (vmass) * rhoC_1(2) * rhoC_1(1);
+    I1(2, 2) = IBBB(2, 2) + (vmass) * (rhoC_1(0) * rhoC_1(0) + rhoC_1(1) * rhoC_1(1));
 }
 
 void Forces::calculate_I_E() {
