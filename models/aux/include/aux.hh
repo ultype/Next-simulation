@@ -45,4 +45,12 @@ double get_elapsed_time();
 
 #define VECTOR_BIND(vec_name, n) \
         vec_name = gsl_vector_view_array(_ ## vec_name, n)
+
+#define VECTOR(vec_name, n) \
+  arma::vec vec_name;       \
+  double _##vec_name[n];
+
+#define MATRIX(mat_name, n, m) \
+  arma::mat mat_name;          \
+  double _##mat_name[n][m];
 #endif  // utility_header__HPP

@@ -112,7 +112,7 @@ extern "C" int event_start() {
     rkt.egse_flight_event_handler_bitmap &= ~(0x1U << FLIGHT_EVENT_CODE_LIFTOFF);
     PRINT_FLIGHT_EVENT_MESSAGE("EGSE", exec_get_sim_time(), "Recived flight_event_code", rkt.flight_event_code_record);
     rkt.propulsion.engine_ignition();
-    rkt.propulsion.set_ignition_time();
+    //rkt.propulsion.set_ignition_time();
     rkt.tvc.set_S2_TVC();
     rkt.tvc.set_s2_tvc_d(0.425);
     rkt.forces.set_e1_d(0.0, 0.0, -0.425);
@@ -186,8 +186,8 @@ extern "C" int master_model_configuration(Rocket_SimObject *rkt) {
     rkt->forces.set_Slosh_flag(0);
     rkt->forces.set_DOF(6);
     rkt->forces.set_damping_ratio(0.005);
-    rkt->propulsion.set_CG_OFFSET(0);
-    rkt->propulsion.set_TWD(0);
+    // rkt->propulsion.set_CG_OFFSET(0);
+    // rkt->propulsion.set_TWD(0);
     rkt->forces.set_TWD_flag(0);
     rkt->forces.set_aero_flag(1);
     rkt->dynamics.set_liftoff(0);  // 1 only for test
@@ -205,7 +205,7 @@ extern "C" void master_init_time(Rocket_SimObject *rkt) {
 
 extern "C" void master_init_environment(Rocket_SimObject *rkt) {
     /***************************************environment*************************************************************/
-    rkt->env.dm_RNP();
+    rkt->env.set_RNP();
     // rkt->env.atmosphere_use_weather_deck("../../../tables/weather_table.txt");
     // rkt->env.atmosphere_use_public();
     rkt->env.atmosphere_use_nasa();
@@ -251,21 +251,23 @@ extern "C" void master_init_propulsion(Rocket_SimObject *rkt) {
     /******************************propulsion & mass property***************************************************************************/
     rkt->propulsion.set_vmass0(S2_vmass0);       // vehicle initial mass
     rkt->propulsion.set_fmass0(S2_PROPELLANT_MASS);      // vehicle initail fuel mass
-    rkt->propulsion.set_S2_structure_mass(S2_STRUCTURE_MASS);
-    rkt->propulsion.set_S2_propellant_mass(S2_PROPELLANT_MASS);
-    rkt->propulsion.set_S2_remaining_fuel_mass(S2_REMAINING_FUEL_MASS);
-    rkt->propulsion.set_S3_structure_mass(S3_STRUCTURE_MASS);
-    rkt->propulsion.set_S3_propellant_mass(S3_PROPELLANT_MASS);
-    rkt->propulsion.set_S3_remaining_fuel_mass(S3_REMAINING_FUEL_MASS);
+    // rkt->propulsion.set_S2_structure_mass(S2_STRUCTURE_MASS);
+    // rkt->propulsion.set_S2_propellant_mass(S2_PROPELLANT_MASS);
+    // rkt->propulsion.set_S2_remaining_fuel_mass(S2_REMAINING_FUEL_MASS);
+    // rkt->propulsion.set_S3_structure_mass(S3_STRUCTURE_MASS);
+    // rkt->propulsion.set_S3_propellant_mass(S3_PROPELLANT_MASS);
+    // rkt->propulsion.set_S3_remaining_fuel_mass(S3_REMAINING_FUEL_MASS);
     rkt->propulsion.set_faring_mass(FARING_MASS);
-    rkt->propulsion.set_S2_spi(S2_SPI);
-    rkt->propulsion.set_S3_spi(S3_SPI);
-
+    // rkt->propulsion.set_S2_spi(S2_SPI);
+    // rkt->propulsion.set_S3_spi(S3_SPI);
+    rkt->propulsion.Allocate_stage(2);
+    rkt->propulsion.set_stage_var(S2_SPI, S2_STRUCTURE_MASS, S2_PROPELLANT_MASS, S2_REMAINING_FUEL_MASS, 0);
+    rkt->propulsion.set_stage_var(S3_SPI, S3_STRUCTURE_MASS, S3_PROPELLANT_MASS, S3_REMAINING_FUEL_MASS, 1);
     rkt->propulsion.load_proptable("../../../tables/Prop_0521_S2+S3.txt");
     rkt->propulsion.get_input_file_var(S2_XCG_0, S2_XCG_1, S2_MOI_ROLL_0, S2_MOI_ROLL_1, S2_MOI_PITCH_0, S2_MOI_PITCH_1, S2_MOI_YAW_0, S2_MOI_YAW_1, S2_SPI, S2_FUEL_FLOW_RATE);
     // rkt->propulsion.get_input_file_var(S2_RBODY_XCG_0, S2_RBODY_XCG_1, S2_RBODY_MOI_ROLL_0, S2_RBODY_MOI_ROLL_1, S2_RBODY_MOI_PITCH_0, S2_RBODY_MOI_PITCH_1, S2_RBODY_MOI_YAW_0, S2_RBODY_MOI_YAW_1, S2_SPI, S2_FUEL_FLOW_RATE);
     rkt->propulsion.set_aexit(0.03333 * 4.0);  // nozzle exhaust area
-    rkt->propulsion.set_payload(PAYLOAD);  // payload mass
+    rkt->propulsion.set_payload_mass(PAYLOAD);  // payload mass
     rkt->forces.set_reference_point(-8.55);  // set reference point
     rkt->dynamics.set_reference_point(-8.55);
     rkt->tvc.set_S2_reference_p(-8.55);
