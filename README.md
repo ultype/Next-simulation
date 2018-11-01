@@ -55,11 +55,12 @@ The testing is based on average result relative error against golden data < 1E-5
 
 
 # Support Hardware List
-### GNSS 9000 Constellation Simulator
-- For Hardware in the Loop
+### GNSS 9000 Constellation Simulator (HIL Support)
+- [Spirent GSS9000 Official Site](https://www.spirent.com/products/gss9000)
+
 ![ ](https://github.com/octoberskyTW/Next-simulation/blob/master/docs/docs_hardware/simgen/simgen_GSS9000.png)
 
-### iXBlue EVO30 (Ratetable)
+### iXBlue EVO30 Ratetable (HIL Support)
 - https://www.ixblue.com/products/evo-30
 - [![ ](https://github.com/octoberskyTW/Next-simulation/blob/master/docs/docs_hardware/iXblue/EVO30L-3Axis-motion-Simulator.png)](https://www.youtube.com/watch?v=-xfvyl8rP8U)
 ## Component Diagram
