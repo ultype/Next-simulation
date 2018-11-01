@@ -59,6 +59,7 @@ class Rocket_SimObject : public Trick::SimObject {
         sensor::Accelerometer *accelerometer;
         SDT *sdt;
         TVC tvc;
+        Data_exchang data_exchang;
 
         time_management *time = time_management::get_instance();
         GPS_constellation gps_con;
@@ -236,8 +237,8 @@ class Rocket_SimObject : public Trick::SimObject {
         }
 
         Rocket_SimObject() 
-            :   env         (  ) ,
-                propulsion  (  )      ,
+            :   env         ( data_exchang ) ,
+                propulsion  ( data_exchang ) ,
                 aerodynamics( propulsion ) ,
                 tvc         (  ) ,
                 forces      ( propulsion   , tvc ) ,

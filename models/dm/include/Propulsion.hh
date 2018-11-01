@@ -20,7 +20,7 @@ class Propulsion {
   TRICK_INTERFACE(Propulsion);
 
  public:
-  Propulsion();
+  Propulsion(Data_exchang &data_exchang);
   Propulsion(const Propulsion& other);
 
   Propulsion& operator=(const Propulsion& other);
@@ -112,7 +112,7 @@ class Propulsion {
   };
 
   Datadeck proptable;
-
+  Data_exchang *data_exchang;
   /* Internal Initializers */
   void default_data();
 

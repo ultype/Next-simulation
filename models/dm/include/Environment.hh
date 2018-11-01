@@ -31,7 +31,7 @@ class Environment {
   TRICK_INTERFACE(Environment);
 
  public:
-  Environment();
+  Environment(Data_exchang &data_exchang);
 
   Environment(const Environment& other);
   ~Environment();
@@ -83,7 +83,8 @@ class Environment {
 
  private:
   time_management* time;
-
+  Data_exchang *data_exchang;
+   
   /* Constants */
   cad::Atmosphere* atmosphere;
   cad::Wind* wind;

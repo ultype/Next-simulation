@@ -136,8 +136,9 @@ double CS_JGM3[N_JGM3 + 1][N_JGM3 + 1] = {
      -2.520877e-26, -8.774566e-28, 2.651434e-29,  8.352807e-30,  -1.878413e-31,
      4.054696e-32}};
 
-Environment::Environment()
+Environment::Environment(Data_exchang &data_exchang)
     : time(time_management::get_instance()),
+      data_exchang(&data_exchang),
       VECTOR_INIT(GRAVG, 3),
       MATRIX_INIT(TEI, 3, 3),
       VECTOR_INIT(VBAB, 3) {
@@ -147,6 +148,7 @@ Environment::Environment()
 
 Environment::Environment(const Environment& other)
     : time(other.time),
+      data_exchang(other.data_exchang),
       VECTOR_INIT(GRAVG, 3),
       MATRIX_INIT(TEI, 3, 3),
       VECTOR_INIT(VBAB, 3) {
@@ -271,6 +273,8 @@ void Environment::algorithm(double int_step) {
 
   // dynamic pressure
   this->pdynmc = 0.5 * atmosphere->get_density() * this->dvba * this->dvba;
+
+  data_exchang->hset("press", atmosphere->get_pressure());
 }
 
 void Environment::update_diagnostic_attributes(double int_step) {

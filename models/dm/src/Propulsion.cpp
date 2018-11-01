@@ -3,8 +3,9 @@
 #include "Propulsion.hh"
 #include "sim_services/include/simtime.h"
 
-Propulsion::Propulsion()
-    : MATRIX_INIT(IBBB, 3, 3),
+Propulsion::Propulsion(Data_exchang &data_exchang)
+    : data_exchang(&data_exchang),
+      MATRIX_INIT(IBBB, 3, 3),
       MATRIX_INIT(IBBB0, 3, 3),
       MATRIX_INIT(IBBB1, 3, 3),
       VECTOR_INIT(XCG, 3),
@@ -14,7 +15,8 @@ Propulsion::Propulsion()
 }
 
 Propulsion::Propulsion(const Propulsion& other)
-    : MATRIX_INIT(IBBB, 3, 3),
+    : data_exchang(other.data_exchang),
+      MATRIX_INIT(IBBB, 3, 3),
       VECTOR_INIT(XCG, 3),
       VECTOR_INIT(XCG_0, 3),
       VECTOR_INIT(XCG_1, 3) {
@@ -71,7 +73,7 @@ Propulsion& Propulsion::operator=(const Propulsion& other) {
   this->Eng_list.assign(other.Eng_list.begin(), other.Eng_list.end());
   this->Stage_var_list.assign(other.Stage_var_list.begin(),
                               other.Stage_var_list.end());
-
+  this->data_exchang = other.data_exchang;
   return *this;
 }
 
@@ -156,8 +158,8 @@ void Propulsion::algorithm(double int_step) {
   arma::mat33 IBBB0;
   arma::mat33 IBBB1;
 
-  double press = grab_press();
-
+  double press;
+  data_exchang->hget("press", &press);
   // no thrusting
   switch (this->thrust_state) {
     case NO_THRUST:
