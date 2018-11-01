@@ -61,7 +61,7 @@ The testing is based on average result relative error against golden data < 1E-5
 
 ### iXBlue EVO30 (Ratetable)
 - https://www.ixblue.com/products/evo-30
-- [[ ](https://github.com/octoberskyTW/Next-simulation/blob/master/docs/docs_hardware/iXblue/EVO30L-3Axis-motion-Simulator.png)](https://www.youtube.com/watch?v=-xfvyl8rP8U)
+- [![ ](https://github.com/octoberskyTW/Next-simulation/blob/master/docs/docs_hardware/iXblue/EVO30L-3Axis-motion-Simulator.png)](https://www.youtube.com/watch?v=-xfvyl8rP8U)
 ## Component Diagram
 The UML of rocket components is in ./docs/Rocket.mdj
 Please use 'StarUML' to view it
