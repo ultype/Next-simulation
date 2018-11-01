@@ -56,7 +56,7 @@ The testing is based on average result relative error against golden data < 1E-5
 
 # Support Hardware Lists
 ## GNSS 9000 Constellation Simulator
-![alt text](Next-simulation/docs/docs_hardware/simgen/simgen_GSS9000.png)
+![ ](https://github.com/octoberskyTW/Next-simulation/blob/master/docs/docs_hardware/simgen/simgen_GSS9000.png)
 
 ## Component Diagram
 The UML of rocket components is in ./docs/Rocket.mdj
