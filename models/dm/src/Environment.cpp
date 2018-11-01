@@ -136,9 +136,9 @@ double CS_JGM3[N_JGM3 + 1][N_JGM3 + 1] = {
      -2.520877e-26, -8.774566e-28, 2.651434e-29,  8.352807e-30,  -1.878413e-31,
      4.054696e-32}};
 
-Environment::Environment(Data_exchang &data_exchang)
+Environment::Environment(Data_exchang &input)
     : time(time_management::get_instance()),
-      data_exchang(&data_exchang),
+      data_exchang(&input),
       VECTOR_INIT(GRAVG, 3),
       MATRIX_INIT(TEI, 3, 3),
       VECTOR_INIT(VBAB, 3) {
@@ -275,6 +275,15 @@ void Environment::algorithm(double int_step) {
   this->pdynmc = 0.5 * atmosphere->get_density() * this->dvba * this->dvba;
 
   data_exchang->hset("press", atmosphere->get_pressure());
+  data_exchang->hset("rho", atmosphere->get_density());
+  data_exchang->hset("vmach", vmach);
+  data_exchang->hset("pdynmc", pdynmc);
+  data_exchang->hset("tempk", atmosphere->get_temperature_in_kelvin());
+  data_exchang->hset("dvba", dvba);
+  data_exchang->hset("GRAVG", GRAVG);
+  data_exchang->hset("TEI", TEI);
+  data_exchang->hset("VAED", wind->get_VAED());
+  data_exchang->hset("gravg", norm(GRAVG));
 }
 
 void Environment::update_diagnostic_attributes(double int_step) {

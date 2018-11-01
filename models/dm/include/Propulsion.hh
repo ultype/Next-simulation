@@ -16,11 +16,11 @@ PROGRAMMERS:
 #include "global_constants.hh"
 #include "sim_services/include/simtime.h"
 
-class Propulsion {
+class Propulsion : public Actuator {
   TRICK_INTERFACE(Propulsion);
 
  public:
-  Propulsion(Data_exchang &data_exchang);
+  Propulsion(Data_exchang &input);
   Propulsion(const Propulsion& other);
 
   Propulsion& operator=(const Propulsion& other);

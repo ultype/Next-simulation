@@ -3,8 +3,8 @@
 #include "Propulsion.hh"
 #include "sim_services/include/simtime.h"
 
-Propulsion::Propulsion(Data_exchang &data_exchang)
-    : data_exchang(&data_exchang),
+Propulsion::Propulsion(Data_exchang &input)
+    : data_exchang(&input),
       MATRIX_INIT(IBBB, 3, 3),
       MATRIX_INIT(IBBB0, 3, 3),
       MATRIX_INIT(IBBB1, 3, 3),
