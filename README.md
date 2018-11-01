@@ -59,6 +59,8 @@ The testing is based on average result relative error against golden data < 1E-5
 - For Hardware in the Loop
 ![ ](https://github.com/octoberskyTW/Next-simulation/blob/master/docs/docs_hardware/simgen/simgen_GSS9000.png)
 
+### iXBlue EVO30
+- https://www.ixblue.com/products/evo-30
 ## Component Diagram
 The UML of rocket components is in ./docs/Rocket.mdj
 Please use 'StarUML' to view it
