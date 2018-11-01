@@ -54,8 +54,9 @@ Result will be displayed on screen.
 The testing is based on average result relative error against golden data < 1E-5
 
 
-# Support Hardware Lists
-## GNSS 9000 Constellation Simulator
+# Support Hardware List
+### GNSS 9000 Constellation Simulator
+- For Hardware in the Loop
 ![ ](https://github.com/octoberskyTW/Next-simulation/blob/master/docs/docs_hardware/simgen/simgen_GSS9000.png)
 
 ## Component Diagram
