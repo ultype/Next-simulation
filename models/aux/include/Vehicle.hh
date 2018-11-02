@@ -5,6 +5,14 @@
 #include <string>
 #include <vector>
 #include "aux.hh"
+/********************************* TRICK HEADER *******************************
+PURPOSE:
+      (Simulation module abstraction class and vehicle class)
+LIBRARY DEPENDENCY:
+      ()
+PROGRAMMERS:
+      (((Chun-Hsu Lai) () () () ))
+*******************************************************************************/
 
 class FH_module {
  public:

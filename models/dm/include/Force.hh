@@ -15,6 +15,7 @@ PROGRAMMERS:
 #include <functional>
 #include "aux.hh"
 #include <armadillo>
+#include "Module.hh"
 
 class Propulsion;
 class TVC;
@@ -25,7 +26,7 @@ class Forces {
  public:
     Forces() {}
 
-    Forces(Propulsion& prop, TVC& tvc);
+    Forces(Data_exchang &input);
     Forces(const Forces& other);
 
     Forces& operator=(const Forces& other);
@@ -154,8 +155,7 @@ class Forces {
     /* Internal Calculators */
 
     /* Routing references */
-    Propulsion   * propulsion;
-    TVC          * tvc;
+    Data_exchang *data_exchang;
 
     /* Input */
 

@@ -12,6 +12,7 @@ LIBRARY DEPENDENCY:
 #include <armadillo>
 #include "global_constants.hh"
 #include "icf_trx_ctrl.h"
+#include "Module.hh"
 
 struct tvc_param_t {
     int valid;
@@ -23,7 +24,7 @@ class TVC {
     TRICK_INTERFACE(TVC);
 
  public:
-    TVC();
+    TVC(Data_exchang &input);
     TVC(const TVC& other);
 
     TVC& operator=(const TVC& other);
@@ -113,7 +114,7 @@ class TVC {
     void set_s3_tvclim(double in);
 
  private:
-    /* Internal Getter */
+    Data_exchang *data_exchang;
 
     /* Internal Initializers */
     void default_data();

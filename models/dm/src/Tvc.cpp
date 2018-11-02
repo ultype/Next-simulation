@@ -5,8 +5,9 @@
 #include "sim_services/include/simtime.h"
 #include "dsp_can_interfaces.h"
 
-TVC::TVC()
-    :   VECTOR_INIT(FPB, 3),
+TVC::TVC(Data_exchang &input)
+    :   data_exchang(&input),
+        VECTOR_INIT(FPB, 3),
         VECTOR_INIT(FMPB, 3),
         MATRIX_INIT(TS2_N1_B, 3, 3),
         MATRIX_INIT(TS2_N2_B, 3, 3),
@@ -67,7 +68,8 @@ TVC::TVC()
 }
 
 TVC::TVC(const TVC& other)
-    :   VECTOR_INIT(FPB, 3),
+    :   data_exchang(other.data_exchang),
+        VECTOR_INIT(FPB, 3),
         VECTOR_INIT(FMPB, 3) {
     this->default_data();
 

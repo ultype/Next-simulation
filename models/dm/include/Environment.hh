@@ -6,7 +6,7 @@ PURPOSE:
 LIBRARY DEPENDENCY:
       ((../src/Environment.cpp))
 PROGRAMMERS:
-      (((Lai Jun Xu) () () () ))
+      (((Chun-Hsu Lai) () () () ))
 *******************************************************************************/
 #include <armadillo>
 #include <functional>

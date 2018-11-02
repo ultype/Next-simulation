@@ -8,8 +8,9 @@
 #include "aux.hh"
 #include <tuple>
 
-Rocket_Flight_DM::Rocket_Flight_DM()
-    :   MATRIX_INIT(TBD, 3, 3),
+Rocket_Flight_DM::Rocket_Flight_DM(Data_exchang &input)
+    :   data_exchang(&input),
+        MATRIX_INIT(TBD, 3, 3),
         MATRIX_INIT(TBI, 3, 3),
         MATRIX_INIT(TBID, 3, 3),
         MATRIX_INIT(WEII_skew, 3, 3),
@@ -55,7 +56,8 @@ Rocket_Flight_DM::Rocket_Flight_DM()
         }
 
 Rocket_Flight_DM::Rocket_Flight_DM(const Rocket_Flight_DM &other)
-    :   MATRIX_INIT(TBD, 3, 3),
+    :   data_exchang(other.data_exchang),
+        MATRIX_INIT(TBD, 3, 3),
         MATRIX_INIT(TBI, 3, 3),
         MATRIX_INIT(TBID, 3, 3),
         MATRIX_INIT(WEII_skew, 3, 3),
