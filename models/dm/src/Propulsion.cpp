@@ -329,6 +329,12 @@ void Propulsion::algorithm(double int_step) {
   if (thrust < 0.0) {
     thrust = 0.0;
   }
+
+  data_exchang->hset("XCG", XCG);
+  data_exchang->hset("thrust", thrust);
+  data_exchang->hset("vmass", vmass);
+  data_exchang->hset("IBBB", IBBB);
+  data_exchang->hset("XCG_0", XCG_0);
 }
 
 void Propulsion::fuel_expend_integrator(double int_step, enum STAGE flag) {
