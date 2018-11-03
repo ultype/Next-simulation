@@ -29,8 +29,8 @@
 double *fvec;
 int nn;
 
-Forces::Forces(Propulsion& prop, TVC& tvc)
-    :   propulsion(&prop), tvc(&tvc),
+Forces::Forces(Data_exchang &input)
+    :   data_exchang(&input),
         VECTOR_INIT(FAPB, 3),
         VECTOR_INIT(FAP, 3),
         VECTOR_INIT(FMB, 3),
@@ -144,7 +144,7 @@ Forces::Forces(Propulsion& prop, TVC& tvc)
     this->default_data();
 }
 Forces::Forces(const Forces& other)
-    :   propulsion(other.propulsion), tvc(other.tvc),
+    :   data_exchang(other.data_exchang),
         VECTOR_INIT(FAPB, 3),
         VECTOR_INIT(FAP, 3),
         VECTOR_INIT(FMB, 3),
@@ -265,9 +265,6 @@ Forces::Forces(const Forces& other)
 Forces& Forces::operator=(const Forces& other) {
     if (&other == this)
         return *this;
-
-    this->propulsion = other.propulsion;
-    this->tvc = other.tvc;
 
     this->FAP = other.FAP;
     this->FAPB = other.FAPB;

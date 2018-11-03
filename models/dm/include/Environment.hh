@@ -6,7 +6,7 @@ PURPOSE:
 LIBRARY DEPENDENCY:
       ((../src/Environment.cpp))
 PROGRAMMERS:
-      (((Lai Jun Xu) () () () ))
+      (((Chun-Hsu Lai) () () () ))
 *******************************************************************************/
 #include <armadillo>
 #include <functional>
@@ -27,11 +27,11 @@ PROGRAMMERS:
 #include "Time_management.hh"
 #include "dm_delta_ut.hh"
 
-class Environment {
+class Environment : public Dynamics{
   TRICK_INTERFACE(Environment);
 
  public:
-  Environment();
+  Environment(Data_exchang &input);
 
   Environment(const Environment& other);
   ~Environment();
@@ -54,7 +54,7 @@ class Environment {
 
   virtual void init();
   virtual void algorithm(double int_step);
-  virtual void update_diagnostic_attributes(double int_step);
+  void update_diagnostic_attributes(double int_step);
   void set_RNP();
 
   double get_rho();
@@ -83,7 +83,8 @@ class Environment {
 
  private:
   time_management* time;
-
+  Data_exchang *data_exchang;
+   
   /* Constants */
   cad::Atmosphere* atmosphere;
   cad::Wind* wind;

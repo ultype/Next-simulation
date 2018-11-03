@@ -6,7 +6,7 @@ PURPOSE:
 LIBRARY DEPENDENCY:
       ((../src/Propulsion.cpp))
 PROGRAMMERS:
-      (((Lai Jun Xu) () () () ))
+      (((Chun-Hsu Lai) () () () ))
 *******************************************************************************/
 #include <armadillo>
 #include <functional>
@@ -16,11 +16,11 @@ PROGRAMMERS:
 #include "global_constants.hh"
 #include "sim_services/include/simtime.h"
 
-class Propulsion {
+class Propulsion : public Actuator {
   TRICK_INTERFACE(Propulsion);
 
  public:
-  Propulsion();
+  Propulsion(Data_exchang &input);
   Propulsion(const Propulsion& other);
 
   Propulsion& operator=(const Propulsion& other);
@@ -112,7 +112,7 @@ class Propulsion {
   };
 
   Datadeck proptable;
-
+  Data_exchang *data_exchang;
   /* Internal Initializers */
   void default_data();
 

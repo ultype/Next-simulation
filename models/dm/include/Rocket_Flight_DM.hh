@@ -17,6 +17,7 @@ PROGRAMMERS:
 #include "aux.hh"
 #include "icf_trx_ctrl.h"
 #include "simgen_remote.h"
+#include "Module.hh"
 class Environment;
 class Propulsion;
 class Forces;
@@ -25,7 +26,7 @@ class Rocket_Flight_DM {
     TRICK_INTERFACE(Rocket_Flight_DM);
 
  public:
-    Rocket_Flight_DM();
+    Rocket_Flight_DM(Data_exchang &input);
     Rocket_Flight_DM(const Rocket_Flight_DM& other);
     Rocket_Flight_DM& operator=(const Rocket_Flight_DM& other);
     struct icf_ctrlblk_t *dm_icf_info_hook;
@@ -138,6 +139,7 @@ class Rocket_Flight_DM {
 
  private:
     Propulsion *propulsion;
+    Data_exchang *data_exchang;
 
     void propagate_position_speed_acceleration(double int_step);
     void propagate_aeroloss(double int_step);
