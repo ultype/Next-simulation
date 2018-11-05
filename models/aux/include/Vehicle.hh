@@ -29,10 +29,10 @@ class Data_exchang {
   void hget(std::string input, double *val) {
     *val = double_table.find(input)->second;
   }
-  void hget(std::string input, arma::vec val) {
+  void hget(std::string input, arma::vec &val) {
     val = vec_table.find(input)->second;
   }
-  void hget(std::string input, arma::mat val) {
+  void hget(std::string input, arma::mat &val) {
     val = mat_table.find(input)->second;
   }
 
