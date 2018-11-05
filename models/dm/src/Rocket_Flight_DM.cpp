@@ -9,8 +9,7 @@
 #include <tuple>
 
 Rocket_Flight_DM::Rocket_Flight_DM(Data_exchang &input)
-    :   data_exchang(&input),
-        MATRIX_INIT(TBD, 3, 3),
+    :   MATRIX_INIT(TBD, 3, 3),
         MATRIX_INIT(TBI, 3, 3),
         MATRIX_INIT(TBID, 3, 3),
         MATRIX_INIT(WEII_skew, 3, 3),
@@ -53,11 +52,11 @@ Rocket_Flight_DM::Rocket_Flight_DM(Data_exchang &input)
         VECTOR_INIT(TBLQ, 4),
         VECTOR_INIT(ABID, 3) {
             build_WEII();
+            data_exchang = &input;
         }
 
 Rocket_Flight_DM::Rocket_Flight_DM(const Rocket_Flight_DM &other)
-    :   data_exchang(other.data_exchang),
-        MATRIX_INIT(TBD, 3, 3),
+    :   MATRIX_INIT(TBD, 3, 3),
         MATRIX_INIT(TBI, 3, 3),
         MATRIX_INIT(TBID, 3, 3),
         MATRIX_INIT(WEII_skew, 3, 3),
@@ -93,6 +92,7 @@ Rocket_Flight_DM::Rocket_Flight_DM(const Rocket_Flight_DM &other)
         VECTOR_INIT(LT_euler, 3),
         VECTOR_INIT(TBLQ, 4),
         VECTOR_INIT(ABID, 3) {
+        this->data_exchang = other.data_exchang;
         }
 
 Rocket_Flight_DM& Rocket_Flight_DM::operator=(const Rocket_Flight_DM& other) {
@@ -102,7 +102,7 @@ Rocket_Flight_DM& Rocket_Flight_DM::operator=(const Rocket_Flight_DM& other) {
     return *this;
         }
 
-void Rocket_Flight_DM::initialize() {
+void Rocket_Flight_DM::init() {
     arma::mat33 TEI = grab_TEI();  // cad::tei(get_elapsed_time());
     arma::vec3 xcg = grab_xcg_0();
     build_WEII();
@@ -230,7 +230,7 @@ void Rocket_Flight_DM::set_reference_point(double rp) {
     reference_point = rp;
 }
 
-void Rocket_Flight_DM::propagate(double int_step) {
+void Rocket_Flight_DM::algorithm(double int_step) {
     double dvba = grab_dvba();
     double vmass = grab_vmass();
 

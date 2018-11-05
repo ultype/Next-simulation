@@ -65,8 +65,6 @@ class AeroDynamics : public Dynamics {
 
  private:
   Propulsion* propulsion;
-  Data_exchang* data_exchang;
-
   Datadeck aerotable; /* ** (--) Aero Deck */
 
   double refa;  /* *o (m2)     Reference area for aero coefficients - m^2*/

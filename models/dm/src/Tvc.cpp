@@ -6,8 +6,7 @@
 #include "dsp_can_interfaces.h"
 
 TVC::TVC(Data_exchang &input)
-    :   data_exchang(&input),
-        VECTOR_INIT(FPB, 3),
+    :   VECTOR_INIT(FPB, 3),
         VECTOR_INIT(FMPB, 3),
         MATRIX_INIT(TS2_N1_B, 3, 3),
         MATRIX_INIT(TS2_N2_B, 3, 3),
@@ -29,6 +28,7 @@ TVC::TVC(Data_exchang &input)
         VECTOR_INIT(S2_FMPB3, 3),
         VECTOR_INIT(S2_FMPB4, 3),
         VECTOR_INIT(lx, 3) {
+    data_exchang = &input;
     this->default_data();
     this->s2_act1_y1 = 0.0;
     this->s2_act2_y1 = 0.0;
@@ -68,11 +68,10 @@ TVC::TVC(Data_exchang &input)
 }
 
 TVC::TVC(const TVC& other)
-    :   data_exchang(other.data_exchang),
-        VECTOR_INIT(FPB, 3),
+    :   VECTOR_INIT(FPB, 3),
         VECTOR_INIT(FMPB, 3) {
     this->default_data();
-
+    this->data_exchang = other.data_exchang;
     this->mtvc = other.mtvc;
 
     /* Constants */
@@ -162,7 +161,7 @@ TVC& TVC::operator=(const TVC& other) {
 void TVC::default_data() {
 }
 
-void TVC::initialize() {
+void TVC::init() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -237,7 +236,7 @@ empty_frame:
         return;
 }
 
-void TVC::actuate(double int_step, struct icf_ctrlblk_t* C) {
+void TVC::algorithm(double int_step) {
     // local variables
     double eta(0), zet(0);
     double etac(0), zetc(0);
@@ -249,45 +248,45 @@ void TVC::actuate(double int_step, struct icf_ctrlblk_t* C) {
     double delecx = 0.0;  // grab_delecx();
     double delrcx = 0.0;  // grab_delrcx();
     double alphax = grab_alphax();
-#ifdef CONFIG_SIL_ENABLE
+// #ifdef CONFIG_SIL_ENABLE
     theta_a_cmd = grab_theta_a_cmd();
     theta_b_cmd = grab_theta_b_cmd();
     theta_c_cmd = grab_theta_c_cmd();
     theta_d_cmd = grab_theta_d_cmd();
-#else
-    struct can_frame frame_tvc_no1;
-    struct can_frame frame_tvc_no2;
-    if (icf_rx_dequeue(C, EGSE_TVC_SW_QIDX, &frame_tvc_no1, sizeof(struct can_frame)) > 0) {
-        decode_frame(&frame_tvc_no1);
-        if (OUT_RANGE(tvc_no1.pitch_count, -TVC_ROTATION_LIMIT_CNT, TVC_ROTATION_LIMIT_CNT)) {
-            fprintf(stderr, "tvc_no1.pitch_count: %d\n", tvc_no1.pitch_count);
-            goto discard;
-        }
-        if (OUT_RANGE(tvc_no1.yaw_count, -TVC_ROTATION_LIMIT_CNT, TVC_ROTATION_LIMIT_CNT)) {
-            fprintf(stderr, "tvc_no1.yaw_count: %d\n", tvc_no1.yaw_count);
-            goto discard;
-        }
-    }
-    if (icf_rx_dequeue(C, EGSE_TVC_SW_QIDX, &frame_tvc_no2, sizeof(struct can_frame)) > 0) {
-        decode_frame(&frame_tvc_no2);
-        if (OUT_RANGE(tvc_no2.pitch_count, -TVC_ROTATION_LIMIT_CNT, TVC_ROTATION_LIMIT_CNT)) {
-            fprintf(stderr, "tvc_no2.pitch_count: %d\n", tvc_no2.pitch_count);
-            goto discard;
-        }
-        if (OUT_RANGE(tvc_no2.yaw_count, -TVC_ROTATION_LIMIT_CNT, TVC_ROTATION_LIMIT_CNT)) {
-            fprintf(stderr, "tvc_no2.yaw_count: %d\n", tvc_no2.yaw_count);
-            goto discard;
-        }
-    }
+// #else
+//     struct can_frame frame_tvc_no1;
+//     struct can_frame frame_tvc_no2;
+//     if (icf_rx_dequeue(C, EGSE_TVC_SW_QIDX, &frame_tvc_no1, sizeof(struct can_frame)) > 0) {
+//         decode_frame(&frame_tvc_no1);
+//         if (OUT_RANGE(tvc_no1.pitch_count, -TVC_ROTATION_LIMIT_CNT, TVC_ROTATION_LIMIT_CNT)) {
+//             fprintf(stderr, "tvc_no1.pitch_count: %d\n", tvc_no1.pitch_count);
+//             goto discard;
+//         }
+//         if (OUT_RANGE(tvc_no1.yaw_count, -TVC_ROTATION_LIMIT_CNT, TVC_ROTATION_LIMIT_CNT)) {
+//             fprintf(stderr, "tvc_no1.yaw_count: %d\n", tvc_no1.yaw_count);
+//             goto discard;
+//         }
+//     }
+//     if (icf_rx_dequeue(C, EGSE_TVC_SW_QIDX, &frame_tvc_no2, sizeof(struct can_frame)) > 0) {
+//         decode_frame(&frame_tvc_no2);
+//         if (OUT_RANGE(tvc_no2.pitch_count, -TVC_ROTATION_LIMIT_CNT, TVC_ROTATION_LIMIT_CNT)) {
+//             fprintf(stderr, "tvc_no2.pitch_count: %d\n", tvc_no2.pitch_count);
+//             goto discard;
+//         }
+//         if (OUT_RANGE(tvc_no2.yaw_count, -TVC_ROTATION_LIMIT_CNT, TVC_ROTATION_LIMIT_CNT)) {
+//             fprintf(stderr, "tvc_no2.yaw_count: %d\n", tvc_no2.yaw_count);
+//             goto discard;
+//         }
+//     }
 
-    //  fprintf(stderr, "TVC::actuate %d %d %d %d\n", tvc_no1.pitch_count,tvc_no1.yaw_count, tvc_no2.pitch_count, tvc_no2.yaw_count);
-    //  fprintf(stderr, "TVC::actuate %f %f %f %f\n", theta_a_cmd, theta_b_cmd, theta_c_cmd, theta_d_cmd);
-    theta_a_cmd = tvc_no1.pitch_count * TVC_DSP_RESOLUTION * (PI/180);
-    theta_b_cmd = tvc_no1.yaw_count * TVC_DSP_RESOLUTION * (PI/180);
-    theta_c_cmd = tvc_no2.pitch_count * TVC_DSP_RESOLUTION * (PI/180);
-    theta_d_cmd = tvc_no2.yaw_count * TVC_DSP_RESOLUTION * (PI/180);
-discard:
-#endif  // CONFIG_SIL_ENABLE
+//     //  fprintf(stderr, "TVC::actuate %d %d %d %d\n", tvc_no1.pitch_count,tvc_no1.yaw_count, tvc_no2.pitch_count, tvc_no2.yaw_count);
+//     //  fprintf(stderr, "TVC::actuate %f %f %f %f\n", theta_a_cmd, theta_b_cmd, theta_c_cmd, theta_d_cmd);
+//     theta_a_cmd = tvc_no1.pitch_count * TVC_DSP_RESOLUTION * (PI/180);
+//     theta_b_cmd = tvc_no1.yaw_count * TVC_DSP_RESOLUTION * (PI/180);
+//     theta_c_cmd = tvc_no2.pitch_count * TVC_DSP_RESOLUTION * (PI/180);
+//     theta_d_cmd = tvc_no2.yaw_count * TVC_DSP_RESOLUTION * (PI/180);
+// discard:
+// #endif  // CONFIG_SIL_ENABLE
 
     switch (mtvc) {
         case NO_TVC:

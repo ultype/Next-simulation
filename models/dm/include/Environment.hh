@@ -83,7 +83,6 @@ class Environment : public Dynamics{
 
  private:
   time_management* time;
-  Data_exchang *data_exchang;
    
   /* Constants */
   cad::Atmosphere* atmosphere;

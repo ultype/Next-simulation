@@ -138,17 +138,16 @@ double CS_JGM3[N_JGM3 + 1][N_JGM3 + 1] = {
 
 Environment::Environment(Data_exchang &input)
     : time(time_management::get_instance()),
-      data_exchang(&input),
       VECTOR_INIT(GRAVG, 3),
       MATRIX_INIT(TEI, 3, 3),
       VECTOR_INIT(VBAB, 3) {
   atmosphere = NULL;
   wind = NULL;
+  data_exchang = &input;
 }
 
 Environment::Environment(const Environment& other)
     : time(other.time),
-      data_exchang(other.data_exchang),
       VECTOR_INIT(GRAVG, 3),
       MATRIX_INIT(TEI, 3, 3),
       VECTOR_INIT(VBAB, 3) {
@@ -168,6 +167,7 @@ Environment::Environment(const Environment& other)
   this->tempc = other.tempc;
   this->DM_sidereal_time = other.DM_sidereal_time;
   this->DM_Julian_century = other.DM_Julian_century;
+  this->data_exchang = other.data_exchang;
 }
 
 Environment& Environment::operator=(const Environment& other) {

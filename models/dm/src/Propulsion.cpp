@@ -4,25 +4,25 @@
 #include "sim_services/include/simtime.h"
 
 Propulsion::Propulsion(Data_exchang &input)
-    : data_exchang(&input),
-      MATRIX_INIT(IBBB, 3, 3),
+    : MATRIX_INIT(IBBB, 3, 3),
       MATRIX_INIT(IBBB0, 3, 3),
       MATRIX_INIT(IBBB1, 3, 3),
       VECTOR_INIT(XCG, 3),
       VECTOR_INIT(XCG_0, 3),
       VECTOR_INIT(XCG_1, 3) {
   this->default_data();
+  data_exchang = &input;
 }
 
 Propulsion::Propulsion(const Propulsion& other)
-    : data_exchang(other.data_exchang),
-      MATRIX_INIT(IBBB, 3, 3),
+    : MATRIX_INIT(IBBB, 3, 3),
       VECTOR_INIT(XCG, 3),
       VECTOR_INIT(XCG_0, 3),
       VECTOR_INIT(XCG_1, 3) {
   this->default_data();
 
   /* Constants */
+  this->data_exchang = other.data_exchang;
   this->XCG_0 = other.XCG_0;
   this->XCG_1 = other.XCG_1;
   this->XCG = other.XCG;

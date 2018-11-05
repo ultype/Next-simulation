@@ -20,7 +20,7 @@ struct tvc_param_t {
     int16_t yaw_count;
 };
 
-class TVC {
+class TVC : public Dynamics {
     TRICK_INTERFACE(TVC);
 
  public:
@@ -29,9 +29,9 @@ class TVC {
 
     TVC& operator=(const TVC& other);
 
-    void initialize();
+    virtual void init();
 
-    void actuate(double int_step, struct icf_ctrlblk_t* C);
+    virtual void algorithm(double int_step);
 
     enum TVC_TYPE {
         NO_TVC = 0,
@@ -114,8 +114,6 @@ class TVC {
     void set_s3_tvclim(double in);
 
  private:
-    Data_exchang *data_exchang;
-
     /* Internal Initializers */
     void default_data();
 
