@@ -11,18 +11,18 @@ LIBRARY DEPENDENCY:
 #include <aux.hh>
 
 #include "accel/accelerometer.hh"
-#include "icf_trx_ctrl.h"
-namespace sensor {
+
 class AccelerometerIdeal : public Accelerometer {
-    TRICK_INTERFACE(sensor__AccelerometerIdeal);
+  TRICK_INTERFACE(AccelerometerIdeal);
 
  public:
-    AccelerometerIdeal();
+  AccelerometerIdeal(Data_exchang &input);
+  AccelerometerIdeal(const AccelerometerIdeal &other);
+  AccelerometerIdeal &operator=(const AccelerometerIdeal &other);
 
-    virtual ~AccelerometerIdeal() {}
-
-    virtual void propagate_error(double int_step, struct icf_ctrlblk_t* C);
+  virtual ~AccelerometerIdeal() {}
+  virtual void init(){};
+  virtual void algorithm(double int_step);
 };
-}  // namespace sensor
 
 #endif  // __ACCEL_IDEAL__
