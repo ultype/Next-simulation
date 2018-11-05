@@ -292,7 +292,7 @@ extern "C" void master_init_sensors(Rocket_SimObject *rkt) {
     double EBIASA[3];      // gauss(0, 1.e-6)
     // rkt->accelerometer = new sensor::AccelerometerRocket6G(EMISA, ESCALA, EBIASA, rkt->newton);
     // Create a Ideal Accelerometer
-    rkt->accelerometer = new AccelerometerIdeal();
+    rkt->accelerometer = new AccelerometerIdeal(rkt->data_exchang);
 
     // gyro
     double EMISG[3];      // gauss(0, 1.1e-4)
@@ -304,7 +304,7 @@ extern "C" void master_init_sensors(Rocket_SimObject *rkt) {
     rkt->gyro = new sensor::GyroIdeal();
 
     // rkt->sdt = new SDT_NONIDEAL();
-    rkt->sdt = new SDT_ideal();
+    rkt->sdt = new SDT_ideal(rkt->data_exchang);
 }
 
 extern "C" void master_init_tvc(Rocket_SimObject *rkt) {

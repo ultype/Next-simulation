@@ -80,11 +80,8 @@ class Rocket_SimObject : public Trick::SimObject {
 
             sdt->grab_WBICB            = LINK( *gyro   , get_computed_WBIB);
             sdt->grab_FSPCB            = LINK( *accelerometer   , get_computed_FSPB);
-            sdt->grab_CONING           = LINK( dynamics , get_CONING);
             sdt->grab_GHIGH            = LINK( *gyro   , get_HIGH);
             sdt->grab_GLOW             = LINK( *gyro   , get_LOW);
-            sdt->grab_AHIGH            = LINK( *accelerometer   , get_HIGH);
-            sdt->grab_ALOW             = LINK( *accelerometer   , get_LOW);
 
             tvc.grab_pdynmc            = LINK( env, get_pdynmc);
             tvc.grab_xcg               = LINK( propulsion, get_XCG);
@@ -221,8 +218,6 @@ class Rocket_SimObject : public Trick::SimObject {
             // propulsion.grab_e3_XCG    = LINK( forces, get_e3_XCG);
             // propulsion.grab_e4_XCG    = LINK( forces, get_e4_XCG);
             propulsion.grab_alt       = LINK( dynamics, get_alt);
-
-
         };
 
         void egse_uplink_packet_transfer(struct icf_ctrlblk_t *C) {
@@ -247,6 +242,7 @@ class Rocket_SimObject : public Trick::SimObject {
             {
 
             ("initialization") link();
+            ("initialization") sdt->init();
             ("initialization") aerodynamics.init();
             ("initialization") dynamics.init();
             ("initialization") env.init();
@@ -263,13 +259,12 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.05, "scheduled") gps_con.compute();
             P1 (0.005, "scheduled") gyro->propagate_error(0.005);
             P1 (0.005, "scheduled") accelerometer->algorithm(0.005);
-            P1 (0.005, "scheduled") sdt->compute(0.005);
+            P1 (0.005, "scheduled") sdt->algorithm(0.005);
 
             P2 (0.05, "scheduled") DM_SaveOutData(dm_ins_db);
             P2 (0.05, "scheduled") egse_uplink_packet_transfer(&icf_ctrl);
             P2 (0.05, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT8, sizeof(refactor_downlink_packet_t));
             P2 (0.05, "scheduled") load_input(&icf_ctrl);
-
 
             P3 (int_step, "scheduled") tvc.algorithm(int_step);
             P3 (int_step, "scheduled") dynamics.algorithm(int_step);
@@ -278,7 +273,6 @@ class Rocket_SimObject : public Trick::SimObject {
             (0.005, "logging") dynamics.Interpolation_Extrapolation(int_step, 0.001, 0.002);
             (5, "scheduled") icf_heartbeat();
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_SIL_EGSE);
-
         }
 };
 
