@@ -34,8 +34,6 @@ typedef struct __attribute__((packed)) {
     /* SDT */
     double sdt_phi[3];
     double sdt_delta_vel[3];
-    double sdt_phi_high[3];
-    double sdt_phi_low[3];
 } refactor_trick_dirty_data_t;
 
 typedef struct __attribute__((packed)) {

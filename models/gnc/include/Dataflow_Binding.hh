@@ -24,8 +24,6 @@
     ins.grab_computed_FSPB          = GRAB_VEC3(dm_ins_db.accel_FSPCB); \
     ins.grab_error_of_computed_FSPB = GRAB_VEC3(dm_ins_db.accel_EFSPB); \
     ins.grab_PHI                    = GRAB_VEC3(dm_ins_db.trick_data.sdt_phi); \
-    ins.grab_PHI_HIGH               = GRAB_VEC3(dm_ins_db.trick_data.sdt_phi_high); \
-    ins.grab_PHI_LOW                = GRAB_VEC3(dm_ins_db.trick_data.sdt_phi_low); \
     ins.grab_DELTA_VEL              = GRAB_VEC3(dm_ins_db.trick_data.sdt_delta_vel); \
     ins.grab_gps_update             = GRAB_VAR(dm_ins_db.gps_con_gps_update); \
 }
@@ -83,8 +81,6 @@
     STORE_VEC(dm_ins_db.trick_data.gyro_WBICB, gyro->get_computed_WBIB()); \
     STORE_VEC(dm_ins_db.trick_data.gyro_EWBIB, gyro->get_error_of_computed_WBIB()); \
     STORE_VEC(dm_ins_db.trick_data.sdt_phi, sdt->get_PHI()); \
-    STORE_VEC(dm_ins_db.trick_data.sdt_phi_high, sdt->get_PHI_HIGH()); \
-    STORE_VEC(dm_ins_db.trick_data.sdt_phi_low, sdt->get_PHI_LOW()); \
     STORE_VEC(dm_ins_db.trick_data.sdt_delta_vel, sdt->get_DELTA_VEL()); \
 }
 #endif
