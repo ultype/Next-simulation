@@ -7,7 +7,8 @@ AeroDynamics::AeroDynamics(Propulsion& prop, Data_exchang& input)
     }
 
 AeroDynamics::AeroDynamics(const AeroDynamics& other)
-    : propulsion(other.propulsion) {
+    : propulsion(other.propulsion),
+      VECTOR_INIT(XCP, 3) {
   this->aerotable = other.aerotable;
   this->refa = other.refa;
   this->refd = other.refd;
@@ -22,6 +23,7 @@ AeroDynamics::AeroDynamics(const AeroDynamics& other)
   this->ca_on = other.ca_on;
   this->cnq = other.cnq;
   this->cmq = other.cmq;
+  this->XCP = other.XCP;
   this->data_exchang = other.data_exchang;
 }
 
@@ -45,6 +47,7 @@ AeroDynamics& AeroDynamics::operator=(const AeroDynamics& other) {
   this->ca_on = other.ca_on;
   this->cnq = other.cnq;
   this->cmq = other.cmq;
+  this->XCP = other.XCP;
 
   return *this;
 }
