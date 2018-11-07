@@ -47,9 +47,9 @@ SDT_NONIDEAL& SDT_NONIDEAL::operator=(const SDT_NONIDEAL& other) {
 }
 
 void SDT_NONIDEAL::algorithm(double int_step) {
-  WBISB = grab_WBICB();
+  data_exchang->hget("WBICB", WBISB);
   data_exchang->hget("FSPCB", FSPSB);
-  // FSPSB = grab_FSPCB();
+  
   if (k == 11) {
     k = 1;
     PHI.zeros();

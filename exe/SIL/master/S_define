@@ -55,7 +55,7 @@ class Rocket_SimObject : public Trick::SimObject {
         Forces forces;
         AeroDynamics aerodynamics;
         Propulsion propulsion;
-        sensor::Gyro *gyro;
+        Gyro *gyro;
         Accelerometer *accelerometer;
         SDT *sdt;
         TVC tvc;
@@ -77,11 +77,6 @@ class Rocket_SimObject : public Trick::SimObject {
             tvc.grab_theta_b_cmd       = GRAB_VAR(ctl_tvc_db.theta_b_cmd);
             tvc.grab_theta_c_cmd       = GRAB_VAR(ctl_tvc_db.theta_c_cmd);
             tvc.grab_theta_d_cmd       = GRAB_VAR(ctl_tvc_db.theta_d_cmd);
-
-            sdt->grab_WBICB            = LINK( *gyro   , get_computed_WBIB);
-            sdt->grab_FSPCB            = LINK( *accelerometer   , get_computed_FSPB);
-            sdt->grab_GHIGH            = LINK( *gyro   , get_HIGH);
-            sdt->grab_GLOW             = LINK( *gyro   , get_LOW);
 
             tvc.grab_pdynmc            = LINK( env, get_pdynmc);
             tvc.grab_xcg               = LINK( propulsion, get_XCG);
@@ -257,7 +252,7 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (int_step, "scheduled") propulsion.algorithm(int_step);
             P1 (int_step, "scheduled") aerodynamics.algorithm(int_step);
             P1 (0.05, "scheduled") gps_con.compute();
-            P1 (0.005, "scheduled") gyro->propagate_error(0.005);
+            P1 (0.005, "scheduled") gyro->algorithm(0.005);
             P1 (0.005, "scheduled") accelerometer->algorithm(0.005);
             P1 (0.005, "scheduled") sdt->algorithm(0.005);
 

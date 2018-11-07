@@ -301,7 +301,7 @@ extern "C" void master_init_sensors(Rocket_SimObject *rkt) {
     // rkt->gyro = new sensor::GyroRocket6G(EMISG, ESCALG, EBIASG, rkt->newton, rkt->euler, rkt->kinematics);
 
     // Create a Ideal Gyro
-    rkt->gyro = new sensor::GyroIdeal();
+    rkt->gyro = new GyroIdeal(rkt->data_exchang);
 
     // rkt->sdt = new SDT_NONIDEAL();
     rkt->sdt = new SDT_ideal(rkt->data_exchang);

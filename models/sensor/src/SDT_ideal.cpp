@@ -51,7 +51,7 @@ void SDT_ideal::init() {
   DELTA_ALPHA.zeros();
 }
 void SDT_ideal::algorithm(double int_step) {
-  WBISB = grab_WBICB();
+  data_exchang->hget("WBICB", WBISB);
   data_exchang->hget("FSPCB", FSPSB);
   if (k == 11 || k == 1) {
     k = 1;
