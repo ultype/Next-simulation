@@ -354,105 +354,10 @@ void TVC::algorithm(double int_step) {
     // zetcx = zetc * DEG;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Second order TVC
-// Member function of class 'Hyper'
-// This subroutine performs the following functions:
-// (1) Models second order lags of pitch and yaw deflections
-// (2) Limits nozzle deflections
-// (3) Limits nozzle deflection rates
-//
-// Return output
-//          eta=Nozzle pitch deflection - rad
-//          zet=Nozzle yaw deflection - rad
-// Argument Input:
-//          etac=Nozzle pitch command - rad
-//          zetc=Nozzle yaw command - rad
-//
-// 030608 Created by Peter H Zipfel
-///////////////////////////////////////////////////////////////////////////////
-
-std::tuple<double, double> TVC::tvc_scnd(double etac, double zetc, double int_step) {
-    double eta, zet;
-
-    // pitch nozzle dynamics
-    // limiting position and the nozzle rate derivative
-    if (fabs(etas) > tvclimx * RAD) {
-        etas = tvclimx * RAD * sign(etas);
-        if (etas * detas > 0.)
-            detas = 0.;
-    }
-    // limiting nozzle rate
-    int iflag = 0;
-    if (fabs(detas) > dtvclimx * RAD) {
-        iflag = 1;
-        detas = dtvclimx * RAD * sign(detas);
-    }
-    // state integration
-    INTEGRATE(etas, detas);
-
-    double eetas = etac - etas;
-
-    INTEGRATE(detas, wntvc * wntvc * eetas - 2. * zettvc * wntvc * etasd);
-
-    // setting nozzle rate derivative to zero if rate is limited
-    if (iflag && detas * detasd > 0.)
-        detasd = 0.;
-    eta = etas;
-
-    // yaw nozzle dynamics
-    // limiting position and the nozzle rate derivative
-    if (fabs(zeta) > tvclimx * RAD) {
-        zeta = tvclimx * RAD * sign(zeta);
-        if (zeta * dzeta > 0.)
-            dzeta = 0.;
-    }
-    // limiting nozzle rate
-    iflag = 0;
-    if (fabs(dzeta) > dtvclimx * RAD) {
-        iflag = 1;
-        dzeta = dtvclimx * RAD * sign(dzeta);
-    }
-    // state integration
-    INTEGRATE(zeta, dzeta);
-
-    double ezeta = zetc - zeta;
-
-    INTEGRATE(dzeta, wntvc * wntvc * ezeta - 2. * zettvc * wntvc * zetad);
-
-    // setting nozzle rate derivative to zero if rate is limited
-    if (iflag && dzeta * dzetad > 0.)
-        dzetad = 0.;
-    zet = zeta;
-
-    return std::make_tuple(eta, zet);
-}
-
 enum TVC::TVC_TYPE TVC::get_mtvc() { return mtvc; }
 void TVC::set_mtvc(enum TVC_TYPE in) { mtvc = in; }
 
-double TVC::get_gtvc() { return gtvc;  }
-void TVC::set_gtvc(double in) { gtvc = in; }
 
-void TVC::set_tvclimx(double in) { tvclimx = in; }
-void TVC::set_dtvclimx(double in) { dtvclimx = in; }
-void TVC::set_wntvc(double in) { wntvc = in; }
-void TVC::set_zettvc(double in) { zettvc = in; }
-void TVC::set_factgtvc(double in) { factgtvc = in; }
-void TVC::set_parm(double in) { parm = in; }
-void TVC::set_s2_tvc_acc_lim(double in) { s2_acclim = in;}
-void TVC::set_s3_tvc_acc_lim(double in) { s3_acclim = in;}
-void TVC::set_s2_tvc_d(double in) { s2_d = in; }
-void TVC::set_s3_tvc_d(double in) { s3_d = in; }
-void TVC::set_S2_reference_p(double in) { s2_reference_p = in; }
-void TVC::set_S3_reference_p(double in) { s3_reference_p = in; }
-
-double TVC::get_parm() { return parm; }
-arma::vec3 TVC::get_lx() { return lx; }
-
-arma::vec3 TVC::get_FPB() { return FPB; }
-arma::vec3 TVC::get_FMPB() { return FMPB; }
-arma::vec6 TVC::get_Q_TVC() { return Q_TVC; }
 
 void TVC::calculate_S2_Q(double theta_a, double theta_b, double theta_c, double theta_d) {
     arma::mat33 TBI = grab_TBI();
@@ -616,73 +521,6 @@ void TVC::calculate_S3_Q(double theta_a, double theta_b) {
     Q_TVC(5) = 0.0;
 }
 
-// arma::vec3 TVC::calculate_S2_FPB(double theta_a, double theta_b, double theta_c, double theta_d, double thrust) {
-//     arma::vec3 S2_FPB;
-
-//     // S2_FPB(0) = (cos(theta_a) + cos(theta_b) + cos(theta_c) + cos(theta_d)) * (thrust / 4.0);
-//     // S2_FPB(1) = (sin(theta_a) + sin(theta_c)) * (thrust / 4.0);
-//     // S2_FPB(2) = (-sin(theta_b) - sin(theta_d)) * (thrust / 4.0);
-//     S2_FPB1(0) = cos(theta_a) * (thrust / 4.0);
-//     S2_FPB1(1) = sin(theta_a) * (thrust / 4.0);
-//     S2_FPB1(2) = 0.0;
-
-//     S2_FPB2(0) = cos(theta_b) * (thrust / 4.0);
-//     S2_FPB2(1) = 0.0;
-//     S2_FPB2(2) = -sin(theta_b) * (thrust / 4.0);
-
-//     S2_FPB3(0) = cos(theta_c) * (thrust / 4.0);
-//     S2_FPB3(1) = sin(theta_c) * (thrust / 4.0);
-//     S2_FPB3(2) = 0.0;
-
-//     S2_FPB4(0) = cos(theta_d) * (thrust / 4.0);
-//     S2_FPB4(1) = 0.0;
-//     S2_FPB4(2) = -sin(theta_d) * (thrust / 4.0);
-
-//     S2_FPB = S2_FPB1 + S2_FPB2 + S2_FPB3 + S2_FPB4;
-
-
-//     return S2_FPB;
-// }
-
-// arma::vec3 TVC::calculate_S2_FMPB(double theta_a, double theta_b, double theta_c, double theta_d, double thrust, double xcg) {
-//     arma::vec3 S2_FMPB;
-//     double d(0.69);
-
-//     lx = -xcg - (-8.436);  // xcg minus because the SE's coordinate definition
-
-//     // S2_FMPB(0) = ((-0.5 * d * sin(theta_b) + 0.5 * d * sin(theta_d)) - (-0.5 * d * sin(theta_a) + 0.5 * d * sin(theta_c))) * (thrust / 4.0);
-//     // S2_FMPB(1) = ((-lx * sin(theta_b) - lx * sin(theta_d))) * (thrust / 4.0);
-//     // S2_FMPB(2) = ((-lx * sin(theta_a) - lx * sin(theta_c))) * (thrust / 4.0);
-//     S2_FMPB(0) = S2_FPB2(2) * 0.5 * d + (-S2_FPB4(2) * 0.5 * d) - (-S2_FPB1(1) * 0.5 * d) - (S2_FPB3(1) * 0.5 * d);
-//     S2_FMPB(1) = -0.5 * d * S2_FPB1(0) + 0.5 * d * S2_FPB3(0) - (-lx * S2_FPB2(2)) - (-lx * S2_FPB4(2));
-//     S2_FMPB(2) = -lx * S2_FPB1(1) + (-lx * S2_FPB3(1)) - (0.5 * d * S2_FPB2(0)) - (-0.5 * d * S2_FPB4(0));
-
-//     return S2_FMPB;
-// }
-
-// arma::vec3 TVC::calculate_S3_FPB(double theta_a, double theta_b, double theta_c, double theta_d, double thrust) {
-//     arma::vec3 S3_FPB;
-
-//     S3_FPB(0) = (cos(theta_a) * cos(theta_b) + cos(theta_c) * cos(theta_d)) * (thrust / 2.0);
-//     S3_FPB(1) = (sin(theta_a) * cos(theta_b) + cos(theta_c) * sin(theta_d)) * (thrust / 2.0);
-//     S3_FPB(2) = (-sin(theta_b) - sin(theta_c)) * (thrust / 2.0);
-
-//     return S3_FPB;
-// }
-
-// arma::vec3 TVC::calculate_S3_FMPB(double theta_a, double theta_b, double theta_c, double theta_d, double thrust, double xcg) {
-//     arma::vec3 S3_FMPB;
-//     double lx;
-//     double d(0.4);
-
-//     lx = -xcg - (-3.275);  // xcg minus because the SE's coordinate definition
-
-//     S3_FMPB(0) = (0.5 * d * cos(theta_b) * sin(theta_a) - 0.5 * d * cos(theta_c) * sin(theta_d)) * (thrust / 2.0);
-//     S3_FMPB(1) = (-0.5 * d * cos(theta_b) * cos(theta_a) + 0.5 * d * cos(theta_c) * cos(theta_d) - lx * sin(theta_b) - lx * sin(theta_c)) * (thrust / 2.0);
-//     S3_FMPB(2) = (-lx * cos(theta_b) * sin(theta_a) - lx * cos(theta_c) * sin(theta_d)) * (thrust / 2.0);
-
-//     return S3_FMPB;
-// }
 
 void TVC::set_S2_TVC() {
     this->mtvc = S2_TVC;
@@ -984,19 +822,6 @@ void TVC::S3_actuator_4(double command, double int_step) {
     }
 }
 
-void TVC::set_s2_tau1(double in) { this->s2_tau1 = in; }
-void TVC::set_s2_tau2(double in) { this->s2_tau2 = in; }
-void TVC::set_s2_tau3(double in) { this->s2_tau3 = in; }
-void TVC::set_s2_tau4(double in) { this->s2_tau4 = in; }
-void TVC::set_s2_ratelim(double in) { this->s2_ratelim = in; }
-void TVC::set_s2_tvclim(double in) { this->s2_tvclim = in; }
-void TVC::set_s3_tau1(double in) { this->s3_tau1 = in; }
-void TVC::set_s3_tau2(double in) { this->s3_tau2 = in; }
-void TVC::set_s3_tau3(double in) { this->s3_tau3 = in; }
-void TVC::set_s3_tau4(double in) { this->s3_tau4 = in; }
-void TVC::set_s3_ratelim(double in) { this->s3_ratelim = in; }
-void TVC::set_s3_tvclim(double in) { this->s3_tvclim = in; }
-
 arma::mat33 TVC::cross_matrix(arma::vec3 in) {
     arma::mat33 c_matrix;
 
@@ -1013,17 +838,4 @@ arma::mat33 TVC::cross_matrix(arma::vec3 in) {
     return c_matrix;
 }
 
-double TVC::get_s2_act1_rate() { return s2_act1_rate; }
-double TVC::get_s2_act2_rate() { return s2_act2_rate; }
-double TVC::get_s2_act3_rate() { return s2_act3_rate; }
-double TVC::get_s2_act4_rate() { return s2_act4_rate; }
 
-double TVC::get_s2_act1_y2_saturation() { return s2_act1_y2_saturation; }
-double TVC::get_s2_act2_y2_saturation() { return s2_act2_y2_saturation; }
-double TVC::get_s2_act3_y2_saturation() { return s2_act3_y2_saturation; }
-double TVC::get_s2_act4_y2_saturation() { return s2_act4_y2_saturation; }
-
-double TVC::get_s2_act1_acc() { return s2_act1_acc; }
-double TVC::get_s2_act2_acc() { return s2_act2_acc; }
-double TVC::get_s2_act3_acc() { return s2_act3_acc; }
-double TVC::get_s2_act4_acc() { return s2_act4_acc; }
