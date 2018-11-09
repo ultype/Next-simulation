@@ -3,12 +3,31 @@
 
 #include "gyro/gyro_ideal.hh"
 
-sensor::GyroIdeal::GyroIdeal() {
-    snprintf(name, sizeof(name), "Ideal Gyro Sensor");
+GyroIdeal::GyroIdeal(Data_exchang &input) {
+  snprintf(name, sizeof(name), "Ideal Gyro Sensor");
+  data_exchang = &input;
 }
 
-void sensor::GyroIdeal::propagate_error(double int_step) {
-    this->WBICB = grab_WBIB();
-    this->EWBIB.zeros();
-    return;
+GyroIdeal::GyroIdeal(const GyroIdeal &other) {
+  this->WBICB = other.WBICB;
+  this->EWBIB = other.EWBIB;
+  this->data_exchang = other.data_exchang;
+}
+
+GyroIdeal &GyroIdeal::operator=(const GyroIdeal &other) {
+  if (&other == this) return *this;
+
+  this->WBICB = other.WBICB;
+  this->EWBIB = other.EWBIB;
+  this->data_exchang = other.data_exchang;
+
+  return *this;
+}
+
+void GyroIdeal::algorithm(double int_step) {
+  this->WBICB = grab_WBIB();
+  this->EWBIB.zeros();
+
+  data_exchang->hset("WBICB", WBICB);
+  return;
 }

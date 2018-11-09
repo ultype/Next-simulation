@@ -12,51 +12,40 @@ LIBRARY DEPENDENCY:
 
 #include "gyro/gyro.hh"
 
-namespace sensor {
 class GyroRocket6G : public Gyro {
-    TRICK_INTERFACE(sensor__GyroRocket6G);
+  TRICK_INTERFACE(GyroRocket6G);
 
  public:
-    GyroRocket6G(double emisg[3], double escalg[3], double ebiasg[3]);
+  GyroRocket6G(Data_exchang &input);
+  GyroRocket6G(const GyroRocket6G &other);
+  GyroRocket6G &operator=(const GyroRocket6G &other);
 
-    virtual ~GyroRocket6G() {}
-
-    virtual void propagate_error(double int_step);
-    std::default_random_engine generator;
+  virtual ~GyroRocket6G() {}
+  virtual void init(){};
+  virtual void algorithm(double int_step);
+  std::default_random_engine generator;
 
  private:
-    /* Routing components */
-    arma::vec EUG;       /* *o   (r/s)    Gyro spin axis accel sensitivity */
-    double _EUG[3];      /* *o   (r/s)    Gyro spin axis accel sensitivity */
+  /* Routing components */
+  VECTOR(EUG, 3); /* *o   (r/s)    Gyro spin axis accel sensitivity */
 
-    arma::vec EWG;       /* *o   (r/s)    Gyro random walk errors */
-    double _EWG[3];      /* *o   (r/s)    Gyro random walk errors */
+  VECTOR(EWG, 3); /* *o   (r/s)    Gyro random walk errors */
 
-    arma::vec EWALKG;    /* *o   (r/s0.5) Random walk */
-    double _EWALKG[3];   /* *o   (r/s0.5) Random walk */
+  VECTOR(EWALKG, 3); /* *o   (r/s0.5) Random walk */
 
-    arma::vec EUNBG;     /* *o   (r)      Gyro cluster misalignment */
-    double _EUNBG[3];    /* *o   (r)      Gyro cluster misalignment */
+  VECTOR(EUNBG, 3); /* *o   (r)      Gyro cluster misalignment */
 
-    arma::vec EMISG;     /* *o   (r)      Gyro misalignmt */
-    double _EMISG[3];    /* *o   (r)      Gyro misalignmt */
+  VECTOR(EMISG, 3); /* *o   (r)      Gyro misalignmt */
 
-    arma::vec ESCALG;    /* *o   (--)     Gyro scale factor */
-    double _ESCALG[3];   /* *o   (--)     Gyro scale factor */
+  VECTOR(ESCALG, 3); /* *o   (--)     Gyro scale factor */
 
-    arma::vec EBIASG;    /* *o   (r/s)    Gyro bias */
-    double _EBIASG[3];   /* *o   (r/s)    Gyro bias */
+  VECTOR(EBIASG, 3); /* *o   (r/s)    Gyro bias */
 
-    arma::vec ITA1;
-    double _ITA1[3];
+  VECTOR(ITA1, 3); /* *o   (--)  Coefficient of gyro noise calculation */
 
-    arma::vec ITA2;
-    double _ITA2[3];
+  VECTOR(ITA2, 3); /* *o   (--)  Coefficient of gyro noise calculation */
 
-    arma::vec BETA;
-    double _BETA[3];
+  VECTOR(BETA, 3); /* *o   (--)  Coefficient of gyro noise calculation */
 };
-}  // namespace sensor
 
 #endif  // __GYRO_ROCKET6G__
-

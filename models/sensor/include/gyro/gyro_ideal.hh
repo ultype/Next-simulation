@@ -12,17 +12,17 @@ LIBRARY DEPENDENCY:
 
 #include "gyro/gyro.hh"
 
-namespace sensor {
 class GyroIdeal : public Gyro {
-    TRICK_INTERFACE(sensor__GyroIdeal);
+  TRICK_INTERFACE(GyroIdeal);
 
  public:
-    GyroIdeal();
+  GyroIdeal(Data_exchang &input);
+  GyroIdeal(const GyroIdeal &other);
+  GyroIdeal &operator=(const GyroIdeal &other);
 
-    virtual ~GyroIdeal() {}
-
-    virtual void propagate_error(double int_step);
+  virtual ~GyroIdeal() {}
+  virtual void init(){};
+  virtual void algorithm(double int_step);
 };
-}  // namespace sensor
 
 #endif  // __GYRO_IDEAL__

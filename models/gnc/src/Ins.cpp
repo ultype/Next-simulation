@@ -614,23 +614,23 @@ void INS::update(double int_step) {
     // Gyro Measurement
     // arma::vec3 WBICB = grab_computed_WBIB();
     
-    if (ideal == 1) {
+    // if (ideal == 1) {
         PHI = grab_PHI();
-    } else {;
-        PHI_HIGH = grab_PHI_HIGH();
-        PHI_LOW = grab_PHI_LOW();
-    }
+    // } else {;
+    //     PHI_HIGH = grab_PHI_HIGH();
+    //     PHI_LOW = grab_PHI_LOW();
+    // }
     DELTA_VEL = grab_DELTA_VEL();
 
 
     calculate_INS_derived_TEI();
     GRAVGI = AccelHarmonic(SBIIC, INS_CS_JGM3, 20, 20, TEIC);
 
-    if (ideal == 1) {
+    // if (ideal == 1) {
       TBIC = build_321_rotation_matrix(PHI) * TBIC;
-    } else {
-      TBIC = build_321_rotation_matrix((PHI_HIGH * GMSB + PHI_LOW * GLSB) * 0.005) * TBIC;
-    }
+    // } else {
+    //   TBIC = build_321_rotation_matrix((PHI_HIGH * GMSB + PHI_LOW * GLSB) * 0.005) * TBIC;
+    // }
 
     arma::mat33 TICB = trans(TBIC);
 

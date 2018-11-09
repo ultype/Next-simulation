@@ -13,16 +13,6 @@ LIBRARY DEPENDENCY:
 PROGRAMMERS:
       (((Chun-Hsu Lai) () () () ))
 *******************************************************************************/
-
-class FH_module {
- public:
-  FH_module(){};
-  ~FH_module(){};
-
-  virtual void algorithm(double int_step) = 0;
-  virtual void init() = 0;
-};
-
 class Data_exchang {
  public:
   Data_exchang(){};
@@ -39,10 +29,10 @@ class Data_exchang {
   void hget(std::string input, double *val) {
     *val = double_table.find(input)->second;
   }
-  void hget(std::string input, arma::vec val) {
+  void hget(std::string input, arma::vec &val) {
     val = vec_table.find(input)->second;
   }
-  void hget(std::string input, arma::mat val) {
+  void hget(std::string input, arma::mat &val) {
     val = mat_table.find(input)->second;
   }
 
@@ -51,6 +41,18 @@ class Data_exchang {
   std::map<std::string, double> double_table;
   std::map<std::string, arma::vec> vec_table;
   std::map<std::string, arma::mat> mat_table;
+};
+
+class FH_module {
+ public:
+  FH_module(){};
+  ~FH_module(){};
+
+  virtual void algorithm(double int_step) = 0;
+  virtual void init() = 0;
+  
+  protected :
+    Data_exchang *data_exchang;
 };
 
 // class Vehicle {

@@ -22,7 +22,7 @@ class Environment;
 class Propulsion;
 class Forces;
 
-class Rocket_Flight_DM {
+class Rocket_Flight_DM : public Dynamics {
     TRICK_INTERFACE(Rocket_Flight_DM);
 
  public:
@@ -52,8 +52,8 @@ class Rocket_Flight_DM {
     double get_psivdx();
     double get_thtbdx_in(double &cthtbd);
 
-    void initialize();
-    void propagate(double int_step);
+    virtual void init();
+    virtual void algorithm(double int_step);
     void load_location(double lonx, double latx, double alt);
     void load_geodetic_velocity(double alpha0x, double beta0x, double dvbe);
     void load_coning_var(double ang, double w);
@@ -139,7 +139,6 @@ class Rocket_Flight_DM {
 
  private:
     Propulsion *propulsion;
-    Data_exchang *data_exchang;
 
     void propagate_position_speed_acceleration(double int_step);
     void propagate_aeroloss(double int_step);

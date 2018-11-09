@@ -20,7 +20,7 @@ PROGRAMMERS:
 class Propulsion;
 class TVC;
 
-class Forces {
+class Forces : public Dynamics {
     TRICK_INTERFACE(Forces);
 
  public:
@@ -31,8 +31,8 @@ class Forces {
 
     Forces& operator=(const Forces& other);
 
-    void initialize();
-
+    virtual void init();
+    virtual void algorithm(double int_step){};
     void collect_forces_and_propagate();
     void set_reference_point(double refp);
     void set_Slosh_flag(unsigned int flag);
@@ -149,19 +149,6 @@ class Forces {
     void slosh();
     void S2_TWD();
     void calculate_I_E();
-
-    /* Internal Propagator / Calculators */
-
-    /* Internal Calculators */
-
-    /* Routing references */
-    Data_exchang *data_exchang;
-
-    /* Input */
-
-    /* Constants */
-
-    /* Propagative Stats */
 
     /* Generating Outputs */
     arma::vec FAPB;         /* *o (N)      Aerodynamic and propulsion forces in body axes */

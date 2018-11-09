@@ -30,8 +30,7 @@ double *fvec;
 int nn;
 
 Forces::Forces(Data_exchang &input)
-    :   data_exchang(&input),
-        VECTOR_INIT(FAPB, 3),
+    :   VECTOR_INIT(FAPB, 3),
         VECTOR_INIT(FAP, 3),
         VECTOR_INIT(FMB, 3),
         VECTOR_INIT(FMAB, 3),
@@ -142,10 +141,10 @@ Forces::Forces(Data_exchang &input)
         VECTOR_INIT(e4_XCG, 3),
         VECTOR_INIT(ddrP_sloshB, 3) {
     this->default_data();
+    data_exchang = &input;
 }
 Forces::Forces(const Forces& other)
-    :   data_exchang(other.data_exchang),
-        VECTOR_INIT(FAPB, 3),
+    :   VECTOR_INIT(FAPB, 3),
         VECTOR_INIT(FAP, 3),
         VECTOR_INIT(FMB, 3),
         VECTOR_INIT(FMAB, 3),
@@ -256,7 +255,7 @@ Forces::Forces(const Forces& other)
         VECTOR_INIT(e4_XCG, 3),
         VECTOR_INIT(ddrP_sloshB, 3) {
     this->default_data();
-
+    this->data_exchang = other.data_exchang;
     this->FAP = other.FAP;
     this->FAPB = other.FAPB;
     this->FMB = other.FMB;
@@ -277,7 +276,7 @@ void Forces::default_data() {
 }
 
 
-void Forces::initialize() {
+void Forces::init() {
     gamma_beta();
     // Gravity_Q();
 }

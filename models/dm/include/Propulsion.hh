@@ -112,7 +112,6 @@ class Propulsion : public Actuator {
   };
 
   Datadeck proptable;
-  Data_exchang *data_exchang;
   /* Internal Initializers */
   void default_data();
 

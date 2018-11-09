@@ -20,7 +20,7 @@ struct tvc_param_t {
     int16_t yaw_count;
 };
 
-class TVC {
+class TVC : public Dynamics {
     TRICK_INTERFACE(TVC);
 
  public:
@@ -29,9 +29,9 @@ class TVC {
 
     TVC& operator=(const TVC& other);
 
-    void initialize();
+    virtual void init();
 
-    void actuate(double int_step, struct icf_ctrlblk_t* C);
+    virtual void algorithm(double int_step);
 
     enum TVC_TYPE {
         NO_TVC = 0,
@@ -45,77 +45,7 @@ class TVC {
     enum TVC_TYPE get_mtvc();
     void set_mtvc(enum TVC_TYPE);
 
-    double get_gtvc();
-    void set_gtvc(double);
-
-    void set_tvclimx(double in);
-    void set_dtvclimx(double in);
-    void set_wntvc(double in);
-    void set_zettvc(double in);
-    void set_factgtvc(double in);
-    void set_parm(double in);
-    void set_S2_TVC();
-    void set_S3_TVC();
-    void set_s2_tvc_acc_lim(double in);
-    void set_s3_tvc_acc_lim(double in);
-    void set_s2_tvc_d(double in);
-    void set_s3_tvc_d(double in);
-    void set_S2_reference_p(double in);
-    void set_S3_reference_p(double in);
-
-
-    double get_parm();
-
-    double get_s2_act1_rate();
-    double get_s2_act2_rate();
-    double get_s2_act3_rate();
-    double get_s2_act4_rate();
-
-    double get_s2_act1_y2_saturation();
-    double get_s2_act2_y2_saturation();
-    double get_s2_act3_y2_saturation();
-    double get_s2_act4_y2_saturation();
-
-    double get_s2_act1_acc();
-    double get_s2_act2_acc();
-    double get_s2_act3_acc();
-    double get_s2_act4_acc();
-
-    std::function<double()> grab_delrcx;
-    std::function<double()> grab_delecx;
-    std::function<double()> grab_theta_a_cmd;
-    std::function<double()> grab_theta_b_cmd;
-    std::function<double()> grab_theta_c_cmd;
-    std::function<double()> grab_theta_d_cmd;
-    std::function<double()> grab_pdynmc;
-    std::function<arma::vec3()> grab_xcg;
-    std::function<double()> grab_thrust;
-    std::function<double()> grab_alphax;
-    std::function<arma::mat33()> grab_TBI;
-    std::function<arma::vec3()> grab_SBII;
-
-
-    arma::vec3 get_FPB();
-    arma::vec3 get_FMPB();
-    arma::vec6 get_Q_TVC();
-    arma::vec3 get_lx();
-
-    void set_s2_tau1(double in);
-    void set_s2_tau2(double in);
-    void set_s2_tau3(double in);
-    void set_s2_tau4(double in);
-    void set_s2_ratelim(double in);
-    void set_s2_tvclim(double in);
-    void set_s3_tau1(double in);
-    void set_s3_tau2(double in);
-    void set_s3_tau3(double in);
-    void set_s3_tau4(double in);
-    void set_s3_ratelim(double in);
-    void set_s3_tvclim(double in);
-
  private:
-    Data_exchang *data_exchang;
-
     /* Internal Initializers */
     void default_data();
 
