@@ -275,6 +275,9 @@ extern "C" void master_init_tvc(Rocket_SimObject *rkt) {
     rkt->tvc.S2_Eng_list[2]->set_ENG_HINGE_POS(0.0, 0.0, 0.425);
     rkt->tvc.S2_Eng_list[3]->set_ENG_HINGE_POS(0.0, -0.425, 0.0);
 
+    // Allocate S3 Engine position
+    rkt->tvc.S3_Eng_list[0]->set_ENG_HINGE_POS(0.0, 0.0, 0.0);
+    
     // Allocate S2 Actuator
     for (int i = 0; i < rkt->tvc.S2_Eng_list.size(); i++) rkt->tvc.S2_Eng_list[i]->Allocate_Actuator(1, FIRST);
 
