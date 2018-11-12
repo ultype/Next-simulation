@@ -257,3 +257,19 @@ arma::vec4 QuaternionMultiply(arma::vec4 Q_in1, arma::vec4 Q_in2) {
 arma::vec4 QuaternionInverse(arma::vec4 Q_in) {
     return Quaternion_conjugate(Q_in) / sqrt(Q_in(0) * Q_in(0) + Q_in(1) * Q_in(1) + Q_in(2) * Q_in(2) + Q_in(3) * Q_in(3));
 }
+
+arma::mat33 cross_matrix(arma::vec3 in) {
+    arma::mat33 c_matrix;
+
+    c_matrix(0, 0) = 0.0;
+    c_matrix(0, 1) = -in(2);
+    c_matrix(0, 2) = in(1);
+    c_matrix(1, 0) = in(2);
+    c_matrix(1, 1) = 0.0;
+    c_matrix(1, 2) = -in(0);
+    c_matrix(2, 0) = -in(1);
+    c_matrix(2, 1) = in(0);
+    c_matrix(2, 2) = 0.0;
+
+    return c_matrix;
+}

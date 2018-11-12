@@ -20,7 +20,7 @@ class Propulsion : public Actuator {
   TRICK_INTERFACE(Propulsion);
 
  public:
-  Propulsion(Data_exchang &input);
+  Propulsion(Data_exchang& input);
   Propulsion(const Propulsion& other);
 
   Propulsion& operator=(const Propulsion& other);

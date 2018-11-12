@@ -6,7 +6,7 @@
 #include "trick/data_record_proto.h"
 
 extern "C" void record_gps_slave() {
-    Trick::DRAscii *drg = new Trick::DRAscii("gps_slave");
+    Trick::DRAscii *drg = new Trick::DRAscii("ngps_slave");
     drg->set_freq(Trick::DR_Always);
     drg->set_cycle(0.05);
     drg->set_single_prec_only(false);
@@ -64,10 +64,10 @@ extern "C" void record_gps_slave() {
     //  drg->add_variable("fc.ins._TESTV[1]");
     //  drg->add_variable("fc.ins._TESTV[2]");
     //  drg->add_variable("fc.ins.liftoff");
-     // drg->add_variable("fc.control.theta_a_cmd");
-     // drg->add_variable("fc.control.theta_c_cmd");
-     // drg->add_variable("fc.control.theta_b_cmd");
-     // drg->add_variable("fc.control.theta_d_cmd");
+     drg->add_variable("fc.control.theta_a_cmd");
+     drg->add_variable("fc.control.theta_c_cmd");
+     drg->add_variable("fc.control.theta_b_cmd");
+     drg->add_variable("fc.control.theta_d_cmd");
     //  drg->add_variable("fc.control.fmasse");
     //  drg->add_variable("fc.control._WBICBT[0]");
     //  drg->add_variable("fc.control._WBICBT[1]");

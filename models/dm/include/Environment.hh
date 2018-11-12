@@ -27,11 +27,11 @@ PROGRAMMERS:
 #include "Time_management.hh"
 #include "dm_delta_ut.hh"
 
-class Environment : public Dynamics{
+class Environment : public Dynamics {
   TRICK_INTERFACE(Environment);
 
  public:
-  Environment(Data_exchang &input);
+  Environment(Data_exchang& input);
 
   Environment(const Environment& other);
   ~Environment();
@@ -83,7 +83,7 @@ class Environment : public Dynamics{
 
  private:
   time_management* time;
-   
+
   /* Constants */
   cad::Atmosphere* atmosphere;
   cad::Wind* wind;

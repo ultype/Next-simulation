@@ -6,7 +6,7 @@
 #include "trick/data_record_proto.h"
 
 extern "C" void record_gps() {
-    Trick::DRAscii *drg = new Trick::DRAscii("gps");
+    Trick::DRAscii *drg = new Trick::DRAscii("ngps");
     drg->set_freq(Trick::DR_Always);
     drg->set_cycle(0.05);
     drg->set_single_prec_only(false);
@@ -38,12 +38,12 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.dynamics._ABID[0]");
     // drg->add_variable("rkt.dynamics._ABID[1]");
     // drg->add_variable("rkt.dynamics._ABID[2]");
-    // drg->add_variable("rkt.dynamics._VBII[0]");
-    // drg->add_variable("rkt.dynamics._VBII[1]");
-    // drg->add_variable("rkt.dynamics._VBII[2]");
-    // drg->add_variable("rkt.dynamics._SBII[0]");
-    // drg->add_variable("rkt.dynamics._SBII[1]");
-    // drg->add_variable("rkt.dynamics._SBII[2]");
+    drg->add_variable("rkt.dynamics._VBII[0]");
+    drg->add_variable("rkt.dynamics._VBII[1]");
+    drg->add_variable("rkt.dynamics._VBII[2]");
+    drg->add_variable("rkt.dynamics._SBII[0]");
+    drg->add_variable("rkt.dynamics._SBII[1]");
+    drg->add_variable("rkt.dynamics._SBII[2]");
     // drg->add_variable("rkt.dynamics.lonx");
     // drg->add_variable("rkt.dynamics.latx");
     // drg->add_variable("rkt.accelerometer->_FSPCB[0]");
@@ -67,12 +67,12 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.env.wind->_VAED[0]");
     // drg->add_variable("rkt.env.wind->_VAED[1]");
     // drg->add_variable("rkt.env.wind->_VAED[2]");
-    // drg->add_variable("rkt.sdt->_DELTA_VEL[0]");
-    // drg->add_variable("rkt.sdt->_DELTA_VEL[1]");
-    // drg->add_variable("rkt.sdt->_DELTA_VEL[2]");
-    // drg->add_variable("rkt.sdt->_PHI[0]");
-    // drg->add_variable("rkt.sdt->_PHI[1]");
-    // drg->add_variable("rkt.sdt->_PHI[2]");
+    drg->add_variable("rkt.sdt->_DELTA_VEL[0]");
+    drg->add_variable("rkt.sdt->_DELTA_VEL[1]");
+    drg->add_variable("rkt.sdt->_DELTA_VEL[2]");
+    drg->add_variable("rkt.sdt->_PHI[0]");
+    drg->add_variable("rkt.sdt->_PHI[1]");
+    drg->add_variable("rkt.sdt->_PHI[2]");
     // drg->add_variable("rkt.dynamics._NEXT_ACC[0]");
     // drg->add_variable("rkt.dynamics._NEXT_ACC[1]");
     // drg->add_variable("rkt.dynamics._NEXT_ACC[2]");
@@ -94,9 +94,9 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.dynamics._VBAB[0]");
     // drg->add_variable("rkt.dynamics._VBAB[1]");
     // drg->add_variable("rkt.dynamics._VBAB[2]");
-    // drg->add_variable("rkt.dynamics.lonx");
-    // drg->add_variable("rkt.dynamics.latx");
-    // drg->add_variable("rkt.dynamics.alt");
+    drg->add_variable("rkt.dynamics.lonx");
+    drg->add_variable("rkt.dynamics.latx");
+    drg->add_variable("rkt.dynamics.alt");
     // drg->add_variable("rkt.aerodynamics.cn");
     // drg->add_variable("rkt.aerodynamics.ca");
     // drg->add_variable("rkt.aerodynamics.ca_on");
@@ -280,6 +280,10 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.tvc._Q_TVC[3]");
     // drg->add_variable("rkt.tvc._Q_TVC[4]");
     // drg->add_variable("rkt.tvc._Q_TVC[5]");
+    drg->add_variable("rkt.tvc.ActOutput1");
+    drg->add_variable("rkt.tvc.ActOutput2");
+    drg->add_variable("rkt.tvc.ActOutput3");
+    drg->add_variable("rkt.tvc.ActOutput4");
     // drg->add_variable("rkt.forces.C_c");
     // drg->add_variable("rkt.forces.C_1");
     // drg->add_variable("rkt.forces.Wn");
