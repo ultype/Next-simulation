@@ -1,14 +1,12 @@
 #include "Aerodynamics.hh"
 
 AeroDynamics::AeroDynamics(Propulsion& prop, Data_exchang& input)
-    : propulsion(&prop), 
-      VECTOR_INIT(XCP, 3) {
-      data_exchang = &input;
-    }
+    : propulsion(&prop), VECTOR_INIT(XCP, 3) {
+  data_exchang = &input;
+}
 
 AeroDynamics::AeroDynamics(const AeroDynamics& other)
-    : propulsion(other.propulsion),
-      VECTOR_INIT(XCP, 3) {
+    : propulsion(other.propulsion), VECTOR_INIT(XCP, 3) {
   this->aerotable = other.aerotable;
   this->refa = other.refa;
   this->refd = other.refd;

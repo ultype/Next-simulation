@@ -78,12 +78,12 @@ class Rocket_SimObject : public Trick::SimObject {
             tvc.grab_theta_c_cmd       = GRAB_VAR(ctl_tvc_db.theta_c_cmd);
             tvc.grab_theta_d_cmd       = GRAB_VAR(ctl_tvc_db.theta_d_cmd);
 
-            tvc.grab_pdynmc            = LINK( env, get_pdynmc);
-            tvc.grab_xcg               = LINK( propulsion, get_XCG);
-            tvc.grab_thrust            = LINK( propulsion, get_thrust);
-            tvc.grab_alphax            = LINK( dynamics, get_alphax);
-            tvc.grab_TBI               = LINK( dynamics, get_TBI);
-            tvc.grab_SBII              = LINK( dynamics, get_SBII);
+            // tvc.grab_pdynmc            = LINK( env, get_pdynmc);
+            // tvc.grab_xcg               = LINK( propulsion, get_XCG);
+            // tvc.grab_thrust            = LINK( propulsion, get_thrust);
+            // tvc.grab_alphax            = LINK( dynamics, get_alphax);
+            // tvc.grab_TBI               = LINK( dynamics, get_TBI);
+            // tvc.grab_SBII              = LINK( dynamics, get_SBII);
 
             aerodynamics.grab_alppx    = LINK( dynamics, get_alppx);
             aerodynamics.grab_phipx    = LINK( dynamics, get_phipx);
@@ -124,10 +124,10 @@ class Rocket_SimObject : public Trick::SimObject {
             forces.grab_cln            = LINK( aerodynamics, get_cln);
             forces.grab_cx             = LINK( aerodynamics, get_cx);
             forces.grab_cz             = LINK( aerodynamics, get_cz);
-            forces.grab_FPB            = LINK( tvc, get_FPB);
-            forces.grab_FMPB           = LINK( tvc, get_FMPB);
-            forces.grab_Q_TVC          = LINK( tvc, get_Q_TVC);
-            forces.grab_lx             = LINK( tvc, get_lx);
+            // forces.grab_FPB            = LINK( tvc, get_FPB);
+            // forces.grab_FMPB           = LINK( tvc, get_FMPB);
+            // forces.grab_Q_TVC          = LINK( tvc, get_Q_TVC);
+            // forces.grab_lx             = LINK( tvc, get_lx);
             forces.grab_GRAVG          = LINK( env, get_GRAVG);
             forces.grab_vmass          = LINK( propulsion, get_vmass);
             forces.grab_TBI            = LINK( dynamics, get_TBI);
@@ -146,14 +146,14 @@ class Rocket_SimObject : public Trick::SimObject {
             forces.grab_NEXT_ACC       = LINK( dynamics, get_NEXT_ACC);
             forces.grab_liftoff        = LINK( dynamics, get_liftoff);
             forces.grab_FSPB           = LINK( dynamics, get_FSPB);
-            forces.grab_dang_e1_B      = LINK(tvc, get_s2_act1_rate);
-            forces.grab_dang_e2_B      = LINK(tvc, get_s2_act2_rate);
-            forces.grab_dang_e3_B      = LINK(tvc, get_s2_act3_rate);
-            forces.grab_dang_e4_B      = LINK(tvc, get_s2_act4_rate);
-            forces.grab_ang_e1_theta   = LINK(tvc, get_s2_act1_y2_saturation);
-            forces.grab_ang_e2_psi     = LINK(tvc, get_s2_act2_y2_saturation);
-            forces.grab_ang_e3_theta   = LINK(tvc, get_s2_act3_y2_saturation);
-            forces.grab_ang_e4_psi     = LINK(tvc, get_s2_act4_y2_saturation);
+            // forces.grab_dang_e1_B      = LINK(tvc, get_s2_act1_rate);
+            // forces.grab_dang_e2_B      = LINK(tvc, get_s2_act2_rate);
+            // forces.grab_dang_e3_B      = LINK(tvc, get_s2_act3_rate);
+            // forces.grab_dang_e4_B      = LINK(tvc, get_s2_act4_rate);
+            // forces.grab_ang_e1_theta   = LINK(tvc, get_s2_act1_y2_saturation);
+            // forces.grab_ang_e2_psi     = LINK(tvc, get_s2_act2_y2_saturation);
+            // forces.grab_ang_e3_theta   = LINK(tvc, get_s2_act3_y2_saturation);
+            // forces.grab_ang_e4_psi     = LINK(tvc, get_s2_act4_y2_saturation);
             // forces.grab_e1_XCG         = LINK(propulsion, get_S2_E1_xcg);
             // forces.grab_e2_XCG         = LINK(propulsion, get_S2_E2_xcg);
             // forces.grab_e3_XCG         = LINK(propulsion, get_S2_E3_xcg);
@@ -166,10 +166,10 @@ class Rocket_SimObject : public Trick::SimObject {
             // forces.grab_I_S2_E2        = LINK(propulsion, get_I_S2_E2);
             // forces.grab_I_S2_E3        = LINK(propulsion, get_I_S2_E3);
             // forces.grab_I_S2_E4        = LINK(propulsion, get_I_S2_E4);
-            forces.grab_s2_act1_acc    = LINK(tvc, get_s2_act1_acc);
-            forces.grab_s2_act2_acc    = LINK(tvc, get_s2_act2_acc);
-            forces.grab_s2_act3_acc    = LINK(tvc, get_s2_act3_acc);
-            forces.grab_s2_act4_acc    = LINK(tvc, get_s2_act4_acc);
+            // forces.grab_s2_act1_acc    = LINK(tvc, get_s2_act1_acc);
+            // forces.grab_s2_act2_acc    = LINK(tvc, get_s2_act2_acc);
+            // forces.grab_s2_act3_acc    = LINK(tvc, get_s2_act3_acc);
+            // forces.grab_s2_act4_acc    = LINK(tvc, get_s2_act4_acc);
             // forces.grab_structure_XCG  = LINK(propulsion, get_structure_XCG);
 
             gps_con.grab_SBEE          = LINK( dynamics, get_SBEE);
@@ -184,7 +184,7 @@ class Rocket_SimObject : public Trick::SimObject {
             dynamics.grab_VAED         = LINK( env, get_VAED);
             dynamics.grab_FMB          = LINK( forces, get_FMB);
             dynamics.grab_IBBB         = LINK( propulsion, get_IBBB);
-            dynamics.grab_vmass        = LINK( propulsion, get_vmass);
+            // dynamics.grab_vmass        = LINK( propulsion, get_vmass);
             dynamics.grab_xcg_0        = LINK( propulsion, get_XCG_0);
             dynamics.grab_FAPB         = LINK( forces, get_FAPB);
             dynamics.grab_FAP          = LINK( forces, get_FAP);
@@ -198,7 +198,7 @@ class Rocket_SimObject : public Trick::SimObject {
             dynamics.collect_forces_and_propagate = LINK( forces, collect_forces_and_propagate);
             dynamics.grab_ddang_slosh_theta = LINK( forces, get_ddang_slosh_theta);
             dynamics.grab_ddang_slosh_psi = LINK( forces, get_ddang_slosh_psi);
-            dynamics.grab_Q_TVC        = LINK( tvc, get_Q_TVC);
+            // dynamics.grab_Q_TVC        = LINK( tvc, get_Q_TVC);
 
             accelerometer->grab_FSPB   = LINK( dynamics, get_FSPB);
 
@@ -239,10 +239,10 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") link();
             ("initialization") sdt->init();
             ("initialization") aerodynamics.init();
+            ("initialization") propulsion.init();
             ("initialization") dynamics.init();
             ("initialization") env.init();
             ("initialization") tvc.init();
-            ("initialization") propulsion.init();
             ("initialization") forces.init();
             ("initialization") gps_con.initialize();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_SIL_EGSE);

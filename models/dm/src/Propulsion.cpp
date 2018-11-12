@@ -3,7 +3,7 @@
 #include "Propulsion.hh"
 #include "sim_services/include/simtime.h"
 
-Propulsion::Propulsion(Data_exchang &input)
+Propulsion::Propulsion(Data_exchang& input)
     : MATRIX_INIT(IBBB, 3, 3),
       MATRIX_INIT(IBBB0, 3, 3),
       MATRIX_INIT(IBBB1, 3, 3),
@@ -79,6 +79,7 @@ Propulsion& Propulsion::operator=(const Propulsion& other) {
 
 void Propulsion::init() {
   this->IBBB = calculate_IBBB();
+  this->XCG = calculate_XCG();
   vmass = payload_mass + faring_mass + Stage_var_list[STAGE_2]->structure_mass +
           Stage_var_list[STAGE_2]->propellant_mass +
           Stage_var_list[STAGE_2]->remaining_fuel_mass +
@@ -90,6 +91,11 @@ void Propulsion::init() {
   for (int i = 0; i < Stage_var_list.size(); i++) {
     Stage_var_list[i]->timer = 0.0;
   }
+
+  data_exchang->hset("vmass", vmass);
+  data_exchang->hset("IBBB", IBBB);
+  data_exchang->hset("XCG", XCG);
+  data_exchang->hset("XCG_0", XCG_0);
 }
 
 void Propulsion::default_data() {
@@ -235,11 +241,14 @@ void Propulsion::algorithm(double int_step) {
           break;
 
         case FARING_SEP:
-          thrust = proptable.look_up("S3_time_vs_thrust",Stage_var_list[STAGE_3]->timer, 0) * AGRAV
-                 + (-press) * this->aexit;
+          thrust = proptable.look_up("S3_time_vs_thrust",
+                                     Stage_var_list[STAGE_3]->timer, 0) *
+                       AGRAV +
+                   (-press) * this->aexit;
           fuel_flow_rate =
-              proptable.look_up("S3_time_vs_thrust", Stage_var_list[STAGE_3]->timer, 0)
-                / Stage_var_list[STAGE_3]->isp;
+              proptable.look_up("S3_time_vs_thrust",
+                                Stage_var_list[STAGE_3]->timer, 0) /
+              Stage_var_list[STAGE_3]->isp;
 
           fuel_expend_integrator(int_step, STAGE_3);
           mass_ratio = Stage_var_list[STAGE_3]->fmasse / fmass0;
@@ -259,10 +268,14 @@ void Propulsion::algorithm(double int_step) {
           break;
 
         case STAGE_3:
-          thrust = proptable.look_up("S3_time_vs_thrust", Stage_var_list[STAGE_3]->timer, 0) * AGRAV 
-                + (-press) * this->aexit;
-          fuel_flow_rate = proptable.look_up("S3_time_vs_thrust", Stage_var_list[STAGE_3]->timer, 0)
-                / Stage_var_list[STAGE_3]->isp;
+          thrust = proptable.look_up("S3_time_vs_thrust",
+                                     Stage_var_list[STAGE_3]->timer, 0) *
+                       AGRAV +
+                   (-press) * this->aexit;
+          fuel_flow_rate =
+              proptable.look_up("S3_time_vs_thrust",
+                                Stage_var_list[STAGE_3]->timer, 0) /
+              Stage_var_list[STAGE_3]->isp;
           fuel_expend_integrator(int_step, STAGE_3);
           mass_ratio = Stage_var_list[STAGE_3]->fmasse / fmass0;
           this->XCG = calculate_XCG();
@@ -291,13 +304,17 @@ void Propulsion::algorithm(double int_step) {
               Stage_var_list[STAGE_3]->structure_mass +
               Stage_var_list[STAGE_3]->propellant_mass +
               Stage_var_list[STAGE_3]->remaining_fuel_mass;
-      thrust = proptable.look_up("S2_time_vs_thrust", Stage_var_list[STAGE_2]->timer, 0) * AGRAV
-             + (-press) * this->aexit;
-      fuel_flow_rate = proptable.look_up("S2_time_vs_thrust", Stage_var_list[STAGE_2]->timer, 0)
-             / Stage_var_list[STAGE_2]->isp;
+      thrust = proptable.look_up("S2_time_vs_thrust",
+                                 Stage_var_list[STAGE_2]->timer, 0) *
+                   AGRAV +
+               (-press) * this->aexit;
+      fuel_flow_rate = proptable.look_up("S2_time_vs_thrust",
+                                         Stage_var_list[STAGE_2]->timer, 0) /
+                       Stage_var_list[STAGE_2]->isp;
       double fuel_flow_rate_hs =
-          proptable.look_up("S3_time_vs_thrust", Stage_var_list[STAGE_3]->timer, 0)
-           / Stage_var_list[STAGE_3]->isp;
+          proptable.look_up("S3_time_vs_thrust", Stage_var_list[STAGE_3]->timer,
+                            0) /
+          Stage_var_list[STAGE_3]->isp;
       if (mass_ratio <= 1.0) {
         fuel_expend_integrator(int_step, STAGE_2);
       } else {
@@ -341,14 +358,20 @@ void Propulsion::fuel_expend_integrator(double int_step, enum STAGE flag) {
   double K1, K2, K3, K4;
   switch (flag) {
     case STAGE_2:
-      K1 = proptable.look_up("S2_time_vs_thrust", Stage_var_list[STAGE_2]->timer, 0)
-        / Stage_var_list[STAGE_2]->isp;
-      K2 = proptable.look_up("S2_time_vs_thrust", Stage_var_list[STAGE_2]->timer + 0.5 * int_step, 0)
-        / Stage_var_list[STAGE_2]->isp;
-      K3 = proptable.look_up("S2_time_vs_thrust", Stage_var_list[STAGE_2]->timer + 0.5 * int_step, 0)
-        / Stage_var_list[STAGE_2]->isp;
-      K4 = proptable.look_up("S2_time_vs_thrust", Stage_var_list[STAGE_2]->timer + int_step, 0)
-        / Stage_var_list[STAGE_2]->isp;
+      K1 = proptable.look_up("S2_time_vs_thrust",
+                             Stage_var_list[STAGE_2]->timer, 0) /
+           Stage_var_list[STAGE_2]->isp;
+      K2 = proptable.look_up("S2_time_vs_thrust",
+                             Stage_var_list[STAGE_2]->timer + 0.5 * int_step,
+                             0) /
+           Stage_var_list[STAGE_2]->isp;
+      K3 = proptable.look_up("S2_time_vs_thrust",
+                             Stage_var_list[STAGE_2]->timer + 0.5 * int_step,
+                             0) /
+           Stage_var_list[STAGE_2]->isp;
+      K4 = proptable.look_up("S2_time_vs_thrust",
+                             Stage_var_list[STAGE_2]->timer + int_step, 0) /
+           Stage_var_list[STAGE_2]->isp;
 
       Stage_var_list[STAGE_2]->fmasse =
           Stage_var_list[STAGE_2]->fmasse +
@@ -356,14 +379,20 @@ void Propulsion::fuel_expend_integrator(double int_step, enum STAGE flag) {
       break;
 
     case STAGE_3:
-      K1 = proptable.look_up("S3_time_vs_thrust", Stage_var_list[STAGE_3]->timer, 0)
-           / Stage_var_list[STAGE_3]->isp;
-      K2 = proptable.look_up("S3_time_vs_thrust", Stage_var_list[STAGE_3]->timer + 0.5 * int_step, 0)
-           / Stage_var_list[STAGE_3]->isp;
-      K3 = proptable.look_up("S3_time_vs_thrust", Stage_var_list[STAGE_3]->timer + 0.5 * int_step, 0)
-           / Stage_var_list[STAGE_3]->isp;
-      K4 = proptable.look_up("S3_time_vs_thrust", Stage_var_list[STAGE_3]->timer + int_step, 0)
-           / Stage_var_list[STAGE_3]->isp;
+      K1 = proptable.look_up("S3_time_vs_thrust",
+                             Stage_var_list[STAGE_3]->timer, 0) /
+           Stage_var_list[STAGE_3]->isp;
+      K2 = proptable.look_up("S3_time_vs_thrust",
+                             Stage_var_list[STAGE_3]->timer + 0.5 * int_step,
+                             0) /
+           Stage_var_list[STAGE_3]->isp;
+      K3 = proptable.look_up("S3_time_vs_thrust",
+                             Stage_var_list[STAGE_3]->timer + 0.5 * int_step,
+                             0) /
+           Stage_var_list[STAGE_3]->isp;
+      K4 = proptable.look_up("S3_time_vs_thrust",
+                             Stage_var_list[STAGE_3]->timer + int_step, 0) /
+           Stage_var_list[STAGE_3]->isp;
       Stage_var_list[STAGE_3]->fmasse =
           Stage_var_list[STAGE_3]->fmasse +
           (int_step / 6.0) * (K1 + 2.0 * K2 + 2.0 * K3 + K4);

@@ -136,7 +136,7 @@ double CS_JGM3[N_JGM3 + 1][N_JGM3 + 1] = {
      -2.520877e-26, -8.774566e-28, 2.651434e-29,  8.352807e-30,  -1.878413e-31,
      4.054696e-32}};
 
-Environment::Environment(Data_exchang &input)
+Environment::Environment(Data_exchang& input)
     : time(time_management::get_instance()),
       VECTOR_INIT(GRAVG, 3),
       MATRIX_INIT(TEI, 3, 3),
@@ -200,6 +200,9 @@ void Environment::init() {
   arma::vec3 SBII = grab_SBII();
   RNP();
   this->GRAVG = AccelHarmonic(SBII, 20, 20);
+
+  data_exchang->hset("GRAVG", GRAVG);
+  data_exchang->hset("TEI", TEI);
 }
 
 void Environment::atmosphere_use_public() {
@@ -306,7 +309,10 @@ double Environment::get_grav() { return norm(GRAVG); }
 arma::vec3 Environment::get_GRAVG() { return GRAVG; }
 arma::vec3 Environment::get_VAED() { return wind->get_VAED(); }
 arma::mat33 Environment::get_TEI() { return TEI; }
-void Environment::set_RNP() { RNP(); }
+void Environment::set_RNP() {
+  RNP();
+  data_exchang->hset("TEI", TEI);
+}
 /* Rotation-Nutation-Precession transfor Matrix (ECI to ECEF) */
 void Environment::RNP() {
   /* double We = 7.2921151467E-5; */
@@ -624,11 +630,13 @@ arma::vec Environment::AccelHarmonic(arma::vec3 SBII, int n_max, int m_max) {
       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; /* Harmonic functions
                                                           */
-  double W[N_JGM3 + 2][N_JGM3 + 2] = {
-      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-      0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; /* work array
-                                                            (0..n_max+1,0..n_max+1)
-                                                          */
+  double
+      W[N_JGM3 + 2]
+       [N_JGM3 + 2] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0}; /* work array
+                                                         (0..n_max+1,0..n_max+1)
+                                                       */
   /* Earth-fixed position */
   r_bf = TEI * SBII;
 
