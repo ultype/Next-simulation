@@ -24,8 +24,16 @@ GyroIdeal &GyroIdeal::operator=(const GyroIdeal &other) {
   return *this;
 }
 
+void GyroIdeal::init() {
+  data_exchang->hget("WBIB", WBICB);
+  this->EWBIB.zeros();
+  data_exchang->hset("WBICB", WBICB);
+
+}
+
 void GyroIdeal::algorithm(double int_step) {
-  this->WBICB = grab_WBIB();
+  this->WBICB;
+  data_exchang->hget("WBIB", WBICB);
   this->EWBIB.zeros();
 
   data_exchang->hset("WBICB", WBICB);

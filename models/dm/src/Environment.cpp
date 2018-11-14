@@ -196,8 +196,9 @@ Environment::~Environment() {
 }
 
 void Environment::init() {
-  dvba = grab_dvbe();
-  arma::vec3 SBII = grab_SBII();
+  arma::vec3 SBII;
+  data_exchang->hget("dvbe", &dvba);
+  data_exchang->hget("SBII", SBII);
   RNP();
   this->GRAVG = AccelHarmonic(SBII, 20, 20);
 
@@ -243,18 +244,25 @@ void Environment::set_wind_turbulunce(double turb_length, double turb_sigma,
 }
 
 void Environment::algorithm(double int_step) {
-  /* Legacy passing data method */
-  arma::vec3 VBED = grab_VBED();
-  arma::vec3 SBII = grab_SBII();
-  double alt = grab_alt();
-  arma::mat33 TGI = grab_TGI();
-  arma::mat33 TBI = grab_TBI();
-
-  arma::mat33 TBD = grab_TBD();
-  double alppx = grab_alppx();
-  double phipx = grab_phipx();
-  arma::vec3 VBEE = grab_VBEE();
-  arma::mat33 TDE = grab_TDE();
+  /* passing data*/
+  arma::vec3 VBED;
+  arma::vec3 SBII;
+  double alt, alppx, phipx;
+  arma::mat33 TGI;
+  arma::mat33 TBI;
+  arma::mat33 TBD;
+  arma::vec3 VBEE;
+  arma::mat33 TDE;
+  data_exchang->hget("VBED", VBED);
+  data_exchang->hget("SBII", SBII);
+  data_exchang->hget("alt", &alt);
+  data_exchang->hget("TGI", TGI);
+  data_exchang->hget("TBI", TBI);
+  data_exchang->hget("TBD", TBD);
+  data_exchang->hget("alppx", &alppx);
+  data_exchang->hget("phipx", &phipx);
+  data_exchang->hget("VBEE", VBEE);
+  data_exchang->hget("TDE", TDE);
   /******************************/
 
   RNP();  // Calculate Rotation-Nutation-Precession (ECI to ECEF) Matrix
@@ -624,7 +632,8 @@ arma::vec Environment::AccelHarmonic(arma::vec3 SBII, int n_max, int m_max) {
 
   arma::vec r_bf(3); /* Earth-fixed position */
   arma::vec a_bf(3); /* Earth-fixed acceleration */
-  arma::mat TGI = grab_TGI();
+  arma::mat TGI;
+  data_exchang->hget("TGI", TGI);
 
   double V[N_JGM3 + 2][N_JGM3 + 2] = {
       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,

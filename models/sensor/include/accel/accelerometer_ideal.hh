@@ -21,7 +21,7 @@ class AccelerometerIdeal : public Accelerometer {
   AccelerometerIdeal &operator=(const AccelerometerIdeal &other);
 
   virtual ~AccelerometerIdeal() {}
-  virtual void init(){};
+  virtual void init();
   virtual void algorithm(double int_step);
 };
 

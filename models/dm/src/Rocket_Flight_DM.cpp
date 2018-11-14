@@ -119,7 +119,7 @@ void Rocket_Flight_DM::init() {
   // building inertial velocity
   TDI = cad::tdi84(lonx * RAD, latx * RAD, alt, TEI);
   TGI = cad::tgi84(lonx * RAD, latx * RAD, alt, TEI);
-
+  TDE = cad::tde84(lonx * RAD, latx * RAD, alt);
   TBD = build_psi_tht_phi_TM(psibdx * RAD, thtbdx * RAD, phibdx * RAD);
   psibd = psibdx * RAD;
   thtbd = thtbdx * RAD;
@@ -136,20 +136,33 @@ void Rocket_Flight_DM::init() {
   arma::mat VBEB = this->build_VBEB(alphax, betax, _dvbe);
   // arma::mat33 TBD = kinematics->get_TBD();
   // Geodetic velocity
-  arma::mat VBED = trans(TBD) * VBEB;
+  VBED = trans(TBD) * VBEB;
 
   VBII = trans(TDI) * VBED + trans(TEI) * (WEII_skew * (TEI * SBII));
   SBIIP = SBII - trans(TBI) * rhoC_1;
   VBIIP = VBII - trans(TBI) * cross(WBIB, rhoC_1);
-  arma::vec3 GRAVG = grab_GRAVG();
+  arma::vec3 GRAVG;
+  data_exchang->hget("GRAVG", GRAVG);
   this->ABII = trans(TEI) * (WEII_skew * WEII_skew * (TEI * SBII));
   FSPB = TBI * (-GRAVG + ABII);  // FSPB: body force include gravity acc
   SBEE = TEI * SBII;             // Calculate position in ECEF
+  VBEE = TEI * VBII - cross(WEII, SBEE);  // Calculate velocity in ECEF
   // liftoff = 0;
   NEXT_ACC = trans(TEI) * (cross(WEII, cross(WEII, (TEI * (SBIIP)))));
   Interpolation_Extrapolation_flag = 4;
 
-  data_exchang->hset("TBI", TBI);
+  if (liftoff == 1) {
+    arma::vec3 VAED;
+    data_exchang->hget("VAED", VAED);
+    VBAB = TBD * (TDE * VBEE - VAED);
+    this->alphax = calculate_alphax(VBAB);
+    this->betax = calculate_betax(VBAB, norm(VBAB));
+
+    this->alppx = calculate_alppx(VBAB, norm(VBAB));
+    this->phipx = calculate_phipx(VBAB);
+  }
+
+  Send();
 }
 
 void Rocket_Flight_DM::load_angle(double yaw, double roll, double pitch) {
@@ -183,13 +196,12 @@ void Rocket_Flight_DM::load_location(double lonx, double latx, double alt) {
   this->lonx = lonx;
   this->latx = latx;
   this->alt = alt;
-  // arma::mat33 TEI = grab_TEI();
-  // // converting geodetic lonx, latx, alt to SBII
-  // SBII = cad::in_geo84(lonx * RAD, latx * RAD, alt, TEI);
-
-  // // building inertial velocity
-  // TDI = cad::tdi84(lonx * RAD, latx * RAD, alt, TEI);
-  // TGI = cad::tgi84(lonx * RAD, latx * RAD, alt, TEI);
+  arma::mat33 TEI;
+  data_exchang->hget("TEI", TEI);
+  SBII = cad::in_geo84(lonx * RAD, latx * RAD, alt, TEI);
+  TGI = cad::tgi84(lonx * RAD, latx * RAD, alt, TEI);
+  data_exchang->hset("SBII", SBII);
+  data_exchang->hset("TGI", TGI);
 }
 
 void Rocket_Flight_DM::load_coning_var(double ang, double w) {
@@ -202,17 +214,10 @@ void Rocket_Flight_DM::load_geodetic_velocity(double alpha0x, double beta0x,
   this->_dvbe = dvbe;
   this->alphax = alpha0x;
   this->betax = beta0x;
-  // arma::mat33 TEI = grab_TEI();
-  // building geodetic velocity VBED(3x1) from  alpha, beta, and dvbe
-  // arma::mat VBEB = this->build_VBEB(alpha0x, beta0x, dvbe);
-  // // arma::mat33 TBD = kinematics->get_TBD();
-  // // Geodetic velocity
-  // arma::mat VBED = trans(TBD) * VBEB;
-
-  // VBII = trans(TDI) * VBED + trans(TEI) * (WEII_skew * (TEI * SBII));
+  data_exchang->hset("dvbe", _dvbe);
 }
 
-void Rocket_Flight_DM::set_liftoff(unsigned int in) { liftoff = in; }
+void Rocket_Flight_DM::set_liftoff(int in) { liftoff = in; }
 
 void Rocket_Flight_DM::build_WEII() {
   WEII_skew(0, 1) = -WEII3;
@@ -238,19 +243,12 @@ void Rocket_Flight_DM::set_reference_point(double rp) { reference_point = rp; }
 
 void Rocket_Flight_DM::algorithm(double int_step) {
   arma::vec VAED;
-  arma::vec3 FAPB = grab_FAPB();
   arma::mat33 TEI;
   arma::vec3 GRAVG;
   data_exchang->hget("GRAVG", GRAVG);
   data_exchang->hget("TEI", TEI);
   data_exchang->hget("VAED", VAED);
-  // this->FSPB = calculate_fspb(FAPB, vmass);
-  vibration(int_step);  // Calculate vibration angular rate
-  // propagate_position_speed_acceleration(int_step);
 
-  // propagate_WBIB(int_step, FMB, IBBB);
-  /* Propagate Quaternion */
-  // propagate_TBI_Q(int_step, WBIB);
   RK4(GRAVG, TEI, int_step);
 
   this->TBD = calculate_TBD(lonx, latx, alt);
@@ -277,15 +275,30 @@ void Rocket_Flight_DM::algorithm(double int_step) {
   this->TBDQ = Matrix2Quaternion(this->TBD);
   Quaternion2Euler(TBDQ, Roll, Pitch, Yaw);
 
-  data_exchang->hset("TBI", TBI);
+  Send();
 }
 
-void Rocket_Flight_DM::vibration(double int_step) {
-  CONING(0) = -con_ang * RAD * con_w * sin(con_w * t) * cos(con_ang * RAD);
-  CONING(1) = con_ang * RAD * con_w * cos(con_w * t) * cos(con_ang * RAD);
-  CONING(2) = -sin(con_ang * RAD) * con_ang * RAD * con_w;
-
-  t += int_step;
+void Rocket_Flight_DM::Send() {
+  data_exchang->hset("TBI", TBI);
+  data_exchang->hset("WBIB", WBIB);
+  data_exchang->hset("FSPB", FSPB);
+  data_exchang->hset("NEXT_ACC", NEXT_ACC);
+  data_exchang->hset("liftoff", liftoff);
+  data_exchang->hset("WBEB", WBEB);
+  data_exchang->hset("betax", betax);
+  data_exchang->hset("alphax", alphax);
+  data_exchang->hset("TDE", TDE);
+  data_exchang->hset("VBEE", VBEE);
+  data_exchang->hset("phipx", phipx);
+  data_exchang->hset("alppx", alppx);
+  data_exchang->hset("TBD", TBD);
+  data_exchang->hset("TBI", TBI);
+  data_exchang->hset("TGI", TGI);
+  data_exchang->hset("alt", alt);
+  data_exchang->hset("VBED", VBED);
+  data_exchang->hset("SBII", SBII);
+  data_exchang->hset("dvbe", _dvbe);
+  data_exchang->hset("WBIBD", WBIBD);
 }
 
 void Rocket_Flight_DM::propagate_TBI(double int_step, arma::vec3 WBIB) {
@@ -340,8 +353,11 @@ void Rocket_Flight_DM::propagate_TBI_Q(double int_step, arma::vec3 WBIB) {
 }
 
 void Rocket_Flight_DM::propagate_position_speed_acceleration(double int_step) {
-  arma::vec3 GRAVG = grab_GRAVG();
-  arma::mat33 TEI = grab_TEI();  // cad::tei(get_elapsed_time());
+  arma::vec3 GRAVG;
+  arma::mat33 TEI;  // cad::tei(get_elapsed_time());
+
+  data_exchang->hget("GRAVG", GRAVG);
+  data_exchang->hget("TEI", TEI);
 
   /* Prograte S, V, A status */
   NEXT_ACC = trans(TBI) * FSPB + GRAVG;  // Strapdown Analytics 4.3-11
@@ -377,9 +393,10 @@ double Rocket_Flight_DM::calculate_alphaix(arma::vec3 VBIB) {
 }
 
 void Rocket_Flight_DM::propagate_aeroloss(double int_step) {
-  arma::vec3 FAPB = grab_FAPB();
+  arma::vec3 FAPB;
   double vmass;
   data_exchang->hget("vmass", &vmass);
+  data_exchang->hget("FAPB", FAPB);
   // calculate aero loss`:`
   FAPB = FAPB * (1. / vmass);
   _aero_loss = _aero_loss + norm(FAPB) * int_step;
@@ -403,8 +420,10 @@ void Rocket_Flight_DM::propagate_control_loss(double int_step) {
 
 void Rocket_Flight_DM::propagate_gravityloss(double int_step) {
   // calculate gravity loss
-  double grav = grab_grav();
-  gravity_loss = gravity_loss + grav * sin(get_thtvdx() * RAD) * int_step;
+  double gravg;
+  data_exchang->hget("gravg", &gravg);
+
+  gravity_loss = gravity_loss + gravg * sin(get_thtvdx() * RAD) * int_step;
 }
 
 double Rocket_Flight_DM::calculate_betaix(arma::vec3 VBIB) {
@@ -628,13 +647,15 @@ void Rocket_Flight_DM::RK4F(arma::vec3 GRAVG, arma::mat33 TEI, double int_step,
 
   collect_forces_and_propagate();
 
-  arma::vec3 ddrP_1 = grab_ddrP_1();
-  arma::vec3 xcg0 = grab_xcg_0();
-  arma::vec3 WBIBD_new = grab_ddang_1();
-  double ddang_slosh_theta = grab_ddang_slosh_theta();
-  double ddang_slosh_psi = grab_ddang_slosh_psi();
+  arma::vec3 ddrP_1;
+  arma::vec3 XCG_0;
+  arma::vec3 WBIBD_new;
 
-  rhoC_IMU(0) = -xcg0(0) - (reference_point);
+  data_exchang->hget("ddrP_1", ddrP_1);
+  data_exchang->hget("XCG_0", XCG_0);
+  data_exchang->hget("ddang_1", WBIBD);
+
+  rhoC_IMU(0) = -XCG_0(0) - (reference_point);
   rhoC_IMU(1) = 0.0;
   rhoC_IMU(2) = 0.0;
   arma::vec3 ddrhoC_IMU =
@@ -689,13 +710,17 @@ void Rocket_Flight_DM::RK4F(arma::vec3 GRAVG, arma::mat33 TEI, double int_step,
 
   K1 = NEXT_ACC;
   K2 = VBII;
-  K3 = WBIBD_new;
+  K3 = WBIBD;
   K4 = TBID_Q_NEW;
-  K5 = ddang_slosh_theta;
-  K6 = dang_slosh_theta;
-  K7 = ddang_slosh_psi;
-  K8 = dang_slosh_psi;
+  K5 = 0.0;
+  K6 = 0.0;
+  K7 = 0.0;
+  K8 = 0.0;
   ABII = NEXT_ACC;
+
+  data_exchang->hset("NEXT_ACC", NEXT_ACC);
+  data_exchang->hset("liftoff", liftoff);
+  data_exchang->hset("FSPB", FSPB);
 }
 void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
   arma::vec3 K11, K21, K31, K41;
@@ -710,13 +735,6 @@ void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
   arma::vec3 VBIIP_post, SBIIP_post, WBIB_post;
   double dang_slosh_theta_post, ang_slosh_theta_post, dang_slosh_psi_post,
       ang_slosh_psi_post;
-
-  arma::vec3 ddang_1 = grab_ddang_1();
-  arma::vec3 rhoC_1;
-  arma::vec3 xcg0 = grab_xcg_0();
-  rhoC_1(0) = -xcg0(0) - (reference_point);
-  rhoC_1(1) = 0.0;
-  rhoC_1(2) = 0.0;
 
   SBIIP_post = SBIIP;  // - trans(TBI) * rhoC_1;
   VBIIP_post = VBIIP;  // - trans(TBI) * cross(WBIB, rhoC_1);
@@ -737,6 +755,8 @@ void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
   dang_slosh_theta = dang_slosh_theta_post + K15 * 0.5 * int_step;
   dang_slosh_psi = dang_slosh_psi_post + K17 * 0.5 * int_step;
   this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to Matrix
+  data_exchang->hset("WBIB", WBIB);
+  data_exchang->hset("TBI", TBI);
 
   RK4F(GRAVG, TEI, int_step, K21, K22, K23, K24, K25, K26, K27, K28);
   VBIIP = VBIIP_post + K21 * 0.5 * int_step;
@@ -748,6 +768,8 @@ void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
   dang_slosh_theta = dang_slosh_theta_post + K25 * 0.5 * int_step;
   dang_slosh_psi = dang_slosh_psi_post + K27 * 0.5 * int_step;
   this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to Matrix
+  data_exchang->hset("WBIB", WBIB);
+  data_exchang->hset("TBI", TBI);
 
   RK4F(GRAVG, TEI, int_step, K31, K32, K33, K34, K35, K36, K37, K38);
   VBIIP = VBIIP_post + K31 * int_step;
@@ -759,6 +781,8 @@ void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
   dang_slosh_theta = dang_slosh_theta_post + K35 * int_step;
   dang_slosh_psi = dang_slosh_psi_post + K37 * int_step;
   this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to Matrix
+  data_exchang->hset("WBIB", WBIB);
+  data_exchang->hset("TBI", TBI);
 
   RK4F(GRAVG, TEI, int_step, K41, K42, K43, K44, K45, K46, K47, K48);
   VBIIP = VBIIP_post + (int_step / 6.0) * (K11 + 2.0 * K21 + 2.0 * K31 + K41);
@@ -775,48 +799,19 @@ void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
                    (int_step / 6.0) * (K17 + 2.0 * K27 + 2.0 * K37 + K47);
   this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to Matrix
 
-  WBIBD = ddang_1;
+  arma::vec3 rhoC_1;
+  arma::vec3 XCG_0;
+
+  data_exchang->hget("XCG_0", XCG_0);
+
+  rhoC_1(0) = -XCG_0(0) - (reference_point);
+  rhoC_1(1) = 0.0;
+  rhoC_1(2) = 0.0;
+
   SBII = SBIIP + trans(TBI) * rhoC_1;
   VBII = VBIIP + trans(TBI) * cross(WBIB, rhoC_1);
-  /********************************************************************************/
-  // arma::vec3 VBII_post, SBII_post;
 
-  // SBII_post = SBII;// - trans(TBI) * rhoC_1;
-  // VBII_post = VBII;// - trans(TBI) * cross(WBIB, rhoC_1);
-  // WBIB_post = WBIB;
-  // TBI_Q_post = TBI_Q;
-
-  // RK4F(GRAVG, TEI, int_step, K11, K12, K13, K14);
-  // VBII = VBII_post + K11 * 0.5 * int_step;
-  // SBII = SBII_post + K12 * 0.5 * int_step;
-  // WBIB = WBIB_post + K13 * 0.5 * int_step;
-  // TBI_Q = TBI_Q_post + K14 * 0.5 *int_step;
-  // this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to
-  // Matrix
-
-  // RK4F(GRAVG, TEI, int_step, K21, K22, K23, K24);
-  // VBII = VBII_post + K21 * 0.5 * int_step;
-  // SBII = SBII_post + K22 * 0.5 * int_step;
-  // WBIB = WBIB_post + K23 * 0.5 * int_step;
-  // TBI_Q = TBI_Q_post + K24 * 0.5 *int_step;
-  // this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to
-  // Matrix
-
-  // RK4F(GRAVG, TEI, int_step, K31, K32, K33, K34);
-  // VBII = VBII_post + K31 * int_step;
-  // SBII = SBII_post + K32 * int_step;
-  // WBIB = WBIB_post + K33 * int_step;
-  // TBI_Q = TBI_Q_post + K34 *int_step;
-  // this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to
-  // Matrix
-
-  // RK4F(GRAVG, TEI, int_step, K41, K42, K43, K44);
-  // VBII = VBII_post + (int_step / 6.0) * (K11 + 2.0 * K21 + 2.0 * K31 + K41);
-  // SBII = SBII_post + (int_step / 6.0) * (K12 + 2.0 * K22 + 2.0 * K32 + K42);
-  // WBIB = WBIB_post + (int_step / 6.0) * (K13 + 2.0 * K23 + 2.0 * K33 + K43);
-  // TBI_Q = TBI_Q_post + (int_step / 6.0) * (K14 + 2.0 * K24 + 2.0 * K34 +
-  // K44); this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to
-  // Matrix
+  Send();
 }
 double Rocket_Flight_DM::get_alppx() { return alppx; }
 double Rocket_Flight_DM::get_phipx() { return phipx; }
@@ -878,7 +873,7 @@ double Rocket_Flight_DM::get_double_psibd() { return psibd; }
 double Rocket_Flight_DM::get_double_thtbd() { return thtbd; }
 double Rocket_Flight_DM::get_double_phibd() { return phibd; }
 
-unsigned int Rocket_Flight_DM::get_liftoff() { return liftoff; }
+int Rocket_Flight_DM::get_liftoff() { return liftoff; }
 
 int Rocket_Flight_DM::enqueue_to_simgen_buffer(struct icf_ctrlblk_t *C,
                                                double ext_porlation) {

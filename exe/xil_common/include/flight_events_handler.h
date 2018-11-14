@@ -166,10 +166,10 @@ extern "C" void master_startup(Rocket_SimObject *rkt) {
 }
 
 extern "C" int master_model_configuration(Rocket_SimObject *rkt) {
-    rkt->forces.set_Slosh_flag(0);
+    // rkt->forces.set_Slosh_flag(0);
     rkt->forces.set_DOF(6);
-    rkt->forces.set_damping_ratio(0.005);
-    rkt->forces.set_TWD_flag(0);
+    // rkt->forces.set_damping_ratio(0.005);
+    // rkt->forces.set_TWD_flag(0);
     rkt->forces.set_aero_flag(1);
     rkt->dynamics.set_liftoff(0);  // 1 only for test
 }

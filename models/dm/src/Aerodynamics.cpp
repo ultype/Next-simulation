@@ -61,33 +61,35 @@ void AeroDynamics::set_refd(double in) { refd = in; }
 
 void AeroDynamics::algorithm(double int_step) {
   /* only calculate when rocket liftoff */
-  unsigned int liftoff = grab_liftoff();
+  int liftoff;
+  data_exchang->hget("liftoff", &liftoff);
 
   if (liftoff == 1) {
-    double alppx = grab_alppx();
-    double phipx = grab_phipx();
-
-    double vmach, dvba;
+    double vmach, dvba, alppx, phipx, alt;
+    data_exchang->hget("alppx", &alppx);
+    data_exchang->hget("phipx", &phipx);
     data_exchang->hget("vmach", &vmach);
     data_exchang->hget("dvba", &dvba);
+    data_exchang->hget("alt", &alt);
+    
+    arma::vec3 WBIB;
+    arma::vec3 WBEB;
+    arma::vec3 XCG;
+    data_exchang->hget("XCG", XCG);
+    data_exchang->hget("WBEB", WBEB);
+    data_exchang->hget("WBIB", WBIB);
 
-    double ppx = grab_ppx();
-    double qqx = grab_qqx();
-    double rrx = grab_rrx();
-    arma::vec3 WBIB = grab_WBIB();
-
-    double alt = grab_alt();
 
     enum Propulsion::THRUST_TYPE thrust_state = propulsion->get_thrust_state();
     // double vmass  = grab_vmass();
-    arma::vec3 xcg = grab_xcg();
+    
 
     //  transforming body rates from body -> aeroballistic coord.
     double phip = phipx * RAD;
     double cphip = cos(phip);
     double sphip = sin(phip);
-    double qqax = RAD * (qqx * cphip - rrx * sphip);
-    double rrax = RAD * (qqx * sphip + rrx * cphip);
+    double qqax = RAD * (WBEB(1) * DEG * cphip - WBEB(2) * DEG * sphip);
+    double rrax = RAD * (WBEB(1) * DEG * sphip + WBEB(2) * DEG * cphip);
 
     cn = aerotable.look_up("CN_vs_mach_alpha", alppx, vmach, 1);
     ca = aerotable.look_up("CA_off_vs_mach_alpha_alt", alppx, alt, vmach, 1);
@@ -107,9 +109,9 @@ void AeroDynamics::algorithm(double int_step) {
     cz = -cn * cphip - cnq * ((WBIB(1) * refd) / (2.0 * dvba));
 
     cll = 0.0;
-    clm = cn * ((-xcg(0) / refd) - XCP(0)) * cphip +
+    clm = cn * ((-XCG(0) / refd) - XCP(0)) * cphip +
           cmq * ((WBIB(1) * refd) / (2.0 * dvba));
-    cln = -cn * ((-xcg(0) / refd) - XCP(0)) * sphip +
+    cln = -cn * ((-XCG(0) / refd) - XCP(0)) * sphip +
           cmq * ((WBIB(2) * refd) / (2.0 * dvba));
   }
 

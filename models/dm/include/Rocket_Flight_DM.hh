@@ -103,8 +103,8 @@ class Rocket_Flight_DM : public Dynamics {
   double get_double_thtbd();
   double get_double_phibd();
 
-  unsigned int get_liftoff();
-  void set_liftoff(unsigned int in);
+  int get_liftoff();
+  void set_liftoff(int in);
 
   std::function<arma::mat33()> grab_TEI;
   std::function<double()> grab_dvba;
@@ -156,6 +156,7 @@ class Rocket_Flight_DM : public Dynamics {
             arma::vec3 &K2, arma::vec3 &K3, arma::vec4 &K4, double &K5,
             double &K6, double &K7, double &K8);
   void RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step);
+  void Send();
 
   double calculate_alphaix(arma::vec3 VBIB);
   double calculate_betaix(arma::vec3 VBIB);
@@ -366,7 +367,7 @@ class Rocket_Flight_DM : public Dynamics {
   double _dvbe;   /* *o  (m/s)   [DIAG] Vehicle geographic speed */
   double _thtvdx; /* *o  (d)     [DIAG] Vehicle's flight path angle */
   double _psivdx; /* *o  (d)     [DIAG] Vehicle's heading angle */
-  unsigned int liftoff; /* *i  (--)     To check wether the rocket liftoff or
+  int liftoff; /* *i  (--)     To check wether the rocket liftoff or
                            not: liftoff = 1, not liftoff = 0 */
   double ppx; /* *io (d/s)        Body roll angular velocity wrt earth in body
                  axes */
