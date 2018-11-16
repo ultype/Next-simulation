@@ -7,8 +7,6 @@ extern Rocket_SimObject rkt;
 const double LONX           = 120.8901527777778;  //  Vehicle longitude - deg  module newton
 const double LATX           = 22.262097222222224;   //  Vehicle latitude  - deg  module newton
 const double ALT            = 6.0;         //  Vehicle altitude  - m  module newton
-const double CON_ANG        = 0.0;
-const double CON_W          = 50.0;
 const double PHIBDX         = 0.0;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
 const double THTBDX         = 90.0;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
 const double PSIBDX         = 90.0;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
@@ -199,10 +197,6 @@ extern "C" void master_init_slv(Rocket_SimObject *rkt) {
     double latx       = LATX;   //  Vehicle latitude  - deg  module newton
     double alt        = ALT;         //  Vehicle altitude  - m  module newton
     rkt->dynamics.load_location(lonx, latx, alt);
-
-    double con_ang = CON_ANG;
-    double con_w = CON_W;
-    rkt->dynamics.load_coning_var(con_ang, con_w);
 
     double phibdx = PHIBDX;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
     double thtbdx = THTBDX;  //  Pitching angle of veh wrt geod coord - deg  module kinematics

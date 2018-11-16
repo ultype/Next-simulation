@@ -32,36 +32,8 @@ class AeroDynamics : public Dynamics {
   virtual void init();
   virtual void algorithm(double int_step);
 
-  double get_refa();
-  double get_refd();
-  double get_cy();
-  double get_cll();
-  double get_clm();
-  double get_cln();
-  double get_cx();
-  double get_cz();
-  arma::vec3 get_xcp();
-
   void set_refa(double);
   void set_refd(double);
-
-  std::function<double()> grab_alppx;
-  std::function<double()> grab_phipx;
-  std::function<double()> grab_alphax;
-  std::function<double()> grab_betax;
-  std::function<double()> grab_rho;
-  std::function<double()> grab_vmach;
-  std::function<double()> grab_pdynmc;
-  std::function<double()> grab_tempk;
-  std::function<double()> grab_dvba;
-  std::function<double()> grab_ppx;
-  std::function<double()> grab_qqx;
-  std::function<double()> grab_rrx;
-  std::function<arma::vec3()> grab_WBIB;
-  std::function<double()> grab_alt;
-  // std::function<double()> grab_vmass;
-  std::function<arma::vec3()> grab_xcg;
-  std::function<unsigned int()> grab_liftoff;
 
  private:
   Propulsion* propulsion;

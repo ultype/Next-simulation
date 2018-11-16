@@ -16,6 +16,8 @@ Propulsion::Propulsion(Data_exchang& input)
 
 Propulsion::Propulsion(const Propulsion& other)
     : MATRIX_INIT(IBBB, 3, 3),
+      MATRIX_INIT(IBBB0, 3, 3),
+      MATRIX_INIT(IBBB1, 3, 3),
       VECTOR_INIT(XCG, 3),
       VECTOR_INIT(XCG_0, 3),
       VECTOR_INIT(XCG_1, 3) {
@@ -428,15 +430,7 @@ void Propulsion::set_vmass0(double in) { vmass0 = in; }
 void Propulsion::set_fmass0(double in) { fmass0 = in; }
 void Propulsion::set_aexit(double in) { aexit = in; }
 void Propulsion::set_payload_mass(double in) { payload_mass = in; }
-int Propulsion::get_mprop() {
-  return static_cast<int>(this->thrust_state); /*XXX work around*/
-}
 enum Propulsion::THRUST_TYPE Propulsion::get_thrust_state() {
   return this->thrust_state;
 }
-double Propulsion::get_vmass() { return vmass; }
-arma::vec3 Propulsion::get_XCG() { return XCG; }
-arma::vec3 Propulsion::get_XCG_0() { return XCG_0; }
-double Propulsion::get_thrust() { return thrust; }
-double Propulsion::get_fmassr() { return fmassr; }
-arma::mat33 Propulsion::get_IBBB() { return IBBB; }
+

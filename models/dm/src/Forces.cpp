@@ -638,13 +638,6 @@ void Forces::rotate(double **r, double **qt, int n, int i, double a, double b) {
   }
 }
 
-arma::vec Forces::get_FAPB() { return FAPB; }
-arma::vec Forces::get_FAP() { return FAP; }
-arma::vec Forces::get_FMB() { return FMB; }
-arma::vec Forces::get_ddrP_1() { return ddrP_1; }
-arma::vec Forces::get_ddang_1() { return ddang_1; }
-arma::vec Forces::get_rhoC_1() { return rhoC_1; }
-arma::vec Forces::get_ddrhoC_1() { return ddrhoC_1; }
 void Forces::set_reference_point(double refp) { xp = refp; }
 
 arma::mat33 Forces::TMX(double ang) {

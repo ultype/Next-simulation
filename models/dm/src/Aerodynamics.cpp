@@ -126,12 +126,3 @@ void AeroDynamics::algorithm(double int_step) {
   data_exchang->hset("XCP", XCP);
 }
 
-double AeroDynamics::get_refa() { return refa; }
-double AeroDynamics::get_refd() { return refd; }
-double AeroDynamics::get_cy() { return cy; }
-double AeroDynamics::get_cll() { return cll; }
-double AeroDynamics::get_clm() { return clm; }
-double AeroDynamics::get_cln() { return cln; }
-double AeroDynamics::get_cx() { return cx; }
-double AeroDynamics::get_cz() { return cz; }
-arma::vec3 AeroDynamics::get_xcp() { return XCP; }

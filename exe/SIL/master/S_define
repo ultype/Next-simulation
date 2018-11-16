@@ -14,7 +14,7 @@ LIBRARY DEPENDENCIES:
 ##include "Time_management.hh"
 ##include "GPS_constellation.hh"
 ##include "Rocket_Flight_DM.hh"
-##include "Environment.hh"
+##include "EarthEnvironment.hh"
 ##include "Vehicle.hh"
 ##include "Module.hh"
 
@@ -41,7 +41,6 @@ LIBRARY DEPENDENCIES:
 
 ##include "time_utility.hh"
 
-##include "transceiver.hh"
 ##include "Dataflow_Binding.hh"
 ##include  "DM_FSW_Interface.hh"
 ##include "flight_events_define.h"
@@ -51,7 +50,7 @@ class Rocket_SimObject : public Trick::SimObject {
         double int_step = 0.005;
         double stand_still_time = 0.0;
         Rocket_Flight_DM dynamics;
-        Environment env;
+        EarthEnvironment env;
         Forces forces;
         AeroDynamics aerodynamics;
         Propulsion propulsion;
@@ -70,7 +69,6 @@ class Rocket_SimObject : public Trick::SimObject {
         struct icf_ctrlblk_t   icf_ctrl;
         uint64_t egse_flight_event_handler_bitmap = 0xFFFFFFFFFFFFFFFF;
         uint64_t flight_event_code_record = 0;
-        Transceiver transceiver;
 
         void link(){
             tvc.grab_theta_a_cmd       = GRAB_VAR(ctl_tvc_db.theta_a_cmd);
@@ -130,7 +128,6 @@ class Rocket_SimObject : public Trick::SimObject {
 
             P3 (int_step, "scheduled") tvc.algorithm(int_step);
             P3 (int_step, "scheduled") dynamics.algorithm(int_step);
-            (int_step, "logging") env.update_diagnostic_attributes(int_step);
             (int_step, "logging") dynamics.update_diagnostic_attributes(int_step);
             (0.005, "logging") dynamics.Interpolation_Extrapolation(int_step, 0.001, 0.002);
             (5, "scheduled") icf_heartbeat();

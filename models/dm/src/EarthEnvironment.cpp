@@ -1,4 +1,4 @@
-#include "Environment.hh"
+#include "EarthEnvironment.hh"
 
 #include "cad_utility.hh"
 
@@ -136,7 +136,7 @@ double CS_JGM3[N_JGM3 + 1][N_JGM3 + 1] = {
      -2.520877e-26, -8.774566e-28, 2.651434e-29,  8.352807e-30,  -1.878413e-31,
      4.054696e-32}};
 
-Environment::Environment(Data_exchang& input)
+EarthEnvironment::EarthEnvironment(Data_exchang& input)
     : time(time_management::get_instance()),
       VECTOR_INIT(GRAVG, 3),
       MATRIX_INIT(TEI, 3, 3),
@@ -146,7 +146,7 @@ Environment::Environment(Data_exchang& input)
   data_exchang = &input;
 }
 
-Environment::Environment(const Environment& other)
+EarthEnvironment::EarthEnvironment(const EarthEnvironment& other)
     : time(other.time),
       VECTOR_INIT(GRAVG, 3),
       MATRIX_INIT(TEI, 3, 3),
@@ -170,7 +170,7 @@ Environment::Environment(const Environment& other)
   this->data_exchang = other.data_exchang;
 }
 
-Environment& Environment::operator=(const Environment& other) {
+EarthEnvironment& EarthEnvironment::operator=(const EarthEnvironment& other) {
   if (&other == this) return *this;
 
   if (other.atmosphere)
@@ -190,12 +190,12 @@ Environment& Environment::operator=(const Environment& other) {
   return *this;
 }
 
-Environment::~Environment() {
+EarthEnvironment::~EarthEnvironment() {
   if (atmosphere) delete atmosphere;
   if (wind) delete wind;
 }
 
-void Environment::init() {
+void EarthEnvironment::init() {
   arma::vec3 SBII;
   data_exchang->hget("dvbe", &dvba);
   data_exchang->hget("SBII", SBII);
@@ -206,35 +206,35 @@ void Environment::init() {
   data_exchang->hset("TEI", TEI);
 }
 
-void Environment::atmosphere_use_public() {
+void EarthEnvironment::atmosphere_use_public() {
   atmosphere = new cad::Atmosphere76();
 }
 
-void Environment::atmosphere_use_nasa() {
+void EarthEnvironment::atmosphere_use_nasa() {
   atmosphere = new cad::Atmosphere_nasa2002();
 }
 
-void Environment::atmosphere_use_weather_deck(char* filename) {
+void EarthEnvironment::atmosphere_use_weather_deck(char* filename) {
   atmosphere = new cad::Atmosphere_weatherdeck(filename);
 }
 
-void Environment::set_no_wind() { wind = new cad::Wind_No(); }
+void EarthEnvironment::set_no_wind() { wind = new cad::Wind_No(); }
 
-void Environment::set_constant_wind(double dvae, double dir, double twind,
+void EarthEnvironment::set_constant_wind(double dvae, double dir, double twind,
                                     double vertical_wind) {
   wind = new cad::Wind_Constant(dvae, dir, twind, vertical_wind);
 }
 
-void Environment::set_tabular_wind(char* filename, double twind,
+void EarthEnvironment::set_tabular_wind(char* filename, double twind,
                                    double vertical_wind) {
   wind = new cad::Wind_Tabular(filename, twind, vertical_wind);
 }
 
-void Environment::set_no_wind_turbulunce() {
+void EarthEnvironment::set_no_wind_turbulunce() {
   if (wind) wind->disable_turbulance();
 }
 
-void Environment::set_wind_turbulunce(double turb_length, double turb_sigma,
+void EarthEnvironment::set_wind_turbulunce(double turb_length, double turb_sigma,
                                       double taux1, double taux1d, double taux2,
                                       double taux2d, double tau,
                                       double gauss_value) {
@@ -243,7 +243,7 @@ void Environment::set_wind_turbulunce(double turb_length, double turb_sigma,
                             taux2d, tau, gauss_value);
 }
 
-void Environment::algorithm(double int_step) {
+void EarthEnvironment::algorithm(double int_step) {
   /* passing data*/
   arma::vec3 VBED;
   arma::vec3 SBII;
@@ -285,6 +285,8 @@ void Environment::algorithm(double int_step) {
   // dynamic pressure
   this->pdynmc = 0.5 * atmosphere->get_density() * this->dvba * this->dvba;
 
+  this->tempc = atmosphere->get_temperature_in_kelvin() + 273.16;
+
   data_exchang->hset("press", atmosphere->get_pressure());
   data_exchang->hset("rho", atmosphere->get_density());
   data_exchang->hset("vmach", vmach);
@@ -297,32 +299,12 @@ void Environment::algorithm(double int_step) {
   data_exchang->hset("gravg", norm(GRAVG));
 }
 
-void Environment::update_diagnostic_attributes(double int_step) {
-  this->gravg = get_grav();
-  this->tempc = atmosphere->get_temperature_in_kelvin() + 273.16;
-}
-
-double Environment::get_press() { return atmosphere->get_pressure(); }
-double Environment::get_rho() { return atmosphere->get_density(); }
-double Environment::get_tempk() {
-  return atmosphere->get_temperature_in_kelvin();
-}
-
-double Environment::get_vmach() { return vmach; }
-double Environment::get_pdynmc() { return pdynmc; }
-double Environment::get_dvba() { return dvba; }
-
-double Environment::get_grav() { return norm(GRAVG); }
-
-arma::vec3 Environment::get_GRAVG() { return GRAVG; }
-arma::vec3 Environment::get_VAED() { return wind->get_VAED(); }
-arma::mat33 Environment::get_TEI() { return TEI; }
-void Environment::set_RNP() {
+void EarthEnvironment::set_RNP() {
   RNP();
   data_exchang->hset("TEI", TEI);
 }
 /* Rotation-Nutation-Precession transfor Matrix (ECI to ECEF) */
-void Environment::RNP() {
+void EarthEnvironment::RNP() {
   /* double We = 7.2921151467E-5; */
   // GPSR gpsr;/* call gpsr function */
   time_util::UTC_TIME utc_caldate;
@@ -622,7 +604,7 @@ void Environment::RNP() {
  *       acc         Gravitational acceleration
  *
  ********************************************************************************/
-arma::vec Environment::AccelHarmonic(arma::vec3 SBII, int n_max, int m_max) {
+arma::vec EarthEnvironment::AccelHarmonic(arma::vec3 SBII, int n_max, int m_max) {
   /* Local variables */
   int n, m;               /* Loop counters */
   double r_sqr, rho, Fac; /* Auxiliary quantities */

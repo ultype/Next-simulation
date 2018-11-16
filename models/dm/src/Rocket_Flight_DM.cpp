@@ -32,7 +32,6 @@ Rocket_Flight_DM::Rocket_Flight_DM(Data_exchang &input)
       VECTOR_INIT(ABEE, 3),
       VECTOR_INIT(JBII, 3),
       VECTOR_INIT(JBEE, 3),
-      VECTOR_INIT(CONING, 3),
       VECTOR_INIT(NEXT_ACC, 3),
       VECTOR_INIT(VBED, 3),
       VECTOR_INIT(VBII_old, 3),
@@ -51,7 +50,6 @@ Rocket_Flight_DM::Rocket_Flight_DM(Data_exchang &input)
       VECTOR_INIT(LT_euler, 3),
       VECTOR_INIT(TBLQ, 4),
       VECTOR_INIT(ABID, 3) {
-  build_WEII();
   data_exchang = &input;
 }
 
@@ -79,7 +77,6 @@ Rocket_Flight_DM::Rocket_Flight_DM(const Rocket_Flight_DM &other)
       VECTOR_INIT(ABEE, 3),
       VECTOR_INIT(JBII, 3),
       VECTOR_INIT(JBEE, 3),
-      VECTOR_INIT(CONING, 3),
       VECTOR_INIT(NEXT_ACC, 3),
       VECTOR_INIT(VBED, 3),
       VECTOR_INIT(VBII_old, 3),
@@ -93,11 +90,177 @@ Rocket_Flight_DM::Rocket_Flight_DM(const Rocket_Flight_DM &other)
       VECTOR_INIT(TBLQ, 4),
       VECTOR_INIT(ABID, 3) {
   this->data_exchang = other.data_exchang;
+  this->TBD = other.TBD;
+  this->TBI = other.TBI;
+  this->TBID = other.TBID;
+  this->WEII_skew = other.WEII_skew;
+  this->TDI = other.TDI;
+  this->TDE = other.TDE;
+  this->TGI = other.TGI;
+  this->TBI_Q = other.TBI_Q;
+  this->TBID_Q = other.TBID_Q;
+  this->TBDQ = other.TBDQ;
+  this->VBAB = other.VBAB;
+  this->SBII = other.SBII;
+  this->VBII = other.VBII;
+  this->SBIIP = other.SBIIP;
+  this->VBIIP = other.VBIIP;
+  this->ABII = other.ABII;
+  this->FSPB = other.FSPB;
+  this->ABIB = other.ABIB;
+  this->SBEE = other.SBEE;
+  this->VBEE = other.VBEE;
+  this->ABEE = other.ABEE;
+  this->JBII = other.JBII;
+  this->JBEE = other.JBEE;
+  this->CONING = other.CONING;
+  this->NEXT_ACC = other.NEXT_ACC;
+  this->VBED = other.VBED;
+  this->VBII_old = other.VBII_old;
+  this->WEII = other.WEII;
+  this->WBII = other.WBII;
+  this->WBIB = other.WBIB;
+  this->WBIBD = other.WBIBD;
+  this->WBEB = other.WBEB;
+  this->TLI = other.TLI;
+  this->LT_euler = other.LT_euler;
+  this->TBLQ = other.TBLQ;
+  this->ABID = other.ABID;
+  this->ortho_error = other.ortho_error;
+  this->alphax = other.alphax;
+  this->betax = other.betax;
+  this->alppx = other.alppx;
+  this->phipx = other.phipx;
+  this->alphaix = other.alphaix;
+  this->betaix = other.betaix;
+  this->psibdx = other.psibdx;
+  this->thtbdx = other.thtbdx;
+  this->phibdx = other.phibdx;
+  this->psibd = other.psibd;
+  this->thtbd = other.thtbd;
+  this->phibd = other.phibd;
+  this->alt = other.alt;
+  this->lonx = other.lonx;
+  this->latx = other.latx;
+  this->_aero_loss = other._aero_loss;
+  this->gravity_loss = other.gravity_loss;
+  this->t = other.t;
+  this->_grndtrck = other._grndtrck;
+  this->_gndtrkmx = other._gndtrkmx;
+  this->_gndtrnmx = other._gndtrnmx;
+  this->_ayx = other._ayx;
+  this->_anx = other._anx;
+  this->_dbi = other._dbi;
+  this->_dvbi = other._dvbi;
+  this->_dvbe = other._dvbe;
+  this->_thtvdx = other._thtvdx;
+  this->_psivdx = other._psivdx;
+  this->liftoff = other.liftoff;
+  this->ppx = other.ppx;
+  this->qqx = other.qqx;
+  this->rrx = other.rrx;
+  this->control_loss = other.control_loss;
+  this->_inclination = other._inclination;
+  this->_eccentricity = other._eccentricity;
+  this->_semi_major = other._semi_major;
+  this->_ha = other._ha;
+  this->_hp = other._hp;
+  this->_lon_anodex = other._lon_anodex;
+  this->_arg_perix = other._arg_perix;
+  this->_true_anomx = other._true_anomx;
+  this->_ref_alt = other._ref_alt;
+  this->reference_point = other.reference_point;
+  this->Roll = other.Roll;
+  this->Pitch = other.Pitch;
+  this->Yaw = other.Yaw;
 }
 
 Rocket_Flight_DM &Rocket_Flight_DM::operator=(const Rocket_Flight_DM &other) {
   if (&other == this) return *this;
-
+  this->data_exchang = other.data_exchang;
+  this->TBD = other.TBD;
+  this->TBI = other.TBI;
+  this->TBID = other.TBID;
+  this->WEII_skew = other.WEII_skew;
+  this->TDI = other.TDI;
+  this->TDE = other.TDE;
+  this->TGI = other.TGI;
+  this->TBI_Q = other.TBI_Q;
+  this->TBID_Q = other.TBID_Q;
+  this->TBDQ = other.TBDQ;
+  this->VBAB = other.VBAB;
+  this->SBII = other.SBII;
+  this->VBII = other.VBII;
+  this->SBIIP = other.SBIIP;
+  this->VBIIP = other.VBIIP;
+  this->ABII = other.ABII;
+  this->FSPB = other.FSPB;
+  this->ABIB = other.ABIB;
+  this->SBEE = other.SBEE;
+  this->VBEE = other.VBEE;
+  this->ABEE = other.ABEE;
+  this->JBII = other.JBII;
+  this->JBEE = other.JBEE;
+  this->CONING = other.CONING;
+  this->NEXT_ACC = other.NEXT_ACC;
+  this->VBED = other.VBED;
+  this->VBII_old = other.VBII_old;
+  this->WEII = other.WEII;
+  this->WBII = other.WBII;
+  this->WBIB = other.WBIB;
+  this->WBIBD = other.WBIBD;
+  this->WBEB = other.WBEB;
+  this->TLI = other.TLI;
+  this->LT_euler = other.LT_euler;
+  this->TBLQ = other.TBLQ;
+  this->ABID = other.ABID;
+  this->ortho_error = other.ortho_error;
+  this->alphax = other.alphax;
+  this->betax = other.betax;
+  this->alppx = other.alppx;
+  this->phipx = other.phipx;
+  this->alphaix = other.alphaix;
+  this->betaix = other.betaix;
+  this->psibdx = other.psibdx;
+  this->thtbdx = other.thtbdx;
+  this->phibdx = other.phibdx;
+  this->psibd = other.psibd;
+  this->thtbd = other.thtbd;
+  this->phibd = other.phibd;
+  this->alt = other.alt;
+  this->lonx = other.lonx;
+  this->latx = other.latx;
+  this->_aero_loss = other._aero_loss;
+  this->gravity_loss = other.gravity_loss;
+  this->t = other.t;
+  this->_grndtrck = other._grndtrck;
+  this->_gndtrkmx = other._gndtrkmx;
+  this->_gndtrnmx = other._gndtrnmx;
+  this->_ayx = other._ayx;
+  this->_anx = other._anx;
+  this->_dbi = other._dbi;
+  this->_dvbi = other._dvbi;
+  this->_dvbe = other._dvbe;
+  this->_thtvdx = other._thtvdx;
+  this->_psivdx = other._psivdx;
+  this->liftoff = other.liftoff;
+  this->ppx = other.ppx;
+  this->qqx = other.qqx;
+  this->rrx = other.rrx;
+  this->control_loss = other.control_loss;
+  this->_inclination = other._inclination;
+  this->_eccentricity = other._eccentricity;
+  this->_semi_major = other._semi_major;
+  this->_ha = other._ha;
+  this->_hp = other._hp;
+  this->_lon_anodex = other._lon_anodex;
+  this->_arg_perix = other._arg_perix;
+  this->_true_anomx = other._true_anomx;
+  this->_ref_alt = other._ref_alt;
+  this->reference_point = other.reference_point;
+  this->Roll = other.Roll;
+  this->Pitch = other.Pitch;
+  this->Yaw = other.Yaw;
   return *this;
 }
 
@@ -111,7 +274,6 @@ void Rocket_Flight_DM::init() {
   rhoC_1(0) = -XCG(0) - (-8.436);
   rhoC_1(1) = 0.0;
   rhoC_1(2) = 0.0;
-  // arma::mat33 TBI = kinematics->get_TBI();
 
   // converting geodetic lonx, latx, alt to SBII
   SBII = cad::in_geo84(lonx * RAD, latx * RAD, alt, TEI);
@@ -134,7 +296,6 @@ void Rocket_Flight_DM::init() {
       this->TBI);  // Convert Direct Cosine Matrix to Quaternion
 
   arma::mat VBEB = this->build_VBEB(alphax, betax, _dvbe);
-  // arma::mat33 TBD = kinematics->get_TBD();
   // Geodetic velocity
   VBED = trans(TBD) * VBEB;
 
@@ -169,25 +330,10 @@ void Rocket_Flight_DM::load_angle(double yaw, double roll, double pitch) {
   this->psibdx = yaw;
   this->phibdx = roll;
   this->thtbdx = pitch;
-
-  // double lonx = newton->get_lonx();
-  // double latx = newton->get_latx();
-  // double alt  = newton->get_alt();
-  // arma::mat33 TEI = grab_TEI();
-
-  // TBD = build_psi_tht_phi_TM(psibdx * RAD, thtbdx * RAD, phibdx * RAD);
-
-  // arma::mat current_TDI = cad::tdi84(lonx * RAD, latx * RAD, alt, TEI);
-  // TBI = TBD * current_TDI;
-
-  // this->TBI_Q = Matrix2Quaternion(this->TBI);  // Convert Direct Cosine
-  // Matrix to Quaternion
 }
 
 void Rocket_Flight_DM::load_angular_velocity(double ppx, double qqx,
                                              double rrx) {
-  // arma::mat33 TBI = kinematics->get_TBI();
-
   // body rate wrt Earth frame in body coordinates
   this->WBEB = {ppx * RAD, qqx * RAD, rrx * RAD};
 }
@@ -202,11 +348,6 @@ void Rocket_Flight_DM::load_location(double lonx, double latx, double alt) {
   TGI = cad::tgi84(lonx * RAD, latx * RAD, alt, TEI);
   data_exchang->hset("SBII", SBII);
   data_exchang->hset("TGI", TGI);
-}
-
-void Rocket_Flight_DM::load_coning_var(double ang, double w) {
-  this->con_ang = ang;
-  this->con_w = w;
 }
 
 void Rocket_Flight_DM::load_geodetic_velocity(double alpha0x, double beta0x,
@@ -259,7 +400,6 @@ void Rocket_Flight_DM::algorithm(double int_step) {
     propagate_gravityloss(int_step);
     propagate_control_loss(int_step);
     VBAB = TBD * (TDE * VBEE - VAED);
-    // VBAB = TBD * (VBED - VAED);
     this->alphax = calculate_alphax(VBAB);
     this->betax = calculate_betax(VBAB, norm(VBAB));
 
@@ -501,8 +641,6 @@ double Rocket_Flight_DM::get_psibdx() {
     cpsi = 1 * sign(cpsi);
   }
   psibd = acos(cpsi) * sign(TBD(0, 1));
-  // psibd = atan2( 2. * (TBDQ(1) * TBDQ(2) + TBDQ(0) * TBDQ(3) ), (1. - 2. *
-  // (TBDQ(2) * TBDQ(2) + TBDQ(3) * TBDQ(3))) );
 
   return DEG * psibd;
 }
@@ -639,9 +777,6 @@ void Rocket_Flight_DM::RK4F(arma::vec3 GRAVG, arma::mat33 TEI, double int_step,
   double thrust;
   data_exchang->hget("vmass", &vmass);
   data_exchang->hget("thrust", &thrust);
-  // arma::vec3 FMB = grab_FMB();
-  // arma::vec3 FAPB = grab_FAPB();
-  // arma::mat33 IBBB = grab_IBBB();
   arma::vec4 TBID_Q_NEW;
   arma::vec3 rhoC_IMU;
 
@@ -662,20 +797,6 @@ void Rocket_Flight_DM::RK4F(arma::vec3 GRAVG, arma::mat33 TEI, double int_step,
       cross(WBIBD, rhoC_IMU) + cross(WBIB, cross(WBIB, rhoC_IMU));
   NEXT_ACC = ddrP_1;
 
-  /******************************************************************************************/
-  /* Prograte S, V, A status */
-  // arma::vec3 WBIBD_new = arma::solve(IBBB, (FMB - skew_sym(this->WBIB) * IBBB
-  // * this->WBIB)); NEXT_ACC = trans(TBI) * FSPB + GRAVG;  // Strapdown
-  // Analytics 4.3-11 if (liftoff == 0) {
-  //     if (norm(FSPB) - norm(GRAVG) > 0) {
-  //         liftoff = 1;
-  //     }
-  //     NEXT_ACC = trans(TEI) * (cross(WEII, cross(WEII, (TEI * SBII))));
-  //     FSPB = TBI * (-GRAVG + NEXT_ACC);  // Strapdown Analytics 4.3-14
-  // } else {
-  //     FSPB = FSPB;  //+ TBI * GRAVG;  // FSPB: body force include gravity acc
-  // }
-  /******************************************************************************************/
   if (liftoff == 0) {
     if ((thrust - norm(vmass * GRAVG)) > 0) {
       liftoff = 1;
@@ -740,20 +861,12 @@ void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
   VBIIP_post = VBIIP;  // - trans(TBI) * cross(WBIB, rhoC_1);
   WBIB_post = WBIB;
   TBI_Q_post = TBI_Q;
-  dang_slosh_theta_post = dang_slosh_theta;
-  ang_slosh_theta_post = ang_slosh_theta;
-  dang_slosh_psi_post = dang_slosh_psi;
-  ang_slosh_psi_post = ang_slosh_psi;
 
   RK4F(GRAVG, TEI, int_step, K11, K12, K13, K14, K15, K16, K17, K18);
   VBIIP = VBIIP_post + K11 * 0.5 * int_step;
   SBIIP = SBIIP_post + K12 * 0.5 * int_step;
   WBIB = WBIB_post + K13 * 0.5 * int_step;
   TBI_Q = TBI_Q_post + K14 * 0.5 * int_step;
-  ang_slosh_theta = ang_slosh_theta_post + K16 * 0.5 * int_step;
-  ang_slosh_psi = ang_slosh_psi_post + K18 * 0.5 * int_step;
-  dang_slosh_theta = dang_slosh_theta_post + K15 * 0.5 * int_step;
-  dang_slosh_psi = dang_slosh_psi_post + K17 * 0.5 * int_step;
   this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to Matrix
   data_exchang->hset("WBIB", WBIB);
   data_exchang->hset("TBI", TBI);
@@ -763,10 +876,6 @@ void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
   SBIIP = SBIIP_post + K22 * 0.5 * int_step;
   WBIB = WBIB_post + K23 * 0.5 * int_step;
   TBI_Q = TBI_Q_post + K24 * 0.5 * int_step;
-  ang_slosh_theta = ang_slosh_theta_post + K26 * 0.5 * int_step;
-  ang_slosh_psi = ang_slosh_psi_post + K28 * 0.5 * int_step;
-  dang_slosh_theta = dang_slosh_theta_post + K25 * 0.5 * int_step;
-  dang_slosh_psi = dang_slosh_psi_post + K27 * 0.5 * int_step;
   this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to Matrix
   data_exchang->hset("WBIB", WBIB);
   data_exchang->hset("TBI", TBI);
@@ -776,10 +885,6 @@ void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
   SBIIP = SBIIP_post + K32 * int_step;
   WBIB = WBIB_post + K33 * int_step;
   TBI_Q = TBI_Q_post + K34 * int_step;
-  ang_slosh_theta = ang_slosh_theta_post + K36 * int_step;
-  ang_slosh_psi = ang_slosh_psi_post + K38 * int_step;
-  dang_slosh_theta = dang_slosh_theta_post + K35 * int_step;
-  dang_slosh_psi = dang_slosh_psi_post + K37 * int_step;
   this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to Matrix
   data_exchang->hset("WBIB", WBIB);
   data_exchang->hset("TBI", TBI);
@@ -789,14 +894,6 @@ void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
   SBIIP = SBIIP_post + (int_step / 6.0) * (K12 + 2.0 * K22 + 2.0 * K32 + K42);
   WBIB = WBIB_post + (int_step / 6.0) * (K13 + 2.0 * K23 + 2.0 * K33 + K43);
   TBI_Q = TBI_Q_post + (int_step / 6.0) * (K14 + 2.0 * K24 + 2.0 * K34 + K44);
-  ang_slosh_theta = ang_slosh_theta_post +
-                    (int_step / 6.0) * (K16 + 2.0 * K26 + 2.0 * K36 + K46);
-  ang_slosh_psi = ang_slosh_psi_post +
-                  (int_step / 6.0) * (K18 + 2.0 * K28 + 2.0 * K38 + K48);
-  dang_slosh_theta = dang_slosh_theta_post +
-                     (int_step / 6.0) * (K15 + 2.0 * K25 + 2.0 * K35 + K45);
-  dang_slosh_psi = dang_slosh_psi_post +
-                   (int_step / 6.0) * (K17 + 2.0 * K27 + 2.0 * K37 + K47);
   this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to Matrix
 
   arma::vec3 rhoC_1;
@@ -813,16 +910,10 @@ void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
 
   Send();
 }
-double Rocket_Flight_DM::get_alppx() { return alppx; }
-double Rocket_Flight_DM::get_phipx() { return phipx; }
-double Rocket_Flight_DM::get_alphax() { return alphax; }
-double Rocket_Flight_DM::get_betax() { return betax; }
+
 double Rocket_Flight_DM::get_ppx() { return this->WBEB(0) * DEG; }
 double Rocket_Flight_DM::get_qqx() { return this->WBEB(1) * DEG; }
 double Rocket_Flight_DM::get_rrx() { return this->WBEB(2) * DEG; }
-double Rocket_Flight_DM::get_alt() { return alt; }
-double Rocket_Flight_DM::get_lonx() { return lonx; }
-double Rocket_Flight_DM::get_latx() { return latx; }
 double Rocket_Flight_DM::get_dbi() { return norm(SBII); }
 double Rocket_Flight_DM::get_dvbi() { return norm(VBII); }
 double Rocket_Flight_DM::get_dvbe() { return pol_from_cart(get_VBED())(0); }
@@ -833,47 +924,9 @@ double Rocket_Flight_DM::get_psivdx() {
   return DEG * pol_from_cart(get_VBED())(1);
 }
 
-arma::mat Rocket_Flight_DM::get_TGI() { return TGI; }
-arma::mat Rocket_Flight_DM::get_TDE() { return TDE; }
-arma::mat Rocket_Flight_DM::get_TBD() { return TBD; }
-arma::mat Rocket_Flight_DM::get_TBI() { return TBI; }
-arma::vec3 Rocket_Flight_DM::get_VBAB() { return VBAB; }
-arma::vec3 Rocket_Flight_DM::get_WBII() { return this->WBII; }
-arma::vec3 Rocket_Flight_DM::get_WBIB() { return this->WBIB; }
-arma::vec3 Rocket_Flight_DM::get_WBIBD() { return this->WBIBD; }
-arma::vec3 Rocket_Flight_DM::get_WEII() { return this->WEII; }
-arma::vec3 Rocket_Flight_DM::get_CONING() { return CONING; }
 arma::vec3 Rocket_Flight_DM::get_VBED() {
   return TDI * (VBII - WEII_skew * SBII);
 }
-arma::vec3 Rocket_Flight_DM::get_VBII() { return VBII; }
-arma::vec3 Rocket_Flight_DM::get_ABII() { return ABII; }
-arma::vec3 Rocket_Flight_DM::get_SBII() { return SBII; }
-arma::vec3 Rocket_Flight_DM::get_FSPB() { return FSPB; }
-arma::vec3 Rocket_Flight_DM::get_SBEE() { return SBEE; }
-arma::vec3 Rocket_Flight_DM::get_VBEE() { return VBEE; }
-arma::vec3 Rocket_Flight_DM::get_SBEE_test() { return SBEE_test; }
-arma::vec3 Rocket_Flight_DM::get_VBEE_test() { return VBEE_test; }
-arma::vec3 Rocket_Flight_DM::get_ABEE_test() { return ABEE_test; }
-arma::vec3 Rocket_Flight_DM::get_NEXT_ACC() { return NEXT_ACC; }
-double Rocket_Flight_DM::get_dang_slosh_theta() { return dang_slosh_theta; }
-double Rocket_Flight_DM::get_ang_slosh_theta() { return ang_slosh_theta; }
-double Rocket_Flight_DM::get_dang_slosh_psi() { return dang_slosh_psi; }
-double Rocket_Flight_DM::get_ang_slosh_psi() { return ang_slosh_psi; }
-
-double *Rocket_Flight_DM::get_double_SBEE() { return _SBEE; }
-double *Rocket_Flight_DM::get_double_VBEE() { return _VBEE; }
-double *Rocket_Flight_DM::get_double_ABEE() { return _ABEE; }
-double *Rocket_Flight_DM::get_double_JBEE() { return _JBEE; }
-double *Rocket_Flight_DM::get_double_WBEB() { return _WBEB; }
-double *Rocket_Flight_DM::get_double_SBEE_test() { return _SBEE_test; }
-double *Rocket_Flight_DM::get_double_VBEE_test() { return _VBEE_test; }
-double *Rocket_Flight_DM::get_double_ABEE_test() { return _ABEE_test; }
-double Rocket_Flight_DM::get_double_psibd() { return psibd; }
-double Rocket_Flight_DM::get_double_thtbd() { return thtbd; }
-double Rocket_Flight_DM::get_double_phibd() { return phibd; }
-
-int Rocket_Flight_DM::get_liftoff() { return liftoff; }
 
 int Rocket_Flight_DM::enqueue_to_simgen_buffer(struct icf_ctrlblk_t *C,
                                                double ext_porlation) {

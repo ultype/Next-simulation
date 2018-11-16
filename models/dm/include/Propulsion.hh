@@ -60,13 +60,6 @@ class Propulsion : public Actuator {
   void set_HOT_STAGE();
   // XXX: get_thrust_state
   enum THRUST_TYPE get_thrust_state();
-  int get_mprop();
-  double get_vmass();
-  arma::vec3 get_XCG();
-  double get_thrust();
-  double get_fmassr();
-  arma::vec3 get_XCG_0();
-  arma::mat33 get_IBBB();
 
   /* Input File */
   void set_vmass0(double);
@@ -74,15 +67,6 @@ class Propulsion : public Actuator {
 
   void set_aexit(double);
   void set_payload_mass(double);
-
-  std::function<double()> grab_press;
-  std::function<arma::vec3()> grab_SLOSH_CG;
-  std::function<double()> grab_slosh_mass;
-  std::function<arma::vec3()> grab_e1_XCG;
-  std::function<arma::vec3()> grab_e2_XCG;
-  std::function<arma::vec3()> grab_e3_XCG;
-  std::function<arma::vec3()> grab_e4_XCG;
-  std::function<double()> grab_alt;
 
  private:
   /* Rocket Engine state variables */
@@ -134,7 +118,7 @@ class Propulsion : public Actuator {
   VECTOR(XCG, 3);   /* *o (m) Current vehicle's cg */
   VECTOR(XCG_1, 3); /* *o (m) Final vehicle's cg */
 
-  MATRIX(IBBB0, 3, 3); /* *o (kg*m2) Initial vehicle's MOI */
+  MATRIX(IBBB0, 3, 3); /* *o (--) Initial vehicle's MOI */
   MATRIX(IBBB, 3, 3);  /* *o (kg*m2) Current cheicle's MOI */
   MATRIX(IBBB1, 3, 3); /* *o (kg*m2) Final vehicle's MOI */
 

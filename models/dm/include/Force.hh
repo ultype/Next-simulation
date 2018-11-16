@@ -34,14 +34,6 @@ class Forces : public Dynamics {
   void set_DOF(int ndof);
   void set_aero_flag(unsigned int in);
 
-  arma::vec get_FAPB();
-  arma::vec get_FAP();
-  arma::vec get_FMB();
-  arma::vec get_rhoC_1();
-  arma::vec get_ddrhoC_1();
-  arma::vec get_ddrP_1();
-  arma::vec get_ddang_1();
-
  private:
   /* Internal Initializers */
   void default_data();

@@ -1,10 +1,10 @@
-#ifndef __environment_HH__
-#define __environment_HH__
+#ifndef __earthenvironment_HH__
+#define __earthenvironment_HH__
 /********************************* TRICK HEADER *******************************
 PURPOSE:
-      (Describe the Environment Module Variables and Algorithm)
+      (Describe the EarthEnvironment Module Variables and Algorithm)
 LIBRARY DEPENDENCY:
-      ((../src/Environment.cpp))
+      ((../src/EarthEnvironment.cpp))
 PROGRAMMERS:
       (((Chun-Hsu Lai) () () () ))
 *******************************************************************************/
@@ -27,16 +27,16 @@ PROGRAMMERS:
 #include "Time_management.hh"
 #include "dm_delta_ut.hh"
 
-class Environment : public Dynamics {
-  TRICK_INTERFACE(Environment);
+class EarthEnvironment : public Dynamics {
+  TRICK_INTERFACE(EarthEnvironment);
 
  public:
-  Environment(Data_exchang& input);
+  EarthEnvironment(Data_exchang& input);
 
-  Environment(const Environment& other);
-  ~Environment();
+  EarthEnvironment(const EarthEnvironment& other);
+  ~EarthEnvironment();
 
-  Environment& operator=(const Environment& other);
+  EarthEnvironment& operator=(const EarthEnvironment& other);
 
   void atmosphere_use_public();
   void atmosphere_use_nasa();
@@ -54,32 +54,21 @@ class Environment : public Dynamics {
 
   virtual void init();
   virtual void algorithm(double int_step);
-  void update_diagnostic_attributes(double int_step);
+
   void set_RNP();
 
-  double get_rho();
-  double get_vmach();
-  double get_pdynmc();
-  double get_tempk();
-  double get_dvba();
-  double get_grav();
-  double get_press();
+  // double get_rho();
+  // double get_vmach();
+  // double get_pdynmc();
+  // double get_tempk();
+  // double get_dvba();
+  // double get_grav();
+  // double get_press();
 
-  arma::vec3 get_GRAVG();
-  arma::vec3 get_VAED();
-  arma::mat33 get_TEI();
+  // arma::vec3 get_GRAVG();
+  // arma::vec3 get_VAED();
+  // arma::mat33 get_TEI();
 
-  std::function<double()> grab_dvbe;
-  std::function<arma::vec3()> grab_SBII;
-  std::function<arma::vec3()> grab_VBED;
-  std::function<double()> grab_alt;
-  std::function<arma::mat33()> grab_TGI;
-  std::function<arma::mat33()> grab_TBI;
-  std::function<arma::mat33()> grab_TBD;
-  std::function<double()> grab_alppx;
-  std::function<double()> grab_phipx;
-  std::function<arma::vec3()> grab_VBEE;
-  std::function<arma::mat33()> grab_TDE;
 
  private:
   time_management* time;
@@ -106,4 +95,4 @@ class Environment : public Dynamics {
   arma::vec AccelHarmonic(arma::vec3 SBII, int n_max, int m_max);
 };
 
-#endif  // __environment_HH__
+#endif  // __earthenvironment_HH__
