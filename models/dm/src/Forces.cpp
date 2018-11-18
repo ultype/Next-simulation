@@ -53,7 +53,6 @@ Forces::Forces(Data_exchang &input)
       VECTOR_INIT(beta_b1_q4, 3),
       VECTOR_INIT(beta_b1_q5, 3),
       VECTOR_INIT(beta_b1_q6, 3) {
-  this->default_data();
   data_exchang = &input;
 }
 Forces::Forces(const Forces &other)
@@ -78,27 +77,61 @@ Forces::Forces(const Forces &other)
       VECTOR_INIT(beta_b1_q4, 3),
       VECTOR_INIT(beta_b1_q5, 3),
       VECTOR_INIT(beta_b1_q6, 3) {
-  this->default_data();
   this->data_exchang = other.data_exchang;
   this->FAP = other.FAP;
   this->FAPB = other.FAPB;
   this->FMB = other.FMB;
+  this->FMAB = other.FMAB;
+  this->Q_G = other.Q_G;
+  this->Q_Aero = other.Q_Aero;
+  this->rhoC_1 = other.rhoC_1;
+  this->I1 = other.I1;
+  this->ddrP_1 = other.ddrP_1;
+  this->ddang_1 = other.ddang_1;
+  this->dang_1 = other.dang_1;
+  this->ddrhoC_1 = other.ddrhoC_1;
+  this->p_b1_ga = other.p_b1_ga;
+  this->p_b1_be = other.p_b1_be;
+  this->f = other.f;
+  this->gamma_b1_q1 = other.gamma_b1_q1;
+  this->gamma_b1_q2 = other.gamma_b1_q2;
+  this->gamma_b1_q3 = other.gamma_b1_q3;
+  this->beta_b1_q4 = other.beta_b1_q4;
+  this->beta_b1_q5 = other.beta_b1_q5;
+  this->beta_b1_q6 = other.beta_b1_q6;
 }
 
 Forces &Forces::operator=(const Forces &other) {
   if (&other == this) return *this;
-
+  this->data_exchang = other.data_exchang;
   this->FAP = other.FAP;
   this->FAPB = other.FAPB;
   this->FMB = other.FMB;
-
+  this->FMAB = other.FMAB;
+  this->Q_G = other.Q_G;
+  this->Q_Aero = other.Q_Aero;
+  this->rhoC_1 = other.rhoC_1;
+  this->I1 = other.I1;
+  this->ddrP_1 = other.ddrP_1;
+  this->ddang_1 = other.ddang_1;
+  this->dang_1 = other.dang_1;
+  this->ddrhoC_1 = other.ddrhoC_1;
+  this->p_b1_ga = other.p_b1_ga;
+  this->p_b1_be = other.p_b1_be;
+  this->f = other.f;
+  this->gamma_b1_q1 = other.gamma_b1_q1;
+  this->gamma_b1_q2 = other.gamma_b1_q2;
+  this->gamma_b1_q3 = other.gamma_b1_q3;
+  this->beta_b1_q4 = other.beta_b1_q4;
+  this->beta_b1_q5 = other.beta_b1_q5;
+  this->beta_b1_q6 = other.beta_b1_q6;
   return *this;
 }
 
 void Forces::default_data() {}
 
 void Forces::init() {
-  gamma_beta();
+  // gamma_beta();
   // Gravity_Q();
 }
 

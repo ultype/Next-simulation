@@ -8,7 +8,7 @@ LIBRARY DEPENDENCIES:
 
 #include "sim_objects/default_trick_sys.sm"
 ##include "Tvc.hh"
-##include "Force.hh"
+// ##include "Force.hh"
 ##include "Propulsion.hh"
 ##include "Aerodynamics.hh"
 ##include "Time_management.hh"
@@ -51,7 +51,7 @@ class Rocket_SimObject : public Trick::SimObject {
         double stand_still_time = 0.0;
         Rocket_Flight_DM dynamics;
         EarthEnvironment env;
-        Forces forces;
+        // Forces forces;
         AeroDynamics aerodynamics;
         Propulsion propulsion;
         Gyro *gyro;
@@ -76,7 +76,7 @@ class Rocket_SimObject : public Trick::SimObject {
             tvc.grab_theta_c_cmd       = GRAB_VAR(ctl_tvc_db.theta_c_cmd);
             tvc.grab_theta_d_cmd       = GRAB_VAR(ctl_tvc_db.theta_d_cmd);
 
-            dynamics.collect_forces_and_propagate = LINK( forces, collect_forces_and_propagate);
+            // dynamics.collect_forces_and_propagate = LINK( forces, collect_forces_and_propagate);
         };
 
         void egse_uplink_packet_transfer(struct icf_ctrlblk_t *C) {
@@ -95,7 +95,7 @@ class Rocket_SimObject : public Trick::SimObject {
                 propulsion  ( data_exchang ) ,
                 aerodynamics( propulsion, data_exchang ) ,
                 tvc         ( data_exchang ) ,
-                forces      ( data_exchang ) ,
+                // forces      ( data_exchang ) ,
                 gps_con     (  ),
                 dynamics    ( data_exchang )
             {
@@ -107,7 +107,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") env.init();
             ("initialization") dynamics.init();
             ("initialization") tvc.init();
-            ("initialization") forces.init();
+            // ("initialization") forces.init();
             ("initialization") gyro->init();
             ("initialization") accelerometer->init();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_SIL_EGSE);
