@@ -1709,54 +1709,6 @@ void Rocket_Flight_DM::rotate(double **r, double **qt, int n, int i, double a, d
   }
 }
 
-arma::mat33 Rocket_Flight_DM::TMX(double ang) {
-  arma::mat33 TM;
-
-  TM(0, 0) = 1.0;
-  TM(0, 1) = 0.0;
-  TM(0, 2) = 0.0;
-  TM(1, 0) = 0.0;
-  TM(1, 1) = cos(ang);
-  TM(1, 2) = sin(ang);
-  TM(2, 0) = 0.0;
-  TM(2, 1) = -sin(ang);
-  TM(2, 2) = cos(ang);
-
-  return TM;
-}
-
-arma::mat33 Rocket_Flight_DM::TMY(double ang) {
-  arma::mat33 TM;
-
-  TM(0, 0) = cos(ang);
-  TM(0, 1) = 0.0;
-  TM(0, 2) = -sin(ang);
-  TM(1, 0) = 0.0;
-  TM(1, 1) = 1.0;
-  TM(1, 2) = 0.0;
-  TM(2, 0) = sin(ang);
-  TM(2, 1) = 0.0;
-  TM(2, 2) = cos(ang);
-
-  return TM;
-}
-
-arma::mat33 Rocket_Flight_DM::TMZ(double ang) {
-  arma::mat33 TM;
-
-  TM(0, 0) = cos(ang);
-  TM(0, 1) = sin(ang);
-  TM(0, 2) = 0.0;
-  TM(1, 0) = -sin(ang);
-  TM(1, 1) = cos(ang);
-  TM(1, 2) = 0.0;
-  TM(2, 0) = 0.0;
-  TM(2, 1) = 0.0;
-  TM(2, 2) = 1.0;
-
-  return TM;
-}
-
 #undef MAXITS
 #undef EPS
 #undef TOLF

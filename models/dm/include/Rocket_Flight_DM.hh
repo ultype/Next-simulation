@@ -104,9 +104,6 @@ class Rocket_Flight_DM : public Dynamics {
   arma::vec3 calculate_fspb(arma::vec3 FAPB, double vmass);
   arma::vec3 calculate_WBEB(arma::mat33 TBI);
   arma::vec3 euler_angle(arma::mat33 TBD);
-  arma::mat33 TMX(double ang);
-  arma::mat33 TMY(double ang);
-  arma::mat33 TMZ(double ang);
 
   void gamma_beta();
   void Gravity_Q();
