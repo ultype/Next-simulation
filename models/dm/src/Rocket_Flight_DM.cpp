@@ -645,11 +645,9 @@ double Rocket_Flight_DM::calculate_alphaix(arma::vec3 VBIB) {
 }
 
 void Rocket_Flight_DM::propagate_aeroloss(double int_step) {
-  arma::vec3 FAPB;
   double vmass;
   data_exchang->hget("vmass", &vmass);
-  data_exchang->hget("FAPB", FAPB);
-  // calculate aero loss`:`
+  // calculate aero loss
   FAPB = FAPB * (1. / vmass);
   _aero_loss = _aero_loss + norm(FAPB) * int_step;
 }
@@ -894,13 +892,10 @@ void Rocket_Flight_DM::RK4F(arma::vec3 GRAVG, arma::mat33 TEI, double int_step,
 
   collect_forces_and_propagate();
 
-  arma::vec3 ddrP_1;
   arma::vec3 XCG_0;
-  arma::vec3 WBIBD_new;
 
-  data_exchang->hget("ddrP_1", ddrP_1);
   data_exchang->hget("XCG_0", XCG_0);
-  data_exchang->hget("ddang_1", WBIBD);
+  WBIBD = ddang_1;
 
   rhoC_IMU(0) = -XCG_0(0) - (reference_point);
   rhoC_IMU(1) = 0.0;
@@ -1205,7 +1200,7 @@ void Rocket_Flight_DM::collect_forces_and_propagate() {
   /*****************input from another module*******************/
 
   data_exchang->hget("XCG", rhoC_1);
-  data_exchang->hget("WBIB", dang_1);
+  dang_1 = WBIB;
 
   rhoC_1(0) = rhoC_1(0) - reference_point;
 
@@ -1230,11 +1225,6 @@ void Rocket_Flight_DM::collect_forces_and_propagate() {
 
   ddrhoC_1 = cross(ddang_1, rhoC_1) +
              cross(dang_1, cross(dang_1, rhoC_1));  // Eq.(5-12)
-
-  data_exchang->hset("ddrP_1", ddrP_1);
-  data_exchang->hset("ddang_1", ddang_1);
-  data_exchang->hset("rhoC_1", rhoC_1);
-  data_exchang->hset("ddrhoC_1", ddrhoC_1);
 
   delete[] ff;
   delete[] x;
@@ -1284,7 +1274,6 @@ void Rocket_Flight_DM::AeroDynamics_Q() {
   double cx;
   double cz;
   arma::vec3 XCP;
-  arma::mat33 TBI;
 
   data_exchang->hget("pdynmc", &pdynmc);
   data_exchang->hget("refa", &refa);
@@ -1296,7 +1285,6 @@ void Rocket_Flight_DM::AeroDynamics_Q() {
   data_exchang->hget("cx", &cx);
   data_exchang->hget("cz", &cz);
   data_exchang->hget("XCP", XCP);
-  data_exchang->hget("TBI", TBI);
 
   arma::vec3 rhoCP;
   rhoCP(0) = -(XCP(0) * refd) - (reference_point);
@@ -1321,21 +1309,14 @@ void Rocket_Flight_DM::AeroDynamics_Q() {
   Q_Aero(5) =
       dot(FMAB, beta_b1_q6) +
       dot(trans(TBI) * FAPB, -trans(TBI) * cross_matrix(rhoCP) * beta_b1_q6);
-
-  data_exchang->hset("FAPB", FAPB);
-  data_exchang->hset("FMAB", FMAB);
 }
 
 void Rocket_Flight_DM::Gravity_Q() {
   arma::vec3 GRAVG;
-  arma::mat33 TBI;
   double vmass;
-  int liftoff;
 
   data_exchang->hget("GRAVG", GRAVG);
-  data_exchang->hget("TBI", TBI);
   data_exchang->hget("vmass", &vmass);
-  data_exchang->hget("liftoff", &liftoff);
 
   arma::vec3 Fg;
   Fg = vmass * GRAVG;
@@ -1379,12 +1360,10 @@ void Rocket_Flight_DM::calculate_I1() {
 }
 
 void Rocket_Flight_DM::funcv(int n, double *x, double *ff) {
-  arma::mat33 TB1_I;
   double m1;
   arma::vec6 Q_TVC;
   data_exchang->hget("vmass", &m1);
   data_exchang->hget("Q_TVC", Q_TVC);
-  data_exchang->hget("TBI", TB1_I);
 
   for (int i = 0; i < 3; i++) {
     ddrP_1(i) = x[i + 1];
@@ -1394,9 +1373,9 @@ void Rocket_Flight_DM::funcv(int n, double *x, double *ff) {
   ddrhoC_1 = cross(ddang_1, rhoC_1) +
              cross(dang_1, cross(dang_1, rhoC_1));  // Eq.(5-12)
   //  Eq.(5-19)
-  p_b1_ga = m1 * (ddrP_1 + trans(TB1_I) * ddrhoC_1);
+  p_b1_ga = m1 * (ddrP_1 + trans(TBI) * ddrhoC_1);
   p_b1_be = I1 * ddang_1 + cross_matrix(dang_1) * I1 * dang_1 +
-            m1 * cross_matrix(rhoC_1) * TB1_I * ddrP_1;
+            m1 * cross_matrix(rhoC_1) * TBI * ddrP_1;
   f(0) = dot(p_b1_ga, gamma_b1_q1) - (Q_G(0) + Q_TVC(0) + Q_Aero(0));
   f(1) = dot(p_b1_ga, gamma_b1_q2) - (Q_G(1) + Q_TVC(1) + Q_Aero(1));
   f(2) = dot(p_b1_ga, gamma_b1_q3) - (Q_G(2) + Q_TVC(2) + Q_Aero(2));
@@ -1729,8 +1708,6 @@ void Rocket_Flight_DM::rotate(double **r, double **qt, int n, int i, double a, d
     qt[i + 1][j] = s * y + c * w;
   }
 }
-
-// void Rocket_Flight_DM::set_reference_point(double refp) { reference_point = refp; }
 
 arma::mat33 Rocket_Flight_DM::TMX(double ang) {
   arma::mat33 TM;
