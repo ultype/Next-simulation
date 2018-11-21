@@ -258,6 +258,35 @@ arma::vec4 QuaternionInverse(arma::vec4 Q_in) {
     return Quaternion_conjugate(Q_in) / sqrt(Q_in(0) * Q_in(0) + Q_in(1) * Q_in(1) + Q_in(2) * Q_in(2) + Q_in(3) * Q_in(3));
 }
 
+arma::vec4 QuaternionTranspose(arma::vec4 Q_in) {
+    arma::vec4 Q_out;
+
+    Q_out(0) = -Q_in(0);
+    Q_out(1) = Q_in(1);
+    Q_out(2) = Q_in(2);
+    Q_out(3) = Q_in(3);
+
+    return Q_out;
+}
+
+arma::vec3 QuaternionRotation(arma::vec4 Q_in, arma::vec3 V_in) {
+    arma::vec4 Q_temp;
+    arma::vec3 V_out;
+
+    Q_temp(0) = 0.0;
+    Q_temp(1) = V_in(0);
+    Q_temp(2) = V_in(1);
+    Q_temp(3) = V_in(2);
+
+    Q_temp = Quaternion_cross(Quaternion_conjugate(Q_in), Quaternion_cross(Q_temp, Q_in));
+
+    V_out(0) = Q_temp(1);
+    V_out(1) = Q_temp(2);
+    V_out(2) = Q_temp(3);
+
+    return V_out;
+}
+
 arma::mat33 cross_matrix(arma::vec3 in) {
     arma::mat33 c_matrix;
 

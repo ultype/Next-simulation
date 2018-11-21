@@ -36,6 +36,8 @@ void Quaternion2Euler(arma::vec4 Quaternion_in, double &Roll, double &Pitch, dou
 arma::vec4 Euler2Quaternion(double Roll, double Pitch, double Yaw);
 arma::vec4 QuaternionMultiply(arma::vec4 Q_in1, arma::vec4 Q_in2);
 arma::vec4 QuaternionInverse(arma::vec4 Q_in);
+arma::vec4 QuaternionTranspose(arma::vec4 Q_in);
+arma::vec3 QuaternionRotation(arma::vec4 Q_in, arma::vec3 V_in);
 arma::mat33 cross_matrix(arma::vec3 in);
 arma::mat33 TMX(double ang);
 arma::mat33 TMY(double ang);
