@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 #include "aux.hh"
+#include <cstdlib>
+#include <cstdio>
 /********************************* TRICK HEADER *******************************
 PURPOSE:
       (Simulation module abstraction class and vehicle class)
@@ -24,15 +26,31 @@ class Data_exchang {
   void hset(std::string input, arma::mat val) { mat_table[input] = val; }
 
   void hget(std::string input, int *val) {
+    if (int_table.find(input) == int_table.end()) {
+      std::cerr << "Can not find " << input << " in int_table." << std::endl;
+      std::abort();
+    } 
     *val = int_table.find(input)->second;
   }
   void hget(std::string input, double *val) {
+    if (double_table.find(input) == double_table.end()) {
+      std::cerr << "Can not find " << input << " in double_table." << std::endl;
+      std::abort();
+    }
     *val = double_table.find(input)->second;
   }
   void hget(std::string input, arma::vec &val) {
+    if (vec_table.find(input) == vec_table.end()) {
+      std::cerr << "Can not find " << input << " in vec_table." << std::endl;
+      std::abort();
+    }
     val = vec_table.find(input)->second;
   }
   void hget(std::string input, arma::mat &val) {
+    if (mat_table.find(input) == mat_table.end()) {
+      std::cerr << "Can not find " << input << " in mat_table." << std::endl;
+      std::abort();
+    }
     val = mat_table.find(input)->second;
   }
 

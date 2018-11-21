@@ -7,8 +7,6 @@ extern Rocket_SimObject rkt;
 const double LONX           = 120.8901527777778;  //  Vehicle longitude - deg  module newton
 const double LATX           = 22.262097222222224;   //  Vehicle latitude  - deg  module newton
 const double ALT            = 6.0;         //  Vehicle altitude  - m  module newton
-const double CON_ANG        = 0.0;
-const double CON_W          = 50.0;
 const double PHIBDX         = 0.0;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
 const double THTBDX         = 90.0;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
 const double PSIBDX         = 90.0;      //  Yawing   angle of veh wrt geod coord - deg  module kinematics
@@ -139,7 +137,7 @@ extern "C" int event_separation_1() {
     rkt.propulsion.set_fmass0(S3_PROPELLANT_MASS);
     rkt.propulsion.get_input_file_var(S3_XCG_0, S3_XCG_1, S3_MOI_ROLL_0, S3_MOI_ROLL_1, S3_MOI_PITCH_0, S3_MOI_PITCH_1, S3_MOI_YAW_0, S3_MOI_YAW_1, S3_SPI, S3_FUEL_FLOW_RATE);
     rkt.propulsion.set_stage_3();
-    rkt.forces.set_reference_point(-3.917);  // set reference point
+    // rkt.forces.set_reference_point(-3.917);  // set reference point
     rkt.dynamics.set_reference_point(-3.917);
     rkt.tvc.set_S3_TVC();
     rkt.propulsion.engine_ignition();
@@ -166,11 +164,11 @@ extern "C" void master_startup(Rocket_SimObject *rkt) {
 }
 
 extern "C" int master_model_configuration(Rocket_SimObject *rkt) {
-    rkt->forces.set_Slosh_flag(0);
-    rkt->forces.set_DOF(6);
-    rkt->forces.set_damping_ratio(0.005);
-    rkt->forces.set_TWD_flag(0);
-    rkt->forces.set_aero_flag(1);
+    // rkt->forces.set_Slosh_flag(0);
+    rkt->dynamics.set_DOF(6);
+    // rkt->forces.set_damping_ratio(0.005);
+    // rkt->forces.set_TWD_flag(0);
+    rkt->dynamics.set_aero_flag(1);
     rkt->dynamics.set_liftoff(0);  // 1 only for test
 }
 
@@ -199,10 +197,6 @@ extern "C" void master_init_slv(Rocket_SimObject *rkt) {
     double latx       = LATX;   //  Vehicle latitude  - deg  module newton
     double alt        = ALT;         //  Vehicle altitude  - m  module newton
     rkt->dynamics.load_location(lonx, latx, alt);
-
-    double con_ang = CON_ANG;
-    double con_w = CON_W;
-    rkt->dynamics.load_coning_var(con_ang, con_w);
 
     double phibdx = PHIBDX;       //  Rolling  angle of veh wrt geod coord - deg  module kinematics
     double thtbdx = THTBDX;  //  Pitching angle of veh wrt geod coord - deg  module kinematics
@@ -236,7 +230,7 @@ extern "C" void master_init_propulsion(Rocket_SimObject *rkt) {
     rkt->propulsion.get_input_file_var(S2_XCG_0, S2_XCG_1, S2_MOI_ROLL_0, S2_MOI_ROLL_1, S2_MOI_PITCH_0, S2_MOI_PITCH_1, S2_MOI_YAW_0, S2_MOI_YAW_1, S2_SPI, S2_FUEL_FLOW_RATE);
     rkt->propulsion.set_aexit(0.03333 * 4.0);  // nozzle exhaust area
     rkt->propulsion.set_payload_mass(PAYLOAD);  // payload mass
-    rkt->forces.set_reference_point(-8.55);  // set reference point
+    // rkt->forces.set_reference_point(-8.55);  // set reference point
     rkt->dynamics.set_reference_point(-8.55);
     rkt->propulsion.set_stage_2();
     rkt->propulsion.set_no_thrust();

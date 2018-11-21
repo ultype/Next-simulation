@@ -21,7 +21,7 @@ class GyroIdeal : public Gyro {
   GyroIdeal &operator=(const GyroIdeal &other);
 
   virtual ~GyroIdeal() {}
-  virtual void init(){};
+  virtual void init();
   virtual void algorithm(double int_step);
 };
 

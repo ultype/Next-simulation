@@ -20,9 +20,14 @@ AccelerometerIdeal &AccelerometerIdeal::operator=(
   return *this;
 }
 
-void AccelerometerIdeal::algorithm(double int_step) {
-  this->FSPCB = grab_FSPB();
+void AccelerometerIdeal::init() {
+  data_exchang->hget("FSPB", FSPCB);
   this->EFSPB.zeros();
+  data_exchang->hset("FSPCB", FSPCB);
+}
 
+
+void AccelerometerIdeal::algorithm(double int_step) {
+  data_exchang->hget("FSPB", FSPCB);
   data_exchang->hset("FSPCB", FSPCB);
 }
