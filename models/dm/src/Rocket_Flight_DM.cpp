@@ -398,7 +398,6 @@ void Rocket_Flight_DM::init() {
   psibd = psibdx * RAD;
   thtbd = thtbdx * RAD;
   phibd = phibdx * RAD;
-  // arma::mat current_TDI = cad::tdi84(lonx * RAD, latx * RAD, alt, TEI);
   TBI = TBD * TDI;
   TLI = TBI;
 
@@ -420,7 +419,6 @@ void Rocket_Flight_DM::init() {
   FSPB = TBI * (-GRAVG + ABII);  // FSPB: body force include gravity acc
   SBEE = TEI * SBII;             // Calculate position in ECEF
   VBEE = TEI * VBII - cross(WEII, SBEE);  // Calculate velocity in ECEF
-  // liftoff = 0;
   NEXT_ACC = trans(TEI) * (cross(WEII, cross(WEII, (TEI * (SBIIP)))));
   Interpolation_Extrapolation_flag = 4;
 
@@ -909,13 +907,13 @@ void Rocket_Flight_DM::RK4F(arma::vec3 GRAVG, arma::mat33 TEI, double int_step,
       liftoff = 1;
     }
     NEXT_ACC = trans(TEI) * (cross(WEII, cross(WEII, (TEI * (SBIIP)))));
-    FSPB =
-        TBI * (-GRAVG + NEXT_ACC + ddrhoC_IMU);  // Strapdown Analytics 4.3-14
+    FSPB = QuaternionRotation(
+        TBI_Q, (-GRAVG + NEXT_ACC + ddrhoC_IMU));  // Strapdown Analytics 4.3-14
   } else {
-    FSPB =
-        TBI *
-        (NEXT_ACC - GRAVG +
-         ddrhoC_IMU);  //+ TBI * GRAVG;  // FSPB: body force include gravity acc
+    FSPB = QuaternionRotation(
+        TBI_Q,
+        (NEXT_ACC - GRAVG + ddrhoC_IMU));  //+ TBI * GRAVG;  // FSPB: body force
+                                           //include gravity acc
   }
   /* Prepare for orthonormalization */
   double quat_metric = TBI_Q(0) * TBI_Q(0) + TBI_Q(1) * TBI_Q(1) +
@@ -974,27 +972,18 @@ void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
   SBIIP = SBIIP_post + K12 * 0.5 * int_step;
   WBIB = WBIB_post + K13 * 0.5 * int_step;
   TBI_Q = TBI_Q_post + K14 * 0.5 * int_step;
-  this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to Matrix
-  data_exchang->hset("WBIB", WBIB);
-  data_exchang->hset("TBI", TBI);
 
   RK4F(GRAVG, TEI, int_step, K21, K22, K23, K24, K25, K26, K27, K28);
   VBIIP = VBIIP_post + K21 * 0.5 * int_step;
   SBIIP = SBIIP_post + K22 * 0.5 * int_step;
   WBIB = WBIB_post + K23 * 0.5 * int_step;
   TBI_Q = TBI_Q_post + K24 * 0.5 * int_step;
-  this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to Matrix
-  data_exchang->hset("WBIB", WBIB);
-  data_exchang->hset("TBI", TBI);
 
   RK4F(GRAVG, TEI, int_step, K31, K32, K33, K34, K35, K36, K37, K38);
   VBIIP = VBIIP_post + K31 * int_step;
   SBIIP = SBIIP_post + K32 * int_step;
   WBIB = WBIB_post + K33 * int_step;
   TBI_Q = TBI_Q_post + K34 * int_step;
-  this->TBI = Quaternion2Matrix(this->TBI_Q);  // Convert Quaternion to Matrix
-  data_exchang->hset("WBIB", WBIB);
-  data_exchang->hset("TBI", TBI);
 
   RK4F(GRAVG, TEI, int_step, K41, K42, K43, K44, K45, K46, K47, K48);
   VBIIP = VBIIP_post + (int_step / 6.0) * (K11 + 2.0 * K21 + 2.0 * K31 + K41);
@@ -1297,18 +1286,24 @@ void Rocket_Flight_DM::AeroDynamics_Q() {
   // aerodynamic moment
   FMAB = pdynmc * refa * refd * arma::vec({cll, clm, cln});
 
-  Q_Aero(0) = dot(trans(TBI) * FAPB, gamma_b1_q1);
-  Q_Aero(1) = dot(trans(TBI) * FAPB, gamma_b1_q2);
-  Q_Aero(2) = dot(trans(TBI) * FAPB, gamma_b1_q3);
-  Q_Aero(3) =
-      dot(FMAB, beta_b1_q4) +
-      dot(trans(TBI) * FAPB, -trans(TBI) * cross_matrix(rhoCP) * beta_b1_q4);
-  Q_Aero(4) =
-      dot(FMAB, beta_b1_q5) +
-      dot(trans(TBI) * FAPB, -trans(TBI) * cross_matrix(rhoCP) * beta_b1_q5);
-  Q_Aero(5) =
-      dot(FMAB, beta_b1_q6) +
-      dot(trans(TBI) * FAPB, -trans(TBI) * cross_matrix(rhoCP) * beta_b1_q6);
+  Q_Aero(0) =
+      dot(QuaternionRotation(QuaternionTranspose(TBI_Q), FAPB), gamma_b1_q1);
+  Q_Aero(1) =
+      dot(QuaternionRotation(QuaternionTranspose(TBI_Q), FAPB), gamma_b1_q2);
+  Q_Aero(2) =
+      dot(QuaternionRotation(QuaternionTranspose(TBI_Q), FAPB), gamma_b1_q3);
+  Q_Aero(3) = dot(FMAB, beta_b1_q4) +
+              dot(QuaternionRotation(QuaternionTranspose(TBI_Q), FAPB),
+                  -QuaternionRotation(QuaternionTranspose(TBI_Q),
+                                      cross_matrix(rhoCP) * beta_b1_q4));
+  Q_Aero(4) = dot(FMAB, beta_b1_q5) +
+              dot(QuaternionRotation(QuaternionTranspose(TBI_Q), FAPB),
+                  -QuaternionRotation(QuaternionTranspose(TBI_Q),
+                                      cross_matrix(rhoCP) * beta_b1_q5));
+  Q_Aero(5) = dot(FMAB, beta_b1_q6) +
+              dot(QuaternionRotation(QuaternionTranspose(TBI_Q), FAPB),
+                  -QuaternionRotation(QuaternionTranspose(TBI_Q),
+                                      cross_matrix(rhoCP) * beta_b1_q6));
 }
 
 void Rocket_Flight_DM::Gravity_Q() {
@@ -1325,16 +1320,22 @@ void Rocket_Flight_DM::Gravity_Q() {
     Q_G(0) = dot(Fg, gamma_b1_q1);
     Q_G(1) = dot(Fg, gamma_b1_q2);
     Q_G(2) = dot(Fg, gamma_b1_q3);
-    Q_G(3) = dot(Fg, -trans(TBI) * cross_matrix(rhoC_1) * beta_b1_q4);
-    Q_G(4) = dot(Fg, -trans(TBI) * cross_matrix(rhoC_1) * beta_b1_q5);
-    Q_G(5) = dot(Fg, -trans(TBI) * cross_matrix(rhoC_1) * beta_b1_q6);
+    Q_G(3) = dot(Fg, -QuaternionRotation(QuaternionTranspose(TBI_Q),
+                                         cross_matrix(rhoC_1) * beta_b1_q4));
+    Q_G(4) = dot(Fg, -QuaternionRotation(QuaternionTranspose(TBI_Q),
+                                         cross_matrix(rhoC_1) * beta_b1_q5));
+    Q_G(5) = dot(Fg, -QuaternionRotation(QuaternionTranspose(TBI_Q),
+                                         cross_matrix(rhoC_1) * beta_b1_q6));
   } else {
     Q_G(0) = dot(Fg, gamma_b1_q1);
     Q_G(1) = dot(Fg, gamma_b1_q2);
     Q_G(2) = dot(Fg, gamma_b1_q3);
-    Q_G(3) = dot(Fg, -trans(TBI) * cross_matrix(rhoC_1) * beta_b1_q4);
-    Q_G(4) = dot(Fg, -trans(TBI) * cross_matrix(rhoC_1) * beta_b1_q5);
-    Q_G(5) = dot(Fg, -trans(TBI) * cross_matrix(rhoC_1) * beta_b1_q6);
+    Q_G(3) = dot(Fg, -QuaternionRotation(QuaternionTranspose(TBI_Q),
+                                         cross_matrix(rhoC_1) * beta_b1_q4));
+    Q_G(4) = dot(Fg, -QuaternionRotation(QuaternionTranspose(TBI_Q),
+                                         cross_matrix(rhoC_1) * beta_b1_q5));
+    Q_G(5) = dot(Fg, -QuaternionRotation(QuaternionTranspose(TBI_Q),
+                                         cross_matrix(rhoC_1) * beta_b1_q6));
   }
 }
 
@@ -1373,9 +1374,10 @@ void Rocket_Flight_DM::funcv(int n, double *x, double *ff) {
   ddrhoC_1 = cross(ddang_1, rhoC_1) +
              cross(dang_1, cross(dang_1, rhoC_1));  // Eq.(5-12)
   //  Eq.(5-19)
-  p_b1_ga = m1 * (ddrP_1 + trans(TBI) * ddrhoC_1);
+  p_b1_ga =
+      m1 * (ddrP_1 + QuaternionRotation(QuaternionTranspose(TBI_Q), ddrhoC_1));
   p_b1_be = I1 * ddang_1 + cross_matrix(dang_1) * I1 * dang_1 +
-            m1 * cross_matrix(rhoC_1) * TBI * ddrP_1;
+            m1 * cross_matrix(rhoC_1) * QuaternionRotation(TBI_Q, ddrP_1);
   f(0) = dot(p_b1_ga, gamma_b1_q1) - (Q_G(0) + Q_TVC(0) + Q_Aero(0));
   f(1) = dot(p_b1_ga, gamma_b1_q2) - (Q_G(1) + Q_TVC(1) + Q_Aero(1));
   f(2) = dot(p_b1_ga, gamma_b1_q3) - (Q_G(2) + Q_TVC(2) + Q_Aero(2));
@@ -1563,8 +1565,9 @@ double Rocket_Flight_DM::f_min(double x[]) {
   return 0.5 * sum;
 }
 
-void Rocket_Flight_DM::lnsrch(int n, double xold[], double fold, double g[], double p[],
-                    double x[], double *f, double stpmax, int *check) {
+void Rocket_Flight_DM::lnsrch(int n, double xold[], double fold, double g[],
+                              double p[], double x[], double *f, double stpmax,
+                              int *check) {
   int i;
   double a, alam, alam2, alamin, b, disc, f2, rhs1, rhs2, slope, sum, temp,
       test, tmplam;
@@ -1629,7 +1632,8 @@ void Rocket_Flight_DM::lnsrch(int n, double xold[], double fold, double g[], dou
   }
 }
 
-void Rocket_Flight_DM::qrdcmp(double **a, int n, double *c, double *d, int *sing) {
+void Rocket_Flight_DM::qrdcmp(double **a, int n, double *c, double *d,
+                              int *sing) {
   int i, j, k;
   double scale, sigma, sum, tau;
 
@@ -1658,7 +1662,8 @@ void Rocket_Flight_DM::qrdcmp(double **a, int n, double *c, double *d, int *sing
   if (d[n] == 0.0) *sing = 1;
 }
 
-void Rocket_Flight_DM::qrupdt(double **r, double **qt, int n, double u[], double v[]) {
+void Rocket_Flight_DM::qrupdt(double **r, double **qt, int n, double u[],
+                              double v[]) {
   int i, j, k;
 
   for (k = n; k >= 1; k--) {
@@ -1679,7 +1684,8 @@ void Rocket_Flight_DM::qrupdt(double **r, double **qt, int n, double u[], double
   for (i = 1; i < k; i++) rotate(r, qt, n, i, r[i][i], -r[i + 1][i]);
 }
 
-void Rocket_Flight_DM::rotate(double **r, double **qt, int n, int i, double a, double b) {
+void Rocket_Flight_DM::rotate(double **r, double **qt, int n, int i, double a,
+                              double b) {
   int j;
   double c, fact, s, w, y;
 
