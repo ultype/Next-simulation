@@ -28,7 +28,6 @@ class SDT : public Sensor {
   virtual arma::vec3 get_DELTA_VEL() { return DELTA_VEL; }
 
  protected:
-  virtual arma::mat33 build_321_rotation_matrix(arma::vec3 angle) {}
 
   VECTOR(PHI, 3); /* *o (r)       PHI = DELTA_ALPHA + 0.5 * DELTA_BETA */
 

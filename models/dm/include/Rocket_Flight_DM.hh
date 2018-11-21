@@ -30,10 +30,10 @@ class Rocket_Flight_DM : public Dynamics {
 
   virtual void init();
   virtual void algorithm(double int_step);
-  void load_location(double lonx, double latx, double alt);
+  void load_location(double lonx_in, double latx_in, double alt_in);
   void load_geodetic_velocity(double alpha0x, double beta0x, double dvbe);
   void load_angle(double yaw, double roll, double pitch);
-  void load_angular_velocity(double ppx, double qqx, double rrx);
+  void load_angular_velocity(double ppx_in, double qqx_in, double rrx_in);
   void update_diagnostic_attributes(double int_step);
   void Interpolation_Extrapolation(double T, double int_step,
                                    double ext_porlation);
@@ -79,13 +79,13 @@ class Rocket_Flight_DM : public Dynamics {
   void propagate_gravityloss(double int_step);
   void propagate_control_loss(double int_step);
   void vibration(double int_step);
-  void propagate_TBI(double int_step, arma::vec3 WBIB);
-  void propagate_TBI_Q(double int_step, arma::vec3 WBIB);
-  void propagate_WBIB(double int_step, arma::vec3 FMB, arma::mat33 IBBB);
-  void orbital(arma::vec3 SBII, arma::vec3 VBII, double dbi);
+  void propagate_TBI(double int_step, arma::vec3 WBIB_in);
+  void propagate_TBI_Q(double int_step, arma::vec3 WBIB_in);
+  void propagate_WBIB(double int_step, arma::vec3 FMB_in, arma::mat33 IBBB);
+  void orbital(arma::vec3 SBII_in, arma::vec3 VBII_in, double dbi_in);
   void build_WEII();
-  void aux_calulate(arma::mat33 TEI, arma::mat33 TBI);
-  void RK4F(arma::vec3 GRAVG, arma::mat33 TEI, double int_step, arma::vec3 &K1,
+  void aux_calulate(arma::mat33 TEI, arma::mat33 TBI_in);
+  void RK4F(arma::vec3 GRAVG, arma::mat33 TEI, arma::vec3 &K1,
             arma::vec3 &K2, arma::vec3 &K3, arma::vec4 &K4, double &K5,
             double &K6, double &K7, double &K8);
   void RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step);
@@ -93,17 +93,17 @@ class Rocket_Flight_DM : public Dynamics {
 
   double calculate_alphaix(arma::vec3 VBIB);
   double calculate_betaix(arma::vec3 VBIB);
-  double calculate_alppx(arma::vec3 VBAB, double dvba);
-  double calculate_phipx(arma::vec3 VBAB);
-  double calculate_alphax(arma::vec3 VBAB);
+  double calculate_alppx(arma::vec3 VBAB_in, double dvba);
+  double calculate_phipx(arma::vec3 VBAB_in);
+  double calculate_alphax(arma::vec3 VBAB_in);
   double calculate_betax(arma::vec3 VBAB, double dvba);
 
-  arma::vec build_VBEB(double _alpha0x, double _beta0x, double _dvbe);
-  arma::mat calculate_TBD(double lonx, double latx, double alt);
-  arma::vec3 calculate_WBII(arma::mat33 TBI);
-  arma::vec3 calculate_fspb(arma::vec3 FAPB, double vmass);
-  arma::vec3 calculate_WBEB(arma::mat33 TBI);
-  arma::vec3 euler_angle(arma::mat33 TBD);
+  arma::vec build_VBEB(double _alpha0x, double _beta0x, double dvbe);
+  arma::mat calculate_TBD(double lonx_in, double latx_in, double alt_in);
+  arma::vec3 calculate_WBII(arma::mat33 TBI_in);
+  arma::vec3 calculate_fspb(arma::vec3 FAPB_in, double vmass);
+  arma::vec3 calculate_WBEB(arma::mat33 TBI_in);
+  arma::vec3 euler_angle(arma::mat33 TBD_in);
 
   void gamma_beta();
   void Gravity_Q();
@@ -112,10 +112,10 @@ class Rocket_Flight_DM : public Dynamics {
   void funcv(int n, double *x, double *ff);
   void broydn(double x[], int n, int *check);
   void rsolv(double **a, int n, double d[], double b[]);
-  void fdjac(int n, double x[], double fvec[], double **df);
+  void fdjac(int n, double x[], double fvec_in[], double **df);
   double f_min(double x[]);
   void lnsrch(int n, double xold[], double fold, double g[], double p[],
-              double x[], double *f, double stpmax, int *check);
+              double x[], double *f_in, double stpmax, int *check);
   void qrdcmp(double **a, int n, double *c, double *d, int *sing);
   void qrupdt(double **r, double **qt, int n, double u[], double v[]);
   void rotate(double **r, double **qt, int n, int i, double a, double b);
@@ -180,8 +180,6 @@ class Rocket_Flight_DM : public Dynamics {
   VECTOR(VBED, 3); /* *o (m/s)   NED velocity */
 
   VECTOR(FSPB, 3); /* *o  (m/s2)   Specific force in body coord */
-
-  VECTOR(CONING, 3); /* *o (r/s)    Coning angular rate */
 
   VECTOR(NEXT_ACC, 3); /* *o (m/s2)   New Inertial acceleration */
 
@@ -292,7 +290,7 @@ class Rocket_Flight_DM : public Dynamics {
   double latx;  /* *o  (d)      Vehicle latitude */
   double _aero_loss; /* *o  (m/s)    Velocity loss caused by aerodynamic drag */
   double gravity_loss; /* *o  (m/s)    Velocity loss caused by gravity */
-  double t;            /* *o (s)       timer */
+  // double t;            /* *o (s)       timer */
   double _grndtrck;    /* *o  (m)     [DIAG] Vehicle ground track on earth */
   double _gndtrkmx;    /* *o  (km)    [DIAG] Ground track - km */
   double _gndtrnmx;    /* **  (nm)    [DIAG] Ground track - nm */
@@ -305,6 +303,7 @@ class Rocket_Flight_DM : public Dynamics {
   double _psivdx; /* *o  (d)     [DIAG] Vehicle's heading angle */
   int liftoff;    /* *i  (--)     To check wether the rocket liftoff or
                               not: liftoff = 1, not liftoff = 0 */
+  int cadorbin_flag; /* Orbit calculation status flag */
   double ppx; /* *o (d/s)        Body roll angular velocity wrt earth in body
                  axes */
   double qqx; /* *o (d/s)        Body pitch angular velocity wrt earth in body

@@ -14,9 +14,8 @@ LIBRARY DEPENDENCIES:
 ##include "GPS.hh"
 ##include "time_utility.hh"
 ##include "Dataflow_Binding.hh"
-##include "transceiver.hh"
-##include  "icf_trx_ctrl.h"
-##include  "DM_FSW_Interface.hh"
+##include "icf_trx_ctrl.h"
+##include "DM_FSW_Interface.hh"
 ##include "flight_events_define.h"
 
 class FlightComputer_SimObject : public Trick::SimObject {
@@ -31,7 +30,6 @@ class FlightComputer_SimObject : public Trick::SimObject {
         time_management *time = time_management::get_instance();
         uint64_t egse_flight_event_trigger_bitmap = 0xFFFFFFFFFFFFFFFF;
 
-        Transceiver transceiver;
         struct icf_ctrlblk_t   icf_esps_ctrl;
         GPS_FSW gps;
 

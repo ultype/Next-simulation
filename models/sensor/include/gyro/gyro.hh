@@ -17,7 +17,7 @@ class Gyro : public Sensor {
  public:
   char name[256];
 
-  Gyro() : VECTOR_INIT(EWBIB, 3), VECTOR_INIT(WBICB, 3){};
+  Gyro() : VECTOR_INIT(WBICB, 3), VECTOR_INIT(EWBIB, 3){};
 
   virtual ~Gyro() {}
   virtual void init() = 0;
