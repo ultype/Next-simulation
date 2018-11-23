@@ -497,14 +497,12 @@ arma::vec Rocket_Flight_DM::build_VBEB(double _alpha0x, double _beta0x,
 void Rocket_Flight_DM::set_reference_point(double rp) { reference_point = rp; }
 
 void Rocket_Flight_DM::algorithm(double int_step) {
-  arma::vec VAED;
+  arma::vec3 VAED;
   arma::mat33 TEI;
-  arma::vec3 GRAVG;
-  data_exchang->hget("GRAVG", GRAVG);
   data_exchang->hget("TEI", TEI);
   data_exchang->hget("VAED", VAED);
 
-  RK4(GRAVG, TEI, int_step);
+  RK4(int_step);
 
   this->TBD = calculate_TBD(lonx, latx, alt);
   aux_calulate(TEI, TBI);
@@ -880,14 +878,17 @@ void Rocket_Flight_DM::aux_calulate(arma::mat33 TEI, arma::mat33 TBI_in) {
   VBED = TDE * VBEE;
 }
 
-void Rocket_Flight_DM::RK4F(arma::vec3 GRAVG, arma::mat33 TEI,
-                            arma::vec3 &K1, arma::vec3 &K2, arma::vec3 &K3,
+void Rocket_Flight_DM::RK4F(arma::vec3 &K1, arma::vec3 &K2, arma::vec3 &K3,
                             arma::vec4 &K4, double &K5, double &K6, double &K7,
                             double &K8) {
   double vmass;
   double thrust;
   data_exchang->hget("vmass", &vmass);
   data_exchang->hget("thrust", &thrust);
+  arma::mat33 TEI;
+  arma::vec3 GRAVG;
+  data_exchang->hget("GRAVG", GRAVG);
+  data_exchang->hget("TEI", TEI);
   arma::vec4 TBID_Q_NEW;
   arma::vec3 rhoC_IMU;
 
@@ -911,11 +912,11 @@ void Rocket_Flight_DM::RK4F(arma::vec3 GRAVG, arma::mat33 TEI,
     }
     NEXT_ACC = trans(TEI) * (cross(WEII, cross(WEII, (TEI * (SBIIP)))));
     FSPB = QuaternionRotation(
-        TBI_Q, (-GRAVG + NEXT_ACC + ddrhoC_IMU));  // Strapdown Analytics 4.3-14
+        TBI_Q, (-GRAVG + NEXT_ACC + QuaternionRotation(QuaternionInverse(TBI_Q), ddrhoC_IMU)));  // Strapdown Analytics 4.3-14
   } else {
     FSPB = QuaternionRotation(
         TBI_Q,
-        (NEXT_ACC - GRAVG + ddrhoC_IMU));  //+ TBI * GRAVG;  // FSPB: body force
+        (NEXT_ACC - GRAVG + QuaternionRotation(QuaternionInverse(TBI_Q), ddrhoC_IMU)));  //+ TBI * GRAVG;  // FSPB: body force
                                            //include gravity acc
   }
   /* Prepare for orthonormalization */
@@ -945,13 +946,12 @@ void Rocket_Flight_DM::RK4F(arma::vec3 GRAVG, arma::mat33 TEI,
   K6 = 0.0;
   K7 = 0.0;
   K8 = 0.0;
-  ABII = NEXT_ACC;
 
   data_exchang->hset("NEXT_ACC", NEXT_ACC);
   data_exchang->hset("liftoff", liftoff);
   data_exchang->hset("FSPB", FSPB);
 }
-void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
+void Rocket_Flight_DM::RK4(double int_step) {
   arma::vec3 K11, K21, K31, K41;
   arma::vec3 K12, K22, K32, K42;
   arma::vec3 K13, K23, K33, K43;
@@ -968,25 +968,25 @@ void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
   WBIB_post = WBIB;
   TBI_Q_post = TBI_Q;
 
-  RK4F(GRAVG, TEI, K11, K12, K13, K14, K15, K16, K17, K18);
+  RK4F(K11, K12, K13, K14, K15, K16, K17, K18);
   VBIIP = VBIIP_post + K11 * 0.5 * int_step;
   SBIIP = SBIIP_post + K12 * 0.5 * int_step;
   WBIB = WBIB_post + K13 * 0.5 * int_step;
   TBI_Q = TBI_Q_post + K14 * 0.5 * int_step;
 
-  RK4F(GRAVG, TEI, K21, K22, K23, K24, K25, K26, K27, K28);
+  RK4F(K21, K22, K23, K24, K25, K26, K27, K28);
   VBIIP = VBIIP_post + K21 * 0.5 * int_step;
   SBIIP = SBIIP_post + K22 * 0.5 * int_step;
   WBIB = WBIB_post + K23 * 0.5 * int_step;
   TBI_Q = TBI_Q_post + K24 * 0.5 * int_step;
 
-  RK4F(GRAVG, TEI, K31, K32, K33, K34, K35, K36, K37, K38);
+  RK4F(K31, K32, K33, K34, K35, K36, K37, K38);
   VBIIP = VBIIP_post + K31 * int_step;
   SBIIP = SBIIP_post + K32 * int_step;
   WBIB = WBIB_post + K33 * int_step;
   TBI_Q = TBI_Q_post + K34 * int_step;
 
-  RK4F(GRAVG, TEI, K41, K42, K43, K44, K45, K46, K47, K48);
+  RK4F(K41, K42, K43, K44, K45, K46, K47, K48);
   VBIIP = VBIIP_post + (int_step / 6.0) * (K11 + 2.0 * K21 + 2.0 * K31 + K41);
   SBIIP = SBIIP_post + (int_step / 6.0) * (K12 + 2.0 * K22 + 2.0 * K32 + K42);
   WBIB = WBIB_post + (int_step / 6.0) * (K13 + 2.0 * K23 + 2.0 * K33 + K43);
@@ -1004,6 +1004,7 @@ void Rocket_Flight_DM::RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step) {
 
   SBII = SBIIP + trans(TBI) * rhoC_IMU;
   VBII = VBIIP + trans(TBI) * cross(WBIB, rhoC_IMU);
+  ABII = NEXT_ACC + trans(TBI) * ddrhoC_1;
 
   Send();
 }

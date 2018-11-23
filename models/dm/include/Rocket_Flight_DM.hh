@@ -85,10 +85,10 @@ class Rocket_Flight_DM : public Dynamics {
   void orbital(arma::vec3 SBII_in, arma::vec3 VBII_in, double dbi_in);
   void build_WEII();
   void aux_calulate(arma::mat33 TEI, arma::mat33 TBI_in);
-  void RK4F(arma::vec3 GRAVG, arma::mat33 TEI, arma::vec3 &K1,
-            arma::vec3 &K2, arma::vec3 &K3, arma::vec4 &K4, double &K5,
+  void RK4F(arma::vec3 &K1,arma::vec3 &K2, arma::vec3 &K3
+            , arma::vec4 &K4, double &K5,
             double &K6, double &K7, double &K8);
-  void RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step);
+  void RK4(double int_step);
   void Send();
 
   double calculate_alphaix(arma::vec3 VBIB);
