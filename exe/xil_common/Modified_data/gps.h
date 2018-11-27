@@ -49,9 +49,9 @@ extern "C" void record_gps() {
     // drg->add_variable("rkt.accelerometer->_FSPCB[0]");
     // drg->add_variable("rkt.accelerometer->_FSPCB[1]");
     // drg->add_variable("rkt.accelerometer->_FSPCB[2]");
-    // drg->add_variable("rkt.dynamics._ABII[0]");
-    // drg->add_variable("rkt.dynamics._ABII[1]");
-    // drg->add_variable("rkt.dynamics._ABII[2]");
+    drg->add_variable("rkt.dynamics._ABII[0]");
+    drg->add_variable("rkt.dynamics._ABII[1]");
+    drg->add_variable("rkt.dynamics._ABII[2]");
     drg->add_variable("rkt.dynamics._ABIB[0]");
     drg->add_variable("rkt.dynamics._ABIB[1]");
     drg->add_variable("rkt.dynamics._ABIB[2]");

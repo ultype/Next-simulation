@@ -43,16 +43,16 @@ void ACT_1st::set_1st_act_var(double Ang_limit_in, double Ang_rate_limit_in,
 }
 
 ENG::ENG()
-    : VECTOR_INIT(THRUST, 3),
+    : VECTOR_INIT(Q, 6),
+      MATRIX_INIT(T_N_B, 3, 3),
+      VECTOR_INIT(THRUST, 3),
       VECTOR_INIT(ENG_HINGE_POS, 3),
       VECTOR_INIT(ENG_GAMMA_1, 3),
       VECTOR_INIT(ENG_GAMMA_2, 3),
       VECTOR_INIT(ENG_GAMMA_3, 3),
       VECTOR_INIT(ENG_BETA_4, 3),
       VECTOR_INIT(ENG_BETA_5, 3),
-      VECTOR_INIT(ENG_BETA_6, 3),
-      MATRIX_INIT(T_N_B, 3, 3),
-      VECTOR_INIT(Q, 6) {
+      VECTOR_INIT(ENG_BETA_6, 3) {
   ENG_GAMMA_1(0) = ENG_BETA_4(0) = 1.0;
   ENG_GAMMA_1(1) = ENG_BETA_4(1) = 0.0;
   ENG_GAMMA_1(2) = ENG_BETA_4(2) = 0.0;

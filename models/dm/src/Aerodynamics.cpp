@@ -88,8 +88,6 @@ void AeroDynamics::algorithm(double int_step) {
     double phip = phipx * RAD;
     double cphip = cos(phip);
     double sphip = sin(phip);
-    double qqax = RAD * (WBEB(1) * DEG * cphip - WBEB(2) * DEG * sphip);
-    double rrax = RAD * (WBEB(1) * DEG * sphip + WBEB(2) * DEG * cphip);
 
     cn = aerotable.look_up("CN_vs_mach_alpha", alppx, vmach, 1);
     ca = aerotable.look_up("CA_off_vs_mach_alpha_alt", alppx, alt, vmach, 1);

@@ -30,10 +30,10 @@ class Rocket_Flight_DM : public Dynamics {
 
   virtual void init();
   virtual void algorithm(double int_step);
-  void load_location(double lonx, double latx, double alt);
+  void load_location(double lonx_in, double latx_in, double alt_in);
   void load_geodetic_velocity(double alpha0x, double beta0x, double dvbe);
   void load_angle(double yaw, double roll, double pitch);
-  void load_angular_velocity(double ppx, double qqx, double rrx);
+  void load_angular_velocity(double ppx_in, double qqx_in, double rrx_in);
   void update_diagnostic_attributes(double int_step);
   void Interpolation_Extrapolation(double T, double int_step,
                                    double ext_porlation);
@@ -41,8 +41,6 @@ class Rocket_Flight_DM : public Dynamics {
 
   arma::vec3 get_VBED();
   void set_liftoff(int in);
-
-  // std::function<void()> collect_forces_and_propagate;
 
   struct TX_data {
     double SBEE[3];
@@ -56,7 +54,6 @@ class Rocket_Flight_DM : public Dynamics {
   } TX_data_forward;
 
   void collect_forces_and_propagate();
-  // void set_reference_point(double refp);
   void set_DOF(int ndof);
   void set_aero_flag(unsigned int in);
 
@@ -79,34 +76,28 @@ class Rocket_Flight_DM : public Dynamics {
   void propagate_gravityloss(double int_step);
   void propagate_control_loss(double int_step);
   void vibration(double int_step);
-  void propagate_TBI(double int_step, arma::vec3 WBIB);
-  void propagate_TBI_Q(double int_step, arma::vec3 WBIB);
-  void propagate_WBIB(double int_step, arma::vec3 FMB, arma::mat33 IBBB);
-  void orbital(arma::vec3 SBII, arma::vec3 VBII, double dbi);
+  void propagate_TBI(double int_step, arma::vec3 WBIB_in);
+  void propagate_TBI_Q(double int_step, arma::vec3 WBIB_in);
+  void propagate_WBIB(double int_step, arma::vec3 FMB_in, arma::mat33 IBBB);
+  void orbital(arma::vec3 SBII_in, arma::vec3 VBII_in, double dbi_in);
   void build_WEII();
-  void aux_calulate(arma::mat33 TEI, arma::mat33 TBI);
-  void RK4F(arma::vec3 GRAVG, arma::mat33 TEI, double int_step, arma::vec3 &K1,
-            arma::vec3 &K2, arma::vec3 &K3, arma::vec4 &K4, double &K5,
-            double &K6, double &K7, double &K8);
-  void RK4(arma::vec3 GRAVG, arma::mat33 TEI, double int_step);
+  void aux_calulate(arma::mat33 TEI, arma::mat33 TBI_in);
+  void RK4F(std::vector<arma::vec> Var_in, std::vector<arma::vec> &Var_out);
   void Send();
 
   double calculate_alphaix(arma::vec3 VBIB);
   double calculate_betaix(arma::vec3 VBIB);
-  double calculate_alppx(arma::vec3 VBAB, double dvba);
-  double calculate_phipx(arma::vec3 VBAB);
-  double calculate_alphax(arma::vec3 VBAB);
+  double calculate_alppx(arma::vec3 VBAB_in, double dvba);
+  double calculate_phipx(arma::vec3 VBAB_in);
+  double calculate_alphax(arma::vec3 VBAB_in);
   double calculate_betax(arma::vec3 VBAB, double dvba);
 
-  arma::vec build_VBEB(double _alpha0x, double _beta0x, double _dvbe);
-  arma::mat calculate_TBD(double lonx, double latx, double alt);
-  arma::vec3 calculate_WBII(arma::mat33 TBI);
-  arma::vec3 calculate_fspb(arma::vec3 FAPB, double vmass);
-  arma::vec3 calculate_WBEB(arma::mat33 TBI);
-  arma::vec3 euler_angle(arma::mat33 TBD);
-  arma::mat33 TMX(double ang);
-  arma::mat33 TMY(double ang);
-  arma::mat33 TMZ(double ang);
+  arma::vec build_VBEB(double _alpha0x, double _beta0x, double dvbe);
+  arma::mat calculate_TBD(double lonx_in, double latx_in, double alt_in);
+  arma::vec3 calculate_WBII(arma::mat33 TBI_in);
+  arma::vec3 calculate_fspb(arma::vec3 FAPB_in, double vmass);
+  arma::vec3 calculate_WBEB(arma::mat33 TBI_in);
+  arma::vec3 euler_angle(arma::mat33 TBD_in);
 
   void gamma_beta();
   void Gravity_Q();
@@ -115,10 +106,10 @@ class Rocket_Flight_DM : public Dynamics {
   void funcv(int n, double *x, double *ff);
   void broydn(double x[], int n, int *check);
   void rsolv(double **a, int n, double d[], double b[]);
-  void fdjac(int n, double x[], double fvec[], double **df);
+  void fdjac(int n, double x[], double fvec_in[], double **df);
   double f_min(double x[]);
   void lnsrch(int n, double xold[], double fold, double g[], double p[],
-              double x[], double *f, double stpmax, int *check);
+              double x[], double *f_in, double stpmax, int *check);
   void qrdcmp(double **a, int n, double *c, double *d, int *sing);
   void qrupdt(double **r, double **qt, int n, double u[], double v[]);
   void rotate(double **r, double **qt, int n, int i, double a, double b);
@@ -141,7 +132,8 @@ class Rocket_Flight_DM : public Dynamics {
 
   VECTOR(VBAB, 3); /* *o  (m/s)    Air speed in body frame */
 
-  MATRIX(WEII_skew, 3,3); /* *o  (r/s)    Earth's angular velocity (skew-sym) */
+  MATRIX(WEII_skew, 3,
+         3); /* *o  (r/s)    Earth's angular velocity (skew-sym) */
 
   VECTOR(SBIIP, 3); /* *o  (m)      Vehicle position in inertia coord */
 
@@ -153,7 +145,8 @@ class Rocket_Flight_DM : public Dynamics {
 
   VECTOR(ABII, 3); /* *o  (m/s2)   Vehicle inertia acceleration */
 
-  VECTOR(ABIB,3); /* *o  (m/s2)   Vehicle inertia acceleration on body coordinate */
+  VECTOR(ABIB,
+         3); /* *o  (m/s2)   Vehicle inertia acceleration on body coordinate */
 
   VECTOR(SBEE, 3); /* *o  (m)     Vehicle position in earth coord  */
 
@@ -174,13 +167,13 @@ class Rocket_Flight_DM : public Dynamics {
   MATRIX(TDI, 3, 3); /* **  (--)     Transformation Matrix of geodetic wrt
                     inertial coordinates */
 
-  MATRIX(TGI, 3,3); /* **  (--)     Transformation Matrix geocentric wrt inertia coord */
+  MATRIX(
+      TGI, 3,
+      3); /* **  (--)     Transformation Matrix geocentric wrt inertia coord */
 
   VECTOR(VBED, 3); /* *o (m/s)   NED velocity */
 
   VECTOR(FSPB, 3); /* *o  (m/s2)   Specific force in body coord */
-
-  VECTOR(CONING, 3); /* *o (r/s)    Coning angular rate */
 
   VECTOR(NEXT_ACC, 3); /* *o (m/s2)   New Inertial acceleration */
 
@@ -219,13 +212,16 @@ class Rocket_Flight_DM : public Dynamics {
 
   VECTOR(ABID, 3); /* ** (--) Vehicle inertia body acceleration in geodetic */
 
-  VECTOR(FAPB, 3); /* *o (N)      Aerodynamic and propulsion forces in body axes */
+  VECTOR(FAPB,
+         3); /* *o (N)      Aerodynamic and propulsion forces in body axes */
 
   VECTOR(FAP, 3); /* *o (N)      Aerodynamic force in body axes */
 
-  VECTOR(FMB, 3); /* *o (N*m)    Aerodynamic and propulsion moment in body axes */
+  VECTOR(FMB,
+         3); /* *o (N*m)    Aerodynamic and propulsion moment in body axes */
 
-  VECTOR(FMAB, 3); /* *o (N*m)    Aerodynamic and propulsion moment in body axes */
+  VECTOR(FMAB,
+         3); /* *o (N*m)    Aerodynamic and propulsion moment in body axes */
 
   VECTOR(Q_G, 6); /* *o (--)     External force generated by gravity */
 
@@ -244,9 +240,11 @@ class Rocket_Flight_DM : public Dynamics {
   VECTOR(ddrhoC_1, 3); /* *o  (m/s2)  Centrifugal acceleration and tangential
                           acceleration term */
 
-  VECTOR(p_b1_ga, 3); /* *o (--)   General dynamics equations 1st DoF to 3rd DoF */
+  VECTOR(p_b1_ga,
+         3); /* *o (--)   General dynamics equations 1st DoF to 3rd DoF */
 
-  VECTOR(p_b1_be, 3); /* *o (--)   General dynamics equations 4th DoF to 6th DoF */
+  VECTOR(p_b1_be,
+         3); /* *o (--)   General dynamics equations 4th DoF to 6th DoF */
 
   VECTOR(f, 6); /* *o  (--)  Summation of external force & internal force */
 
@@ -256,14 +254,18 @@ class Rocket_Flight_DM : public Dynamics {
 
   VECTOR(gamma_b1_q3, 3); /* *o (--)  Vehicle's 3rd DoF velocity coefficient */
 
-  VECTOR(beta_b1_q4, 3); /* *o (--)  Vehicle's 4th DoF angular velocity coefficient */
+  VECTOR(beta_b1_q4,
+         3); /* *o (--)  Vehicle's 4th DoF angular velocity coefficient */
 
-  VECTOR(beta_b1_q5, 3); /* *o (--)  Vehicle's 5th DoF angular velocity coefficient */
+  VECTOR(beta_b1_q5,
+         3); /* *o (--)  Vehicle's 5th DoF angular velocity coefficient */
 
-  VECTOR(beta_b1_q6, 3); /* *o (--)  Vehicle's 6th DoF angular velocity coefficient */
+  VECTOR(beta_b1_q6,
+         3); /* *o (--)  Vehicle's 6th DoF angular velocity coefficient */
 
   /* Generating Outputs */
-  double ortho_error; /* *o (--)    Direction cosine matrix orthogonality error*/
+  double
+      ortho_error; /* *o (--)    Direction cosine matrix orthogonality error*/
   double alphax;   /* *o (d)     Angle of attack */
   double betax;    /* *o (d)     Sideslip angle */
   double alppx;    /* *o (d)     Total angle of attack */
@@ -271,7 +273,8 @@ class Rocket_Flight_DM : public Dynamics {
   double alphaix;  /* *o (d)     Angle of attack, inertia velocity*/
   double betaix;   /* *o (d)     Sideslip angle, inertia velocity*/
   double psibdx; /* *o (d)     Yaw angle of Vehicle wrt geodetic coord - deg */
-  double thtbdx; /* *o (d)     Pitch angle of Vehicle wrt geodetic coord - deg */
+  double
+      thtbdx; /* *o (d)     Pitch angle of Vehicle wrt geodetic coord - deg */
   double phibdx; /* *o (d)     Roll angle of Vehicle wrt geodetic coord - deg */
   double psibd;  /* *o (r)     Yaw angle of Vehicle wrt geodetic coord - rad */
   double thtbd; /* *o (r)     Pitch angle of Vehicle wrt geodetic coord - rad */
@@ -281,12 +284,12 @@ class Rocket_Flight_DM : public Dynamics {
   double latx;  /* *o  (d)      Vehicle latitude */
   double _aero_loss; /* *o  (m/s)    Velocity loss caused by aerodynamic drag */
   double gravity_loss; /* *o  (m/s)    Velocity loss caused by gravity */
-  double t;            /* *o (s)       timer */
-  double _grndtrck;    /* *o  (m)     [DIAG] Vehicle ground track on earth */
-  double _gndtrkmx;    /* *o  (km)    [DIAG] Ground track - km */
-  double _gndtrnmx;    /* **  (nm)    [DIAG] Ground track - nm */
-  double _ayx;         /* *o  (m/s2)  [DIAG] Achieved side acceleration */
-  double _anx;         /* *o  (m/s2)  [DIAG] Achieved normal acceleration */
+  // double t;            /* *o (s)       timer */
+  double _grndtrck; /* *o  (m)     [DIAG] Vehicle ground track on earth */
+  double _gndtrkmx; /* *o  (km)    [DIAG] Ground track - km */
+  double _gndtrnmx; /* **  (nm)    [DIAG] Ground track - nm */
+  double _ayx;      /* *o  (m/s2)  [DIAG] Achieved side acceleration */
+  double _anx;      /* *o  (m/s2)  [DIAG] Achieved normal acceleration */
   double _dbi;    /* *o  (m)     [DIAG] Vehicle distance from center of earth */
   double _dvbi;   /* *o  (m/s)   [DIAG] Vehicle inertia speed */
   double _dvbe;   /* *o  (m/s)   [DIAG] Vehicle geographic speed */
@@ -294,18 +297,19 @@ class Rocket_Flight_DM : public Dynamics {
   double _psivdx; /* *o  (d)     [DIAG] Vehicle's heading angle */
   int liftoff;    /* *i  (--)     To check wether the rocket liftoff or
                               not: liftoff = 1, not liftoff = 0 */
+  int cadorbin_flag; /* Orbit calculation status flag */
   double ppx; /* *o (d/s)        Body roll angular velocity wrt earth in body
                  axes */
   double qqx; /* *o (d/s)        Body pitch angular velocity wrt earth in body
                  axes */
   double rrx; /* *o (d/s)        Body yaw angular velocity wrt earth in body
                  axes */
-  double control_loss;  /* *o (--) Velocity loss due to control effect */
+  double control_loss; /* *o (--) Velocity loss due to control effect */
 
   /* Orbital Logging */
-  double _inclination;     /* *o  (deg)   [DIAG] Orbital inclination is the minimun
-                           angle between reference plane and the orbital plane or
-                           direction of an object in orbit around another object */
+  double _inclination;  /* *o  (deg)   [DIAG] Orbital inclination is the minimun
+                        angle between reference plane and the orbital plane or
+                        direction of an object in orbit around another object */
   double _eccentricity; /* *o  (--)    [DIAG] Determines the amount by which its
                            orbit around another body deviates from a perfect
                            circle */
@@ -325,13 +329,13 @@ class Rocket_Flight_DM : public Dynamics {
                          orbiting body. Parametrically, ω is the angle from the
                          body's ascending node to its periapsis, measured in the
                          direction of motion */
-  double _true_anomx; /* *o  (deg)   [DIAG] In celestial mechanics, true anomaly is
-                      an angular parameter that defines the position of a body
-                      moving along a Keplerian orbit. It is the angle between
-                      the direction of periapsis and the current position of the
-                      body, as seen from the main focus of the ellipse (the
-                      point around which the object orbits) */
-  double _ref_alt; /* *o  (m)     [DIAG] */
+  double _true_anomx; /* *o  (deg)   [DIAG] In celestial mechanics, true anomaly
+                      is an angular parameter that defines the position of a
+                      body moving along a Keplerian orbit. It is the angle
+                      between the direction of periapsis and the current
+                      position of the body, as seen from the main focus of the
+                      ellipse (the point around which the object orbits) */
+  double _ref_alt;    /* *o  (m)     [DIAG] */
   double reference_point; /* *o (m)    Multibody dynamics reference point */
   double Roll;
   double Pitch;
