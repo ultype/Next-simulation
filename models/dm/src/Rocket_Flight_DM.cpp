@@ -979,7 +979,7 @@ void Rocket_Flight_DM::RK4F(std::vector<arma::vec> Var_in,
       50. * erq * TBI_Q(3);
 
   Var_out[0] = NEXT_ACC;
-  Var_out[1] = VBII;
+  Var_out[1] = VBIIP;
   Var_out[2] = WBIBD;
   Var_out[3] = TBID_Q_NEW;
 
