@@ -42,8 +42,6 @@ class Rocket_Flight_DM : public Dynamics {
   arma::vec3 get_VBED();
   void set_liftoff(int in);
 
-  // std::function<void()> collect_forces_and_propagate;
-
   struct TX_data {
     double SBEE[3];
     double VBEE[3];
@@ -56,7 +54,6 @@ class Rocket_Flight_DM : public Dynamics {
   } TX_data_forward;
 
   void collect_forces_and_propagate();
-  // void set_reference_point(double refp);
   void set_DOF(int ndof);
   void set_aero_flag(unsigned int in);
 
@@ -85,10 +82,7 @@ class Rocket_Flight_DM : public Dynamics {
   void orbital(arma::vec3 SBII_in, arma::vec3 VBII_in, double dbi_in);
   void build_WEII();
   void aux_calulate(arma::mat33 TEI, arma::mat33 TBI_in);
-  void RK4F(arma::vec3 &K1,arma::vec3 &K2, arma::vec3 &K3
-            , arma::vec4 &K4, double &K5,
-            double &K6, double &K7, double &K8);
-  void RK4(double int_step);
+  void RK4F(std::vector<arma::vec> Var_in, std::vector<arma::vec> &Var_out);
   void Send();
 
   double calculate_alphaix(arma::vec3 VBIB);
@@ -291,11 +285,11 @@ class Rocket_Flight_DM : public Dynamics {
   double _aero_loss; /* *o  (m/s)    Velocity loss caused by aerodynamic drag */
   double gravity_loss; /* *o  (m/s)    Velocity loss caused by gravity */
   // double t;            /* *o (s)       timer */
-  double _grndtrck;    /* *o  (m)     [DIAG] Vehicle ground track on earth */
-  double _gndtrkmx;    /* *o  (km)    [DIAG] Ground track - km */
-  double _gndtrnmx;    /* **  (nm)    [DIAG] Ground track - nm */
-  double _ayx;         /* *o  (m/s2)  [DIAG] Achieved side acceleration */
-  double _anx;         /* *o  (m/s2)  [DIAG] Achieved normal acceleration */
+  double _grndtrck; /* *o  (m)     [DIAG] Vehicle ground track on earth */
+  double _gndtrkmx; /* *o  (km)    [DIAG] Ground track - km */
+  double _gndtrnmx; /* **  (nm)    [DIAG] Ground track - nm */
+  double _ayx;      /* *o  (m/s2)  [DIAG] Achieved side acceleration */
+  double _anx;      /* *o  (m/s2)  [DIAG] Achieved normal acceleration */
   double _dbi;    /* *o  (m)     [DIAG] Vehicle distance from center of earth */
   double _dvbi;   /* *o  (m/s)   [DIAG] Vehicle inertia speed */
   double _dvbe;   /* *o  (m/s)   [DIAG] Vehicle geographic speed */
