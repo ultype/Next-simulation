@@ -5,6 +5,12 @@ SCRIPT_FILE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SIM_HOME_PATH=$(echo $SCRIPT_FILE_DIR | sed 's/\/exe\/SIL\/master//g')
 S_DEFINE_PATH=$SCRIPT_FILE_DIR
 
+if [ ! -f "/usr/local/include/hiredis/hiredis.h" ]; then
+    echo "Insall the hiredis (client)"
+    cd $SIM_HOME_PATH/third-party/hiredis
+    make && sudo make install
+fi
+
 cd $S_DEFINE_PATH
 trick-CP
 ./S_main_Linux_*_x86_64.exe RUN_golden/golden_dm.cpp &

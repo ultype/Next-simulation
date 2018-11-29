@@ -23,5 +23,4 @@
 #include <sys/select.h>
 #include <endian.h>
 #include <limits.h>
-
 #endif  //  MODELS_ICF_INCLUDE_ICF_EXPORT_H_
