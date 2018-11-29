@@ -121,8 +121,6 @@ class Rocket_SimObject : public Trick::SimObject {
 
             P3 (int_step, "scheduled") tvc.algorithm(int_step);
             P3 (int_step, "scheduled") dynamics.algorithm(int_step);
-            (int_step, "logging") dynamics.update_diagnostic_attributes(int_step);
-            (0.005, "logging") dynamics.Interpolation_Extrapolation(int_step, 0.001, 0.002);
             (5, "scheduled") icf_heartbeat();
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_SIL_EGSE);
         }
