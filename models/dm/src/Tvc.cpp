@@ -80,21 +80,19 @@ void TVC::algorithm(double int_step) {
       S2_Eng_list[2]->Act_list[0]->Actuate(theta_c_cmd, int_step);
       S2_Eng_list[3]->Act_list[0]->Actuate(theta_d_cmd, int_step);
 
-      S2_Eng_list[0]->calculate_Q(S2_Eng_list[0]->Act_list[0]->ActOuptut,
-                                  thrust / 4., TBI, Z);
-      S2_Eng_list[1]->calculate_Q(S2_Eng_list[1]->Act_list[0]->ActOuptut,
-                                  thrust / 4., TBI, Y);
-      S2_Eng_list[2]->calculate_Q(S2_Eng_list[2]->Act_list[0]->ActOuptut,
-                                  thrust / 4., TBI, Z);
-      S2_Eng_list[3]->calculate_Q(S2_Eng_list[3]->Act_list[0]->ActOuptut,
-                                  thrust / 4., TBI, Y);
+      for(unsigned int i = 0; i < S2_Eng_list.size(); i++) {
+        for(unsigned int j = 0; j < S2_Eng_list[i]->Act_list.size(); j++) {
+          S2_Eng_list[i]->calculate_Q(S2_Eng_list[i]->Act_list[j]->ActOuptut,
+                                  thrust / 4., TBI, S2_Eng_list[i]->type);
+        }
+      }
 
       ActOutput1 = S2_Eng_list[0]->Act_list[0]->ActOuptut;
       ActOutput2 = S2_Eng_list[1]->Act_list[0]->ActOuptut;
       ActOutput3 = S2_Eng_list[2]->Act_list[0]->ActOuptut;
       ActOutput4 = S2_Eng_list[3]->Act_list[0]->ActOuptut;
 
-      for (int i = 0; i < S2_Eng_list.size(); i++) {
+      for (unsigned int i = 0; i < S2_Eng_list.size(); i++) {
         Q_TVC += S2_Eng_list[i]->Q;
       }
       data_exchang->hset("Q_TVC", Q_TVC);
@@ -107,12 +105,12 @@ void TVC::algorithm(double int_step) {
 
       S3_Eng_list[0]->calculate_Q(S3_Eng_list[0]->Act_list[0]->ActOuptut,
                                   S3_Eng_list[0]->Act_list[1]->ActOuptut,
-                                  thrust, TBI, YZ);
+                                  thrust, TBI, S3_Eng_list[0]->type);
 
       ActOutput1 = S3_Eng_list[0]->Act_list[0]->ActOuptut;
       ActOutput2 = S3_Eng_list[0]->Act_list[1]->ActOuptut;
 
-      for (int i = 0; i < S3_Eng_list.size(); i++) {
+      for (unsigned int i = 0; i < S3_Eng_list.size(); i++) {
         Q_TVC += S3_Eng_list[i]->Q;
       }
       data_exchang->hset("Q_TVC", Q_TVC);

@@ -72,6 +72,10 @@ void ENG::set_ENG_HINGE_POS(double x, double y, double z) {
   ENG_HINGE_POS(2) = z;
 }
 
+void ENG::set_ENG_Dir(int type_in) {
+  type = static_cast<EngType>(type_in);
+}
+
 void ENG::Allocate_Actuator(int NumAct, enum ActDynType TYPE) {
   switch (TYPE) {
     case FIRST: {
@@ -87,7 +91,7 @@ void ENG::Allocate_Actuator(int NumAct, enum ActDynType TYPE) {
 }
 
 void ENG::calculate_Q(double input_ang, double thrust_in, arma::mat33 TBI,
-                      enum ActType TYPE) {
+                      enum EngType TYPE) {
   THRUST(0) = thrust_in;
   THRUST(1) = 0.0;
   THRUST(2) = 0.0;
@@ -133,7 +137,7 @@ void ENG::calculate_Q(double input_ang, double thrust_in, arma::mat33 TBI,
 }
 
 void ENG::calculate_Q(double input_ang_1, double input_ang_2, double thrust_in,
-                      arma::mat33 TBI, enum ActType TYPE) {
+                      arma::mat33 TBI, enum EngType TYPE) {
   THRUST(0) = thrust_in;
   THRUST(1) = 0.0;
   THRUST(2) = 0.0;
