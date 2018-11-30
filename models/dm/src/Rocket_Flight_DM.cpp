@@ -537,7 +537,7 @@ void Rocket_Flight_DM::algorithm(double int_step) {
 
   this->TBD = calculate_TBD(lonx, latx, alt);
   aux_calulate(TEI, TBI);
-
+  update_diagnostic_attributes(int_step);
   if (liftoff == 1) {
     propagate_aeroloss(int_step);
     propagate_gravityloss(int_step);

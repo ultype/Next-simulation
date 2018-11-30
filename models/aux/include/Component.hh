@@ -9,7 +9,7 @@ PURPOSE:
 LIBRARY DEPENDENCY:
       ((../src/Component.cpp))
 *******************************************************************************/
-enum ActType { X = 0, Y, Z, YZ };
+enum EngType { X = 0, Y, Z, YZ };
 
 enum ActDynType { FIRST = 0 };
 
@@ -60,14 +60,16 @@ class ENG {
   VECTOR(Q, 6);        /* *o (--)  External force produced by the engine */
   MATRIX(T_N_B, 3, 3); /* *o  (--)  T.M. from vehicle body to Nozzle */
   std::vector<ACT *> Act_list;
-
+  enum EngType type;  // Engine type
+  
   /* Function declaration */
   void calculate_Q(double input_ang, double thrust_in, arma::mat33 TBI,
-                   enum ActType TYPE);
+                   enum EngType TYPE);
   void calculate_Q(double input_ang_1, double input_ang_2, double thrust_in,
-                   arma::mat33 TBI, enum ActType TYPE);
+                   arma::mat33 TBI, enum EngType TYPE);
   void Allocate_Actuator(int NumAct, enum ActDynType TYPE);
   void set_ENG_HINGE_POS(double x, double y, double z);
+  void set_ENG_Dir(int type_in);
 
  private:
   /* Variable declaration */
