@@ -10,6 +10,7 @@ The aim is to provide high fidelity of Rocket Launch and In-flight Dynamics.
  - Python 2.7
  - [Armadillo Matrix Library](http://arma.sourceforge.net/)
  - Boost Serialization
+ - [Redis](https://redis.io/)
 
 # Type of Simulation
 These simulation as different S_defines resides in exe/ directory.
@@ -40,6 +41,14 @@ Deep Clean HIL/PIL/SIL image, object files, .csv, log
 ```
    ./exe/deep_clean_exe.sh
 ```
+# Install The redis
+```
+cd third-party/redis
+tar -zxvf redis-*.tar.gz -C ./
+cd redis-*/src
+make && make install
+```
+
 # Tests
 
 ## Automative testing
