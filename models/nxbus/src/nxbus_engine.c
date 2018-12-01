@@ -1,10 +1,12 @@
 #include "nxbus_engine.h"
 #include <hiredis.h>
 
+static redisContext *c;
+static redisReply *reply;
+
 void nxbus_init(void) {
     unsigned int j;
-    redisContext *c;
-    redisReply *reply;
+
     const char *hostname = "127.0.0.1";
     int port = 6379;
 
@@ -67,8 +69,25 @@ void nxbus_init(void) {
     }
     freeReplyObject(reply);
 
+    return 0;
+}
+
+void nxbus_deinit(void) {
     /* Disconnects and frees the context */
     redisFree(c);
+}
 
-    return 0;
+void nxbus_hset_vector(char *dst, char *src, char *name, double *vec) {
+
+    reply = redisCommand(c,"MULTI");
+    freeReplyObject(reply);
+    reply = redisCommand(c,"LPUSH %s[0] %f", name, vec[0]);
+    freeReplyObject(reply);
+    reply = redisCommand(c,"LPUSH %s[1] %f", name, vec[1]);
+    freeReplyObject(reply);
+    reply = redisCommand(c,"LPUSH %s[2] %f", name, vec[2]);
+    freeReplyObject(reply);
+    reply = redisCommand(c,"EXEC");
+    freeReplyObject(reply);
+
 }

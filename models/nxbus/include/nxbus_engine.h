@@ -17,6 +17,8 @@ extern "C" {
 #endif
 
 void nxbus_init(void);
+void nxbus_hset_vector(char *dst, char *src, char *name, double *vec);
+void nxbus_deinit(void);
 
 #ifdef __cplusplus
 }
