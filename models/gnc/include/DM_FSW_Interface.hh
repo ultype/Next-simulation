@@ -40,11 +40,8 @@ typedef struct __attribute__((packed)) {
     /* accel */
     double accel_FSPCB[3];
     double accel_EFSPB[3];
-
     /* GPS Constellation */
     uint32_t gps_con_gps_update;
-    transmit_channel gps_con_transmit_data[MAX_CHAN];
-
     refactor_trick_dirty_data_t trick_data;
 } refactor_uplink_packet_t;
 
