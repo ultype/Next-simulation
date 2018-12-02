@@ -27,4 +27,5 @@ cd $S_DEFINE_PATH
 python3 $SIM_HOME_PATH/utilities/generate_error.py $SIM_HOME_PATH/tables/golden_answer/golden.csv $S_DEFINE_PATH/RUN_golden/log_rocket_csv.csv -l
 python3 $SIM_HOME_PATH/utilities/ci_test.py $S_DEFINE_PATH/result.csv 5e-5 | tee test_result
 # Test the exit status of the command before pipe
+kill $REDIS_SERVER_PID
 test ${PIPESTATUS[0]} -eq 0

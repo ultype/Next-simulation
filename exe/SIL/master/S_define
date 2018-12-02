@@ -117,7 +117,8 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.005, "scheduled") sdt->algorithm(0.005);
 
             P2 (0.05, "scheduled") DM_SaveOutData(dm_ins_db);
-            P2 (0.05, "scheduled") nxbus_hset_vector(NULL, NULL, "FSPCB", dm_ins_db.accel_FSPCB);
+            P2 (0.05, "scheduled") nxbus_mset_vec("_FSPCB", dm_ins_db.accel_FSPCB, 3);
+            P2 (0.05, "scheduled") nxbus_mget_vec("_FSPCB", dm_ins_db.accel_FSPCB, 3);
             P2 (0.05, "scheduled") egse_uplink_packet_transfer(&icf_ctrl);
             P2 (0.05, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT8, sizeof(refactor_downlink_packet_t));
             P2 (0.05, "scheduled") load_input(&icf_ctrl);

@@ -10,14 +10,15 @@ LIBRARY DEPENDENCY:
 PROGRAMMERS:
       (((Dung-Ru Tsai) () () () ))
 *******************************************************************************/
-
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 void nxbus_init(void);
-void nxbus_hset_vector(char *dst, char *src, char *name, double *vec);
+void nxbus_mset_vec(const char *key_name, double *vector, size_t dimension);
+void nxbus_mget_vec(const char *key_name, double *vector, size_t dimension);
 void nxbus_deinit(void);
 
 #ifdef __cplusplus

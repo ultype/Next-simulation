@@ -25,50 +25,6 @@ void nxbus_init(void) {
     reply = redisCommand(c,"PING");
     printf("PING: %s\n", reply->str);
     freeReplyObject(reply);
-
-    /* Set a key */
-    reply = redisCommand(c,"SET %s %s", "foo", "hello world");
-    printf("SET: %s\n", reply->str);
-    freeReplyObject(reply);
-
-    /* Set a key using binary safe API */
-    reply = redisCommand(c,"SET %b %b", "bar", (size_t) 3, "hello", (size_t) 5);
-    printf("SET (binary API): %s\n", reply->str);
-    freeReplyObject(reply);
-
-    /* Try a GET and two INCR */
-    reply = redisCommand(c,"GET foo");
-    printf("GET foo: %s\n", reply->str);
-    freeReplyObject(reply);
-
-    reply = redisCommand(c,"INCR counter");
-    printf("INCR counter: %lld\n", reply->integer);
-    freeReplyObject(reply);
-    /* again ... */
-    reply = redisCommand(c,"INCR counter");
-    printf("INCR counter: %lld\n", reply->integer);
-    freeReplyObject(reply);
-
-    /* Create a list of numbers, from 0 to 9 */
-    reply = redisCommand(c,"DEL mylist");
-    freeReplyObject(reply);
-    for (j = 0; j < 10; j++) {
-        char buf[64];
-
-        snprintf(buf,64,"%u",j);
-        reply = redisCommand(c,"LPUSH mylist element-%s", buf);
-        freeReplyObject(reply);
-    }
-
-    /* Let's check what we have inside the list */
-    reply = redisCommand(c,"LRANGE mylist 0 -1");
-    if (reply->type == REDIS_REPLY_ARRAY) {
-        for (j = 0; j < reply->elements; j++) {
-            printf("%u) %s\n", j, reply->element[j]->str);
-        }
-    }
-    freeReplyObject(reply);
-
     return 0;
 }
 
@@ -77,17 +33,23 @@ void nxbus_deinit(void) {
     redisFree(c);
 }
 
-void nxbus_hset_vector(char *dst, char *src, char *name, double *vec) {
+void nxbus_mset_vec(const char *key_name, double *vector, size_t dimension) {
+    reply = redisCommand(c,"MSET %s[0] %f %s[1] %f %s[2] %f",
+                         key_name, vector[0],
+                         key_name, vector[1],
+                         key_name, vector[2]);
+    if(reply->type == REDIS_REPLY_ERROR)
+        printf("MSET: %s\n", reply->str);
+    freeReplyObject(reply);
+}
 
-    reply = redisCommand(c,"MULTI");
+void nxbus_mget_vec(const char *key_name, double *vector, size_t dimension) {
+    double temp;
+    reply = redisCommand(c,"MGET %s[0] %s[1] %s[2]", key_name, key_name, key_name);
+    if(reply->type == REDIS_REPLY_ERROR)
+        printf("MGET: %s\n", reply->str);
+    sscanf(reply->element[0]->str, "%lf", &vector[0]);
+    sscanf(reply->element[1]->str, "%lf", &vector[1]);
+    sscanf(reply->element[2]->str, "%lf", &vector[2]);
     freeReplyObject(reply);
-    reply = redisCommand(c,"LPUSH %s[0] %f", name, vec[0]);
-    freeReplyObject(reply);
-    reply = redisCommand(c,"LPUSH %s[1] %f", name, vec[1]);
-    freeReplyObject(reply);
-    reply = redisCommand(c,"LPUSH %s[2] %f", name, vec[2]);
-    freeReplyObject(reply);
-    reply = redisCommand(c,"EXEC");
-    freeReplyObject(reply);
-
 }
