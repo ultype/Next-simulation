@@ -84,9 +84,6 @@ class FlightComputer_SimObject : public Trick::SimObject {
 
             P2 (0.01, "scheduled") clear_flag();
 
-            P2 (0.05, "scheduled") gps.filter_extrapolation(0.05);
-            P2 (0.05, "scheduled") gps.measure(0.05);
-
             P2 (0.05, "scheduled") ins.update(0.05);
             P2 (0.05, "scheduled") INS_SaveOutData(ins, dm_ins_db, ins_ctl_db);
             P2 (0.05, "scheduled") control.control(0.05);
