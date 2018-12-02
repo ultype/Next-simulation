@@ -13,7 +13,6 @@
     gps.grab_SBEEC = LINK(ins, get_SBEEC); \
     gps.grab_VBEEC = LINK(ins, get_VBEEC); \
     gps.grab_TEIC = LINK(ins, get_TEIC); \
-    gps.grab_transmit_data  = GRAB_VAR(dm_ins_db.gps_con_transmit_data); \
 }
 
 #define INS_LINK_decl() void INSLinkInData(INS &ins, refactor_uplink_packet_t &dm_ins_db, GPS_FSW &gps) { \
@@ -74,10 +73,6 @@
     STORE_VEC(dm_ins_db.accel_FSPCB, accelerometer->get_computed_FSPB()); \
     STORE_VEC(dm_ins_db.accel_EFSPB, accelerometer->get_error_of_computed_FSPB()); \
     dm_ins_db.gps_con_gps_update = gps_con.get_gps_update(); \
-    transmit_channel *trans_chan = gps_con.get_transmit_data(); \
-    for (int i = 0; i < MAX_CHAN; ++i) { \
-        dm_ins_db.gps_con_transmit_data[i] = trans_chan[i]; \
-    } \
     STORE_VEC(dm_ins_db.trick_data.gyro_WBICB, gyro->get_computed_WBIB()); \
     STORE_VEC(dm_ins_db.trick_data.gyro_EWBIB, gyro->get_error_of_computed_WBIB()); \
     STORE_VEC(dm_ins_db.trick_data.sdt_phi, sdt->get_PHI()); \
