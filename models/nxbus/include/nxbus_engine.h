@@ -17,8 +17,8 @@ extern "C" {
 #endif
 
 void nxbus_init(void);
-void nxbus_mset_vec(const char *key_name, double *vector, size_t dimension);
-void nxbus_mget_vec(const char *key_name, double *vector, size_t dimension);
+int nxbus_mset_vec(const char *key_name, double *vector, size_t dimension);
+int nxbus_mget_vec(const char *key_name, double *vector, size_t dimension);
 void nxbus_deinit(void);
 
 #ifdef __cplusplus
