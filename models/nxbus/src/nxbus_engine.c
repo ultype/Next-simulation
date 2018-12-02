@@ -33,23 +33,48 @@ void nxbus_deinit(void) {
     redisFree(c);
 }
 
-void nxbus_mset_vec(const char *key_name, double *vector, size_t dimension) {
-    reply = redisCommand(c,"MSET %s[0] %f %s[1] %f %s[2] %f",
-                         key_name, vector[0],
-                         key_name, vector[1],
-                         key_name, vector[2]);
-    if(reply->type == REDIS_REPLY_ERROR)
-        printf("MSET: %s\n", reply->str);
+int nxbus_mset_vec(const char *key_name, double *vector, size_t dimension) {
+    int idx = 0;
+    int rc = 0;
+    reply = redisCommand(c,"MULTI");
     freeReplyObject(reply);
+    for (idx = 0; idx < dimension; ++idx) {
+        reply = redisCommand(c,"SET %s[%d] %f ", key_name, idx, vector[idx]);
+        freeReplyObject(reply);
+    }
+
+    reply = redisCommand(c,"EXEC");
+    for (idx = 0; idx < dimension; ++idx) {
+        if(reply->element[idx]->type == REDIS_REPLY_ERROR) {
+            printf("EXEC: %s\n", reply->str);
+            rc |= 0x1;
+        }
+    }
+    freeReplyObject(reply);
+
+    return rc;
 }
 
-void nxbus_mget_vec(const char *key_name, double *vector, size_t dimension) {
+int nxbus_mget_vec(const char *key_name, double *vector, size_t dimension) {
     double temp;
-    reply = redisCommand(c,"MGET %s[0] %s[1] %s[2]", key_name, key_name, key_name);
-    if(reply->type == REDIS_REPLY_ERROR)
-        printf("MGET: %s\n", reply->str);
-    sscanf(reply->element[0]->str, "%lf", &vector[0]);
-    sscanf(reply->element[1]->str, "%lf", &vector[1]);
-    sscanf(reply->element[2]->str, "%lf", &vector[2]);
+    int idx = 0;
+    int rc = 0;
+    reply = redisCommand(c,"MULTI");
     freeReplyObject(reply);
+    for (idx = 0; idx < dimension; ++idx) {
+        reply = redisCommand(c,"GET %s[%d]", key_name, idx);
+        freeReplyObject(reply);
+    }
+
+    reply = redisCommand(c,"EXEC");
+    for (idx = 0; idx < dimension; ++idx) {
+        if(reply->element[idx]->type == REDIS_REPLY_ERROR) {
+            printf("EXEC: %s\n", reply->str);
+            rc |= 0x1;
+        }
+        sscanf(reply->element[idx]->str, "%lf", &vector[idx]);
+    }
+    freeReplyObject(reply);
+
+    return rc;
 }
