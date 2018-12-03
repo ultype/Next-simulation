@@ -26,6 +26,7 @@ class Accelerometer : public Sensor {
 
   virtual arma::vec3 get_computed_FSPB() { return FSPCB; }
   virtual arma::vec3 get_error_of_computed_FSPB() { return EFSPB; }
+  virtual int write_to_(const char *bus_name) { return 0; }
 
  protected:
   VECTOR(FSPCB, 3); /* *o  (N/kg)  Computed specific force on body */
