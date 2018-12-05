@@ -8,7 +8,6 @@ LIBRARY DEPENDENCY:
 *******************************************************************************/
 
 #include <armadillo>
-#include <boost/variant.hpp>
 #include <cassert>
 #include <vector>
 #include "Rocket_Flight_DM.hh"
