@@ -106,7 +106,7 @@ int nxbus_mget(ENUM_NXBUS_DATA_T data_type, const char *key_name, size_t dimensi
         case NXBUS_UINT32:
             vector_uint32 = va_arg(ap, uint32_t*);
             for (idx = 0; idx < dimension; ++idx)
-                sscanf(reply->element[idx]->str, "%lf", &vector_uint32[idx]);
+                sscanf(reply->element[idx]->str, "%u", &vector_uint32[idx]);
             break;
         default:
             fprintf(stderr, "[%s:%d]NXBUS Error: Data Type not found !\n", __FUNCTION__, __LINE__);
