@@ -4,7 +4,7 @@
 static redisContext *c;
 static redisReply *reply;
 
-void nxbus_init(void) {
+void nxbus_init(struct nxbus_ctrlblk_t *N) {
     unsigned int j;
 
     const char *hostname = "127.0.0.1";
@@ -28,7 +28,7 @@ void nxbus_init(void) {
     return 0;
 }
 
-void nxbus_deinit(void) {
+void nxbus_deinit(struct nxbus_ctrlblk_t *N) {
     /* Disconnects and frees the context */
     redisFree(c);
 }
@@ -46,14 +46,14 @@ int nxbus_mset(ENUM_NXBUS_DATA_T data_type, const char *key_name, size_t dimensi
         case NXBUS_DOUBLE:
             vector_double = va_arg(ap, double*);
             for (idx = 0; idx < dimension; ++idx) {
-                reply = redisCommand(c,"SET %s[%d] %f ", key_name, idx, vector_double[idx]);
+                reply = redisCommand(c,"ZADD %s %f [%d]", key_name, vector_double[idx], idx);
                 freeReplyObject(reply);
             }
             break;
         case NXBUS_UINT32:
             vector_uint32 = va_arg(ap, uint32_t*);
             for (idx = 0; idx < dimension; ++idx) {
-                reply = redisCommand(c,"SET %s[%d] %u ", key_name, idx, vector_uint32[idx]);
+                reply = redisCommand(c,"ZADD %s %u [%d]", key_name, vector_uint32[idx], idx);
                 freeReplyObject(reply);
             }
             break;
@@ -83,7 +83,7 @@ int nxbus_mget(ENUM_NXBUS_DATA_T data_type, const char *key_name, size_t dimensi
     reply = redisCommand(c,"MULTI");
     freeReplyObject(reply);
     for (idx = 0; idx < dimension; ++idx) {
-        reply = redisCommand(c,"GET %s[%d]", key_name, idx);
+        reply = redisCommand(c,"ZSCORE %s [%d]", key_name, idx);
         freeReplyObject(reply);
     }
 
