@@ -1,26 +1,23 @@
-
-MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-SIRIUS_HOME = $(patsubst %/exe/PIL/master/S_overrides.mk, %, $(MKFILE_PATH))
-
-$(info MKFILE_PATH = $(MKFILE_PATH))
-$(info SIRIUS_HOME = $(SIRIUS_HOME))
-
-INCLUDES = -I${TRICK_HOME}/trick_models \
-		   -I$(SIRIUS_HOME)/models/gnc/include \
-		   -I$(SIRIUS_HOME)/models/dm/include \
-		   -I$(SIRIUS_HOME)/models/cad/include \
-		   -I$(SIRIUS_HOME)/models/math/include \
-		   -I$(SIRIUS_HOME)/models/aux/include \
-		   -I$(SIRIUS_HOME)/models/sensor/include \
-		   -I$(SIRIUS_HOME)/models/driver/include \
-		   -I$(SIRIUS_HOME)/models/icf/include \
-		   -I$(SIRIUS_HOME)/models/clock_source_mgmt \
-		   -I$(SIRIUS_HOME)/models/equipment_protocol/include \
-		   -I$(SIRIUS_HOME)/models/flight_events/include
-
-TRICK_CFLAGS += --std=c++11 ${INCLUDES} -g -D_GNU_SOURCE -DCONFIG_PIL_ENABLE
-TRICK_CFLAGS += -Wall -Wmissing-prototypes -Wextra -Wshadow
-TRICK_CXXFLAGS += --std=c++11 ${INCLUDES} -g -DCONFIG_PIL_ENABLE
-TRICK_CXXFLAGS += -Wall -Wextra -Wshadow -Wno-narrowing
-TRICK_USER_LINK_LIBS += -larmadillo -lboost_serialization -lbiodaq
-MAKEFLAGS += -j16
+## Readme First
+## You should not modify this file.
+## Because, this is the common for master and slave.
+## If you necessary to change, please also consider both PIL master and slave.
+## Also, please reference the cmm_model.mk and pil_mode.mk
+##
+SHELL=/bin/bash
+TOP_DIR=$(shell TOP_DIR=Unable_To_Find_Top_Dir; \
+				CUR_DIR=$$(pwd); \
+				while [ "$$CUR_DIR" != "/" ]; \
+				do { \
+					if [ -a $$CUR_DIR/.git ]; then \
+					TOP_DIR=$$CUR_DIR; \
+					fi; \
+				    CUR_DIR=$$(dirname $$CUR_DIR); } \
+				done;\
+				echo $$TOP_DIR)
+$(info TOP_DIR = $(TOP_DIR))
+include $(TOP_DIR)/exe/xil_common/makefile/cmm_model.mk
+include $(TOP_DIR)/exe/xil_common/makefile/pil_model.mk
+include $(TOP_DIR)/exe/xil_common/makefile/cmm_flags.mk
+#MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+#SIM_ROOT = $(patsubst %/exe/SIL/master/S_overrides.mk, %, $(MKFILE_PATH))
