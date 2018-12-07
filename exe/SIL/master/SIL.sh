@@ -17,7 +17,7 @@ for name in "${redis_pid_arr[@]}"; do
     kill $redis_pid_arr
 done
 
-redis-server &
+# redis-server &
 REDIS_SERVER_PID=$(echo $!)
 
 

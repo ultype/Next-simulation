@@ -68,7 +68,6 @@ class Rocket_SimObject : public Trick::SimObject {
         struct icf_ctrlblk_t   icf_ctrl;
         uint64_t egse_flight_event_handler_bitmap = 0xFFFFFFFFFFFFFFFF;
         uint64_t flight_event_code_record = 0;
-        struct nxbus_ctrlblk_t nxbus_ctrl;
 
         void link(){
             tvc.grab_theta_a_cmd       = GRAB_VAR(ctl_tvc_db.theta_a_cmd);
@@ -107,7 +106,6 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") gyro->init();
             ("initialization") accelerometer->init();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_SIL_EGSE);
-            ("initialization") nxbus_init(&nxbus_ctrl);
 
             P1 (int_step, "scheduled") time->dm_time(int_step);
 	        P1 (int_step, "scheduled") env.algorithm(int_step);
@@ -117,17 +115,6 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.005, "scheduled") accelerometer->algorithm(0.005);
             P1 (0.005, "scheduled") sdt->algorithm(0.005);
 
-            P2 (0.05, "scheduled") accelerometer->write_to_("NXBUS");
-            P2 (0.05, "scheduled") gps_con.write_to_("NXBUS");
-            P2 (0.05, "scheduled") gyro->write_to_("NXBUS");
-            P2 (0.05, "scheduled") sdt->write_to_("NXBUS");
-            P2 (0.05, "scheduled") nxbus_mget(NXBUS_DOUBLE, "Accelerometer:_FSPCB", 3, dm_ins_db.accel_FSPCB);
-            P2 (0.05, "scheduled") nxbus_mget(NXBUS_DOUBLE, "Accelerometer:_EFSPB", 3, dm_ins_db.accel_EFSPB);
-            P2 (0.05, "scheduled") nxbus_mget(NXBUS_UINT32, "GPS_constellation:gps_con_gps_update", 1, &dm_ins_db.gps_con_gps_update);
-            P2 (0.05, "scheduled") nxbus_mget(NXBUS_DOUBLE, "Gyro:_WBICB", 3, dm_ins_db.trick_data.gyro_WBICB);
-            P2 (0.05, "scheduled") nxbus_mget(NXBUS_DOUBLE, "Gyro:_EWBIB", 3, dm_ins_db.trick_data.gyro_EWBIB);
-            P2 (0.05, "scheduled") nxbus_mget(NXBUS_DOUBLE, "SDT:_PHI", 3, dm_ins_db.trick_data.sdt_phi);
-            P2 (0.05, "scheduled") nxbus_mget(NXBUS_DOUBLE, "SDT:_DELTA_VEL", 3, dm_ins_db.trick_data.sdt_delta_vel);
             P2 (0.05, "scheduled") DM_SaveOutData(dm_ins_db);
             P2 (0.05, "scheduled") egse_uplink_packet_transfer(&icf_ctrl);
             P2 (0.05, "scheduled") icf_rx_ctrl_job(&icf_ctrl, HW_PORT8, sizeof(refactor_downlink_packet_t));
@@ -137,7 +124,6 @@ class Rocket_SimObject : public Trick::SimObject {
             P3 (int_step, "scheduled") dynamics.algorithm(int_step);
             (5, "scheduled") icf_heartbeat();
             ("shutdown") icf_ctrlblk_deinit(&icf_ctrl, ICF_SYSTEM_TYPE_SIL_EGSE);
-            ("shutdown") nxbus_deinit(&nxbus_ctrl);
         }
 };
 
