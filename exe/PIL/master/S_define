@@ -108,6 +108,7 @@ class Rocket_SimObject : public Trick::SimObject {
             ("initialization") tvc.init();
             ("initialization") gyro->init();
             ("initialization") accelerometer->init();
+            ("initialization") fc_can_hashtbl_init();
             ("initialization") icf_ctrlblk_init(&icf_ctrl, ICF_SYSTEM_TYPE_EGSE);
 
             P1 (int_step, "scheduled") time->dm_time(int_step);

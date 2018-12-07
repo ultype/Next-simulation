@@ -20,7 +20,6 @@ extern "C" int run_me() {
     slave_init_stage2_control(&fc);
     /* events */
     flight_events_trigger_configuration(&fc);
-
     return 0;
 }
 
