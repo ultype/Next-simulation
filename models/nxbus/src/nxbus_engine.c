@@ -39,6 +39,7 @@ int nxbus_mset(ENUM_NXBUS_DATA_T data_type, const char *key_name, size_t dimensi
     double *vector_double;
     uint32_t *vector_uint32;
     va_list ap;
+
     reply = redisCommand(c,"MULTI");
     freeReplyObject(reply);
     va_start(ap, dimension);
@@ -46,14 +47,14 @@ int nxbus_mset(ENUM_NXBUS_DATA_T data_type, const char *key_name, size_t dimensi
         case NXBUS_DOUBLE:
             vector_double = va_arg(ap, double*);
             for (idx = 0; idx < dimension; ++idx) {
-                reply = redisCommand(c,"ZADD %s %f [%d]", key_name, vector_double[idx], idx);
+                reply = redisCommand(c,"SET %s[%d] %f", key_name, idx, vector_double[idx]);
                 freeReplyObject(reply);
             }
             break;
         case NXBUS_UINT32:
             vector_uint32 = va_arg(ap, uint32_t*);
             for (idx = 0; idx < dimension; ++idx) {
-                reply = redisCommand(c,"ZADD %s %u [%d]", key_name, vector_uint32[idx], idx);
+                reply = redisCommand(c,"SET %s[%d] %u", key_name, idx, vector_uint32[idx]);
                 freeReplyObject(reply);
             }
             break;
@@ -79,11 +80,13 @@ int nxbus_mget(ENUM_NXBUS_DATA_T data_type, const char *key_name, size_t dimensi
     int rc = 0;
     double *vector_double = NULL;
     uint32_t *vector_uint32 = NULL;
+    uint64_t u64val;
     va_list ap;
+
     reply = redisCommand(c,"MULTI");
     freeReplyObject(reply);
     for (idx = 0; idx < dimension; ++idx) {
-        reply = redisCommand(c,"ZSCORE %s [%d]", key_name, idx);
+        reply = redisCommand(c,"GET %s[%d]", key_name, idx);
         freeReplyObject(reply);
     }
 
@@ -100,8 +103,9 @@ int nxbus_mget(ENUM_NXBUS_DATA_T data_type, const char *key_name, size_t dimensi
     switch(data_type) {
         case NXBUS_DOUBLE:
             vector_double = va_arg(ap, double*);
-            for (idx = 0; idx < dimension; ++idx)
+            for (idx = 0; idx < dimension; ++idx) {
                 sscanf(reply->element[idx]->str, "%lf", &vector_double[idx]);
+            }
             break;
         case NXBUS_UINT32:
             vector_uint32 = va_arg(ap, uint32_t*);
