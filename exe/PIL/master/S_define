@@ -45,6 +45,7 @@ LIBRARY DEPENDENCIES:
 ##include "flight_events_define.h"
 ##include "flight_events_handler.h"
 ##include "ExternalSourceClock.hh"
+##include "atuator_hw.hh"
 
 class Rocket_SimObject : public Trick::SimObject {
     public:
@@ -91,6 +92,28 @@ class Rocket_SimObject : public Trick::SimObject {
             icf_rx_ctrl_job(C, HW_PORT0, sizeof(struct can_frame));
         };
 
+        void load_input(struct icf_ctrlblk_t *C) {
+                struct can_frame frame_tvc_no1;
+                struct can_frame frame_tvc_no2;
+                int update_val = 0;
+                if (icf_rx_dequeue(C, EGSE_TVC_SW_QIDX, &frame_tvc_no1, sizeof(struct can_frame)) > 0) {
+                    update_val = actuator_tvc_decode_frame(&frame_tvc_no1);
+
+                }
+                if (icf_rx_dequeue(C, EGSE_TVC_SW_QIDX, &frame_tvc_no2, sizeof(struct can_frame)) > 0) {
+                    update_val = actuator_tvc_decode_frame(&frame_tvc_no2);
+
+                }
+                if (update_val < 0)
+                    return;
+                //  fprintf(stderr, "TVC::actuate %d %d %d %d\n", tvc_no1.pitch_count,tvc_no1.yaw_count, tvc_no2.pitch_count, tvc_no2.yaw_count);
+                //  fprintf(stderr, "TVC::actuate %f %f %f %f\n", theta_a_cmd, theta_b_cmd, theta_c_cmd, theta_d_cmd);
+                actuator_tvc_cmd2numerical(&ctl_tvc_db.theta_a_cmd,
+                                           &ctl_tvc_db.theta_b_cmd,
+                                           &ctl_tvc_db.theta_c_cmd,
+                                           &ctl_tvc_db.theta_d_cmd);
+        };
+
         Rocket_SimObject() 
             :   env         ( data_exchang ) ,
                 propulsion  ( data_exchang ) ,
@@ -119,10 +142,11 @@ class Rocket_SimObject : public Trick::SimObject {
             P1 (0.005, "scheduled") accelerometer->algorithm(0.005);
             P1 (0.005, "scheduled") sdt->algorithm(0.005);
 
-            P2 (0.05, "scheduled") DM_SaveOutData(dm_ins_db);
+            P2 (0.050, "scheduled") DM_SaveOutData(dm_ins_db);
             P2 (0.050, "scheduled") egse_uplink_packet_enqueue(&icf_ctrl);
             P2 (0.050, "scheduled") icf_tx_ctrl_job(&icf_ctrl, EGSE_FLIGHT_COMPUTER_SW_QIDX);
             P2 (0.005, "scheduled") egse_downlink_rx_job_group(&icf_ctrl);
+            P2 (0.005, "scheduled") load_input(&icf_ctrl);
             P2 (0.005, "scheduled") flight_event_code_handler(&icf_ctrl, &flight_event_code_record, ICF_SYSTEM_TYPE_EGSE);
 
 
