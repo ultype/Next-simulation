@@ -71,7 +71,7 @@ void AeroDynamics::algorithm(double int_step) {
     data_exchang->hget("vmach", &vmach);
     data_exchang->hget("dvba", &dvba);
     data_exchang->hget("alt", &alt);
-    
+
     arma::vec3 WBIB;
     arma::vec3 WBEB;
     arma::vec3 XCG;
@@ -79,10 +79,8 @@ void AeroDynamics::algorithm(double int_step) {
     data_exchang->hget("WBEB", WBEB);
     data_exchang->hget("WBIB", WBIB);
 
-
     enum Propulsion::THRUST_TYPE thrust_state = propulsion->get_thrust_state();
     // double vmass  = grab_vmass();
-    
 
     //  transforming body rates from body -> aeroballistic coord.
     double phip = phipx * RAD;
@@ -103,14 +101,14 @@ void AeroDynamics::algorithm(double int_step) {
       cx = -ca_on;
     }
 
-    cy = -cn * sphip + cnq * ((WBIB(2) * refd) / (2.0 * dvba));
-    cz = -cn * cphip - cnq * ((WBIB(1) * refd) / (2.0 * dvba));
+    cy = -cn * sphip + cnq * ((WBEB(2) * refd) / (2.0 * dvba));
+    cz = -cn * cphip - cnq * ((WBEB(1) * refd) / (2.0 * dvba));
 
     cll = 0.0;
     clm = cn * ((-XCG(0) / refd) - XCP(0)) * cphip +
-          cmq * ((WBIB(1) * refd) / (2.0 * dvba));
+          cmq * ((WBEB(1) * refd) / (2.0 * dvba));
     cln = -cn * ((-XCG(0) / refd) - XCP(0)) * sphip +
-          cmq * ((WBIB(2) * refd) / (2.0 * dvba));
+          cmq * ((WBEB(2) * refd) / (2.0 * dvba));
   }
 
   data_exchang->hset("refa", refa);
@@ -123,4 +121,3 @@ void AeroDynamics::algorithm(double int_step) {
   data_exchang->hset("cln", cln);
   data_exchang->hset("XCP", XCP);
 }
-
