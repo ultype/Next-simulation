@@ -42,6 +42,8 @@ $ pip install cpplint
    - [Redis Official](https://redis.io/)
    ```
    $ cd Next-simulation/third-party/redis
+   $ tar -Jxvf redis-5.0.2.tar.gz
+   $ cd redis-5.0.2
    $ make
    $ sudo make install
    ``` 
