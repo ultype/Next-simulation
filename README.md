@@ -2,15 +2,60 @@ Next is a Simulation Platform of 6Dof
 From version 0.1, it is ported form Rocket Simulation in 6DOF.
 The aim is to provide high fidelity of Rocket Launch and In-flight Dynamics.
 
-# Dependencies
- - NASA Trick 17.0.5
-   - Github [NASA/trick](https://github.com/nasa/trick)
-   - Internal mirror: rTRICK repo (Deprecated)
- - GCC 5.4
+# Getting Started
+## 0. Clone the Repo and sub repo
+```
+$ git clone --recursive https://github.com/octoberskyTW/Next-simulation.git
+```
+## 1. Dependencies
+ - GCC 5.4 up
  - Python 2.7
- - [Armadillo Matrix Library](http://arma.sourceforge.net/)
  - Boost Serialization
- - [Redis](https://redis.io/)
+ - cpplint
+```
+$ sudo apt-get install htop cmake vim tree git-core libopenblas-dev libboost-dev libboost-all-dev bison curl flex python-pip
+$ pip install cpplint
+```
+
+## 2. Third-Party Installation
+ - NASA Trick 17.0.5
+   - Official Github [NASA/trick](https://github.com/nasa/trick)
+   ```
+   $ sudo apt-get install bison curl flex g++ libx11-dev libxml2-dev libxt-dev \
+            libmotif-common libmotif-dev make openjdk-8-jdk python2.7-dev swig \
+            zlib1g-dev llvm llvm-dev clang libclang-dev libudunits2-dev
+   $ cd Next-simulation/third-party/trick
+   $ ./configure
+   $ make
+   $ sudo make install
+   ```
+ - Armadillo Matrix Library-9.100.6
+   - [Official Github Armadillo](http://arma.sourceforge.net/)
+   ```
+   $ cd Next-simulation/third-party/armadillo
+   $ ./configure
+   $ make
+   $ sudo make install
+   ``` 
+ - Redis Server Memory Database-5.0.2
+   - [Redis Official](https://redis.io/)
+   ```
+   $ cd Next-simulation/third-party/redis
+   $ make
+   $ sudo make install
+   ``` 
+   - [hiredis Official](https://github.com/redis/hiredis )
+   ```
+   $ cd Next-simulation/third-party/hiredis
+   $ make all
+   $ sudo make install
+   ``` 
+
+## 3. Build and Run a SIL Simulation
+```
+$ cd Next-simulation/exe/SIL/master
+$ ./SIL.sh
+```
 
 # Type of Simulation
 These simulation as different S_defines resides in exe/ directory.
