@@ -11,7 +11,6 @@ $ git clone --recursive https://github.com/octoberskyTW/Next-simulation.git
 ## 1. Dependencies
  - GCC 5.4 up
  - Python 2.7
- - Boost Serialization
  - cpplint
 ```
 $ sudo apt-get install htop cmake vim tree git-core libopenblas-dev libboost-dev libboost-all-dev bison curl flex python-pip
