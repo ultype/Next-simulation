@@ -1,6 +1,6 @@
-#include "Rocket_Flight_DM.hh"
 #include <iomanip>
 #include <tuple>
+#include "Rocket_Flight_DM.hh"
 #include "aux.hh"
 #include "cad_utility.hh"
 #include "integrate.hh"
@@ -957,7 +957,7 @@ void Rocket_Flight_DM::RK4F(std::vector<arma::vec> Var_in,
         (NEXT_ACC - GRAVG +
          QuaternionRotation(QuaternionInverse(TBI_Q),
                             ddrhoC_IMU)));  //+ TBI * GRAVG;  // FSPB: body
-                                            //force include gravity acc
+                                            // force include gravity acc
   }
   /* Prepare for orthonormalization */
   double quat_metric = TBI_Q(0) * TBI_Q(0) + TBI_Q(1) * TBI_Q(1) +
@@ -1243,7 +1243,7 @@ void Rocket_Flight_DM::AeroDynamics_Q() {
   double cln;
   double cx;
   double cz;
-  arma::vec3 XCP;
+  arma::vec3 XCG;
 
   data_exchang->hget("pdynmc", &pdynmc);
   data_exchang->hget("refa", &refa);
@@ -1254,12 +1254,12 @@ void Rocket_Flight_DM::AeroDynamics_Q() {
   data_exchang->hget("cln", &cln);
   data_exchang->hget("cx", &cx);
   data_exchang->hget("cz", &cz);
-  data_exchang->hget("XCP", XCP);
+  data_exchang->hget("XCG", XCG);
 
-  arma::vec3 rhoCP;
-  rhoCP(0) = -(XCP(0) * refd) - (reference_point);
-  rhoCP(1) = 0.0;
-  rhoCP(2) = 0.0;
+  arma::vec3 rhoCG;
+  rhoCG(0) = XCG(0) - (reference_point);
+  rhoCG(1) = 0.0;
+  rhoCG(2) = 0.0;
 
   // total non-gravitational forces
   FAPB = pdynmc * refa * arma::vec({cx, cy, cz});
@@ -1276,15 +1276,15 @@ void Rocket_Flight_DM::AeroDynamics_Q() {
   Q_Aero(3) = dot(FMAB, beta_b1_q4) +
               dot(QuaternionRotation(QuaternionTranspose(TBI_Q), FAPB),
                   -QuaternionRotation(QuaternionTranspose(TBI_Q),
-                                      cross_matrix(rhoCP) * beta_b1_q4));
+                                      cross_matrix(rhoCG) * beta_b1_q4));
   Q_Aero(4) = dot(FMAB, beta_b1_q5) +
               dot(QuaternionRotation(QuaternionTranspose(TBI_Q), FAPB),
                   -QuaternionRotation(QuaternionTranspose(TBI_Q),
-                                      cross_matrix(rhoCP) * beta_b1_q5));
+                                      cross_matrix(rhoCG) * beta_b1_q5));
   Q_Aero(5) = dot(FMAB, beta_b1_q6) +
               dot(QuaternionRotation(QuaternionTranspose(TBI_Q), FAPB),
                   -QuaternionRotation(QuaternionTranspose(TBI_Q),
-                                      cross_matrix(rhoCP) * beta_b1_q6));
+                                      cross_matrix(rhoCG) * beta_b1_q6));
 }
 
 void Rocket_Flight_DM::Gravity_Q() {
