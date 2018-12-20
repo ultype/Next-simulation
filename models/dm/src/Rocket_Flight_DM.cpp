@@ -679,8 +679,8 @@ void Rocket_Flight_DM::propagate_aeroloss(double int_step) {
   double vmass;
   data_exchang->hget("vmass", &vmass);
   // calculate aero loss
-  FAPB = FAPB * (1. / vmass);
-  _aero_loss = _aero_loss + norm(FAPB) * int_step;
+  arma::vec3 tmp = FAPB * (1. / vmass);
+  _aero_loss = _aero_loss + norm(tmp) * int_step;
 }
 
 void Rocket_Flight_DM::propagate_control_loss(double int_step) {
