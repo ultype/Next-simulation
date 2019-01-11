@@ -1,5 +1,5 @@
 Next is a 6Dof Simulation Platform.
-It is ported form [Modeling INS/GPS/Star-Tracker in 6 DoF: Simulating NGC of a Three-Stage Rocket Booster in CADAC++](https://www.amazon.com/Modeling-INS-GPS-Star-Tracker-DoF/dp/1518899315)
+It is ported from [Modeling INS/GPS/Star-Tracker in 6 DoF: Simulating NGC of a Three-Stage Rocket Booster in CADAC++](https://www.amazon.com/Modeling-INS-GPS-Star-Tracker-DoF/dp/1518899315)
 
 The aim is to provide to verify flight software, and delivery accuracy hardware-in-the-loop and flight testing.
 
