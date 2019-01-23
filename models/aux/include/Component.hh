@@ -49,6 +49,16 @@ class ACT_1st : public ACT {
   double Act_prior_rate;  /* *o (r/s) Actuator's proir angular rate */
 };
 
+class ACT_NO_DYN : public ACT {
+  TRICK_INTERFACE(ACT_1st);
+
+ public:
+  ACT_NO_DYN(){};
+  ~ACT_NO_DYN(){};
+
+  virtual void Actuate(double input_command, double int_step);
+};
+
 class ENG {
   TRICK_INTERFACE(ENG);
 
@@ -61,7 +71,7 @@ class ENG {
   MATRIX(T_N_B, 3, 3); /* *o  (--)  T.M. from vehicle body to Nozzle */
   std::vector<ACT *> Act_list;
   enum EngType type;  // Engine type
-  
+
   /* Function declaration */
   void calculate_Q(double input_ang, double thrust_in, arma::mat33 TBI,
                    enum EngType TYPE);

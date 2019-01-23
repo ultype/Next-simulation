@@ -42,6 +42,10 @@ void ACT_1st::set_1st_act_var(double Ang_limit_in, double Ang_rate_limit_in,
   Tau = Tau_in;
 }
 
+void ACT_NO_DYN::Actuate(double input_command, double int_step) {
+  ActOuptut = input_command;
+}
+
 ENG::ENG()
     : VECTOR_INIT(Q, 6),
       MATRIX_INIT(T_N_B, 3, 3),
@@ -72,9 +76,7 @@ void ENG::set_ENG_HINGE_POS(double x, double y, double z) {
   ENG_HINGE_POS(2) = z;
 }
 
-void ENG::set_ENG_Dir(int type_in) {
-  type = static_cast<EngType>(type_in);
-}
+void ENG::set_ENG_Dir(int type_in) { type = static_cast<EngType>(type_in); }
 
 void ENG::Allocate_Actuator(int NumAct, enum ActDynType TYPE) {
   switch (TYPE) {
