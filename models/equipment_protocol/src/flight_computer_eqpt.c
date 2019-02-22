@@ -186,7 +186,7 @@ void fc_can_cmd_record_time(FILE *output_file) {
     milli = ts.tv_nsec / 1000000;
     strftime(date_buf, (size_t) 20, "%Y/%m/%d,%H:%M:%S", localtime(&ts.tv_sec));
     snprintf(currentTime, sizeof(currentTime), "%s.%03d", date_buf, milli);
-    fprintf(output_file, "%s, %f,", currentTime, exec_get_sim_time());
+    //fprintf(output_file, "%s, %f,", currentTime, exec_get_sim_time());
 }
 
 int fc_can_cmd_record_init(FILE **output_file) {

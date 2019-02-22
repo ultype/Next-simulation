@@ -1,6 +1,7 @@
 #include "icf_trx_ctrl.h"
 #include "simgen_remote.h"
 #include <hiredis.h>
+/*  HIL EGSE  */
 static const struct icf_mapping g_icf_egse_maptbl[] = {
     {HW_PORT0, EGSE_TVC_SW_QIDX,              ICF_DRIVERS_ID0},
     {HW_PORT1, EGSE_IMU01_SW_QIDX,            ICF_DRIVERS_ID1},
@@ -53,6 +54,7 @@ static struct icf_ctrl_queue g_egse_queue[] = {
     {1, EGSE_IMU02_RX_SW_QIDX,         ICF_DIRECTION_RX, NULL, {}}
 };
 
+/*  HIL ESPS  */
 static const struct icf_mapping g_icf_esps_maptbl[] = {
     {HW_PORT0, ESPS_TVC_SW_QIDX,          ICF_DRIVERS_ID0},
     {HW_PORT8, ESPS_GNC_SW_QIDX,          ICF_DRIVERS_ID2},
@@ -101,6 +103,24 @@ static struct icf_ctrl_queue g_esps_sil_queue[] = {
     {1, ESPS_GNC_SW_QIDX,                  ICF_DIRECTION_RX, NULL, {}}
 };
 
+/* ECAT HIL EGSE Table  */
+static const struct icf_mapping g_icf_egse_ecat_hil_maptbl[] = {
+    {HW_PORTA, EGSE_FC_ECS_RX_SW_QIDX, ICF_DRIVERS_ID4},
+    {HW_PORTA, EGSE_FC_ECS_TX_SW_QIDX, ICF_DRIVERS_ID4}
+};
+
+static struct icf_ctrl_port g_egse_ecat_hil_port[] = {
+    {1, HW_PORTA, "cifX0",   0,  ECS_DEVICE_TYPE, NULL, NULL}
+};
+
+static struct icf_ctrl_queue g_egse_ecat_hil_queue[] = {
+    {1, EGSE_FC_ECS_TX_SW_QIDX, ICF_DIRECTION_TX, NULL, {}},
+    {1, EGSE_FC_ECS_RX_SW_QIDX, ICF_DIRECTION_RX, NULL, {}}
+};
+
+/* ECAT HIL ESPS Table  */
+
+
 static struct icf_mapping *icf_choose_map_tbl(int system_type, int *tbl_size) {
     struct icf_mapping *table = NULL;
 
@@ -120,7 +140,11 @@ static struct icf_mapping *icf_choose_map_tbl(int system_type, int *tbl_size) {
         case ICF_SYSTEM_TYPE_SIL_ESPS:
             table = g_icf_esps_sil_maptbl;
             *tbl_size = sizeof(g_icf_esps_sil_maptbl);
-            break;
+            break; 
+		case ICF_SYSTEM_TYPE_ECAT_EGSE:
+			table = g_icf_egse_ecat_hil_maptbl;
+            *tbl_size = sizeof(g_icf_egse_ecat_hil_maptbl);
+			break;		
         default:
             table = g_icf_egse_maptbl;
             *tbl_size = sizeof(g_icf_egse_maptbl);
@@ -148,6 +172,10 @@ static struct icf_ctrl_queue *icf_choose_sw_queue_tbl(int system_type, int *tbl_
             table = g_esps_sil_queue;
             *tbl_size = sizeof(g_esps_sil_queue);
             break;
+		case ICF_SYSTEM_TYPE_ECAT_EGSE:
+			table = g_egse_ecat_hil_queue;
+            *tbl_size = sizeof(g_egse_ecat_hil_queue);
+			break;
         default:
             table = g_egse_queue;
             *tbl_size = sizeof(g_egse_queue);
@@ -175,6 +203,10 @@ static struct icf_ctrl_port *icf_choose_hw_port_tbl(int system_type, int *tbl_si
             table = g_esps_sil_port;
             *tbl_size = sizeof(g_esps_sil_port);
             break;
+		case ICF_SYSTEM_TYPE_ECAT_EGSE:
+			table = g_egse_ecat_hil_port;
+			*tbl_size = sizeof(g_egse_ecat_hil_port);
+			break;
         default:
             table = g_egse_port;
             *tbl_size = sizeof(g_egse_port);
@@ -377,6 +409,19 @@ static int icf_dispatch_rx_frame(int system_type, void *rxframe, int hw_port_idx
         }
         return qidx;
     }
+
+	if (system_type == ICF_SYSTEM_TYPE_ECAT_EGSE) {
+        debug_hex_dump("egse_dispatch", rxframe, 24);
+        switch (hw_port_idx) {
+            case HW_PORTA:
+                qidx = EGSE_FC_ECS_RX_SW_QIDX;
+                break;
+            default:
+                qidx = fc_can_cmd_dispatch(rxframe);
+        }
+        return qidx;
+    }
+
     fprintf(stderr, "[%s:%d] System type not match !!\n", __FUNCTION__, __LINE__);
     return qidx;
 }
@@ -439,6 +484,11 @@ int icf_rx_ctrl_job(struct icf_ctrlblk_t* C, int pidx, int rx_buff_size) {
             break;
         case ETHERNET_DEVICE_TYPE:
                 if (icf_l2frame_receive_process(C, drv_ops, ctrlport, rx_buff_size) < 0)
+                    break;
+                debug_print("[%lf] RX Ethernet Received !!\n", get_curr_time());
+            break;
+		case ECS_DEVICE_TYPE:
+				if (icf_l2frame_receive_process(C, drv_ops, ctrlport, rx_buff_size) < 0)
                     break;
                 debug_print("[%lf] RX Ethernet Received !!\n", get_curr_time());
             break;

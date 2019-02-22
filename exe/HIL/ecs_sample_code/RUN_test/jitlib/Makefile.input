@@ -1,0 +1,13 @@
+# JITInputFile auto generated Makefile.  Paths are relative to the simulation directory
+# To manually use this file go to sim directory and use "make -f ./RUN_test/jitlib/Makefile.input <makefile_target>"
+
+./RUN_test/jitlib/libinput.so: ./RUN_test/jitlib/input.o
+	/usr/bin/g++ -shared -o $@ $<
+
+./RUN_test/jitlib/input.o: ./RUN_test/input.cpp
+	/usr/bin/g++  --std=c++11 -I /home/octobersky/workspace/Next-simulation/models/clock_source_mgmt -I /home/octobersky/workspace/Next-simulation/models/gnc/include -I /home/octobersky/workspace/Next-simulation/models/icf/include -I /home/octobersky/workspace/Next-simulation/models/equipment_protocol/include -I /home/octobersky/workspace/Next-simulation/models/icf/include/third_party_header -I/usr/local/include/hiredis -DCONFIG_FC_ECS_TEST_ENABLE -Wall -Wextra -Wshadow -Wno-narrowing -lpthread -I/usr/local/trick_source -I/usr/local/include -I/usr/local/include/trick/compat -DTRICK_VER=17 -DTRICK_MINOR=5 -fpic  -DUSE_ER7_UTILS_INTEGRATORS  -MMD -c -fPIC -o $@ $<
+
+clean:
+	 rm -f ./RUN_test/jitlib/input.o ./RUN_test/jitlib/libinput.so ./RUN_test/./RUN_test/jitlib/input.d
+
+-include ./RUN_test/jitlib/input.d

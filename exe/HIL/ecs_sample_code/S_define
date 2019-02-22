@@ -1,0 +1,69 @@
+/************************TRICK HEADER*************************
+PURPOSE:
+    (This S_define works with the RUN_analytic input file)
+LIBRARY DEPENDENCIES:
+    (
+    )
+*************************************************************/
+#include "sim_objects/default_trick_sys.sm"
+##include "icf_trx_ctrl.h"
+class EcsSimObject : public Trick::SimObject {
+    public:
+        struct icf_ctrlblk_t* ctrlblk;
+		uint8_t* sendData;
+        uint8_t* recvData;
+        
+        double int_step = 0.005;
+        
+        void init(void) {
+			ctrlblk  = (icf_ctrlblk_t*) malloc(sizeof(icf_ctrlblk_t));
+			sendData = (uint8_t*) malloc(200);
+			recvData = (uint8_t*) malloc(200);
+            memset(sendData, 0, 200);
+            memset(recvData, 0 ,200);
+        }
+		
+		void deinit(void) {
+			if(ctrlblk != NULL) {
+				free(ctrlblk);
+			}
+			free(sendData);
+			free(recvData);
+		}
+		void data_process(void) {
+			printf("recv Data\n");
+			printf("%5d %5d %5d %5d\n", recvData[0], recvData[1], recvData[2], recvData[3]);
+			printf("=================================\n");
+			
+			sendData[0] = (sendData[0]+1)%256;
+			sendData[1] = (sendData[1]+1)%256;
+			sendData[2] = (sendData[2]+1)%256;
+			sendData[3] = (sendData[3]+1)%256;
+			
+			printf("send Data\n");
+			printf("%5d %5d %5d %5d\n", sendData[0], sendData[1], sendData[2], sendData[3]);
+			printf("=================================\n");
+		}
+ 		
+		void printer(char *str) {
+			if(str != NULL) {
+				printf("%s\n",str);
+			}
+		}
+        EcsSimObject() {
+			("initialization") init();
+            ("initialization") icf_ctrlblk_init(ctrlblk, ICF_SYSTEM_TYPE_ECAT_EGSE);
+			("initialization") printer("icf_ctrlblk_init ok!\n");
+            P1 (int_step, "scheduled") icf_rx_ctrl_job(ctrlblk, HW_PORTA, 200); 
+            P1 (int_step, "scheduled") icf_rx_dequeue(ctrlblk, EGSE_FC_ECS_RX_SW_QIDX, recvData, 4);
+			P2 (int_step, "scheduled") data_process();
+			P3 (int_step, "scheduled") icf_tx_enqueue(ctrlblk, EGSE_FC_ECS_TX_SW_QIDX, sendData, 4);
+			P3 (int_step, "scheduled") icf_tx_ctrl_job(ctrlblk, EGSE_FC_ECS_TX_SW_QIDX);
+            ("shutdown") icf_ctrlblk_deinit(ctrlblk, ICF_SYSTEM_TYPE_EGSE);
+			("shutdown") deinit();
+        }
+} ;
+void create_connections() {
+
+}
+EcsSimObject rkt ;

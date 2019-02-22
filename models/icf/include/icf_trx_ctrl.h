@@ -12,6 +12,7 @@ LIBRARY DEPENDENCY:
         (../src/rs422_serialport.c)
         (../src/ethernet.c)
         (../src/icf_drivers.c)
+		(../src/ECS.c)
       )
 PROGRAMMERS:
       (((Dung-Ru Tsai) () () () ))
@@ -33,6 +34,7 @@ PROGRAMMERS:
 #define RS422_GPSR_PORT_EN      1
 #define ETH_FC_PORT_EN          1
 #define ETH_SIMGEN_PORT_EN      1
+#define ECS_FC_PORT_ENABLE      0
 
 #elif defined(CONFIG_SAMPLE_SDT_ENABLE)
 #define CAN_PORT_EN             0
@@ -41,6 +43,7 @@ PROGRAMMERS:
 #define RS422_GPSR_PORT_EN      1
 #define ETH_FC_PORT_EN          0
 #define ETH_SIMGEN_PORT_EN      0
+#define ECS_FC_PORT_ENABLE      0
 
 #elif defined(CONFIG_SAMPLE_RATETABLE_ENABLE)
 #define CAN_PORT_EN             0
@@ -49,6 +52,7 @@ PROGRAMMERS:
 #define RS422_GPSR_PORT_EN      0
 #define ETH_FC_PORT_EN          0
 #define ETH_SIMGEN_PORT_EN      0
+#define ECS_FC_PORT_ENABLE      0
 
 #elif defined(CONFIG_FC_CAN_TEST_ENABLE)
 #define CAN_PORT_EN             1
@@ -57,6 +61,16 @@ PROGRAMMERS:
 #define RS422_GPSR_PORT_EN      0
 #define ETH_FC_PORT_EN          0
 #define ETH_SIMGEN_PORT_EN      0
+#define ECS_FC_PORT_ENABLE      0
+
+#elif defined(CONFIG_FC_ECS_TEST_ENABLE)
+#define CAN_PORT_EN             0
+#define RS422_IMU_PORT_EN       0
+#define RS422_RATETBL_PORT_EN   0
+#define RS422_GPSR_PORT_EN      0
+#define ETH_FC_PORT_EN          0
+#define ETH_SIMGEN_PORT_EN      0
+#define ECS_FC_PORT_ENABLE      1
 
 #else  //  Other
 #define CAN_PORT_EN             1
@@ -65,6 +79,7 @@ PROGRAMMERS:
 #define RS422_GPSR_PORT_EN      0
 #define ETH_FC_PORT_EN          1
 #define ETH_SIMGEN_PORT_EN      0
+#define ECS_FC_PORT_ENABLE      0
 
 #endif  //  CONFIG_HIL_ENABLE
 
@@ -93,6 +108,9 @@ typedef enum _ENUM_ICF_EGSE_SW_QUEUE {
     EGSE_RX_RATETBL_Z_SW_QIDX = 15,
     EGSE_IMU01_RX_SW_QIDX = 16,
     EGSE_IMU02_RX_SW_QIDX = 17,
+	EGSE_FC_ECS_RX_SW_QIDX = 18,
+	EGSE_FC_ECS_TX_SW_QIDX = 19,
+	//==============================
     EGSE_NUM_OF_SW_QUE
 }ENUM_ICF_EGSE_SW_QUEUE;
 
@@ -116,6 +134,7 @@ typedef enum _ENUM_ICF_HW_PORT {
     HW_PORT7 = 7,
     HW_PORT8 = 8,
     HW_PORT9 = 9,
+	HW_PORTA = 10,
     NUM_OF_HW_PORT
 }ENUM_ICF_HW_PORT;
 
@@ -134,6 +153,7 @@ typedef enum _ENUM_ICF_DEVICE_TYPE {
     CAN_DEVICE_TYPE = 0x1,
     RS422_DEVICE_TYPE = 0x2,
     ETHERNET_DEVICE_TYPE = 0x3,
+	ECS_DEVICE_TYPE =0x4,
     NUM_OF_DEVICE_TYPE
 }ENUM_ICF_DEVICE_TYPE;
 
@@ -147,13 +167,16 @@ typedef enum _ENUM_ICF_DRIVERS_ID {
     ICF_DRIVERS_ID1,
     ICF_DRIVERS_ID2,
     ICF_DRIVERS_ID3,
+	ICF_DRIVERS_ID4,
 }ENUM_ICF_DRIVERS_ID;
 
 typedef enum _ENUM_ICF_SYSTEM_TYPE {
-    ICF_SYSTEM_TYPE_EGSE = 0,
-    ICF_SYSTEM_TYPE_ESPS = 1,
-    ICF_SYSTEM_TYPE_SIL_EGSE = 2,
-    ICF_SYSTEM_TYPE_SIL_ESPS = 3,
+    ICF_SYSTEM_TYPE_EGSE      = 0,
+    ICF_SYSTEM_TYPE_ESPS      = 1,
+    ICF_SYSTEM_TYPE_SIL_EGSE  = 2,
+    ICF_SYSTEM_TYPE_SIL_ESPS  = 3,
+	ICF_SYSTEM_TYPE_ECAT_EGSE = 4,
+	ICF_SYSTEM_TYPE_ECAT_ESPS = 5,
 }ENUM_ICF_SYSTEM_TYPE;
 
 struct icf_mapping {
