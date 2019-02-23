@@ -491,23 +491,23 @@ int32_t ECS_Init(void **priv_data, char* ifname, int ulChannel ) {
 	dev_info->tCommon.ulCycReadDataSize  = MAX_RTD_SIZE;
     dev_info->tCommon.ulCycWriteDataSize = MAX_RTD_SIZE;
     dev_info->tCommon.esmState = 0;
-	printf("dev_info ok\n");
 	/* initial driver */
-	printf("Initial driver!!!\n");
+	printf("Initial driver...\n");
     long lRet = cifXDriverInit(&ptInit);
     if(lRet != CIFX_NO_ERROR) {
-	    printf("Driver initial error\n");
+	    printf("Driver initial error!\n");
 	    return -1;
     }
-    
+    printf("Driver initial success!\n");
+
     /* Open Driver */
-    printf("Opening driver...\n");
+    printf("Opening driver card...\n");
     tResult = xDriverOpen(&hDriver);
     if (CIFX_NO_ERROR != tResult) {
-        printf("Driver open fail!!!\n");
+        printf("Driver card open fail!!!\n");
         goto CLOSEDRIVER;
     }
-    printf("Driver open success!\n");
+    printf("Driver card open success!\n");
     dev_info->tCommon.hDriver = hDriver;
     	
 	
@@ -515,33 +515,45 @@ int32_t ECS_Init(void **priv_data, char* ifname, int ulChannel ) {
     printf("Opening channel%d...\n",ulChannel);
     tResult = xChannelOpen(hDriver, ifname, ulChannel, &hChannel);
     if (CIFX_NO_ERROR != tResult) {
-        printf("channel open fail%d!\n",ulChannel);
+        printf("channel%d open fail !\n",ulChannel);
         goto CLOSEDRIVER;
     }
     printf("channel %d open success!\n",ulChannel);
     dev_info->tCommon.hChannel = hChannel;
 
-	tResult = xChannelHostState( hChannel, CIFX_HOST_STATE_READ, &ulState, 0L);
+	tResult = xChannelHostState( hChannel, CIFX_HOST_STATE_READ, &ulState, 1000L);
 	if (CIFX_NO_ERROR != tResult) {
 		printf("read Host state error\n");		
 		goto CLOSECHANNEL;	
 	}    
     
+	printf("setting Host state...\n");	
     tResult = xChannelHostState( hChannel, CIFX_HOST_STATE_READY, NULL, 1000L);
     if (CIFX_NO_ERROR != tResult) {
-		printf("set Host state ready error\n");		
+		printf("set Host state ready error !\n");		
 		goto CLOSECHANNEL;	
 	}
+	printf("set Host state ready success !\n");
 
+	printf("setting Bus state ON...\n");
     tResult = xChannelBusState( hChannel, CIFX_BUS_STATE_ON, NULL, 1000L);
-	
+	/*
+	if (CIFX_NO_ERROR != tResult && CIFX_DEV_NO_COM_FLAG != tResult) {
+		printf("Set Bus state error ! %x hChannel %x\n", tResult, hChannel);		
+		goto CLOSECHANNEL;	
+	}
+	printf("set Bus state ON success !\n");	
+	*/
+
+
 	/* regist cifx notification */
-	printf("register cifx notification ...");
+	printf("regist cifx notification ...");
 	tResult = ECS_RegistNotification(dev_info);
 	if (CIFX_NO_ERROR != tResult && CIFX_DEV_NO_COM_FLAG != tResult) {
-		printf("register cifx notification Error tResult=%x!\n",tResult);
+		printf("regist cifx notification Error tResult=%x!\n",tResult);
 		goto CLOSECHANNEL;
 	} 
+	printf("regist cifx notification success!\n");
 
 	tResult = xChannelDMAState( hChannel, CIFX_BUS_STATE_OFF, &ulState);
 	if (CIFX_NO_ERROR != tResult) {

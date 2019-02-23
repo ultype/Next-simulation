@@ -12,15 +12,16 @@ class EcsSimObject : public Trick::SimObject {
         struct icf_ctrlblk_t* ctrlblk;
 		uint8_t* sendData;
         uint8_t* recvData;
-        
+        unsigned long int times;
         double int_step = 0.005;
         
         void init(void) {
 			ctrlblk  = (icf_ctrlblk_t*) malloc(sizeof(icf_ctrlblk_t));
 			sendData = (uint8_t*) malloc(200);
 			recvData = (uint8_t*) malloc(200);
-            memset(sendData, 0, 200);
-            memset(recvData, 0 ,200);
+            memset(sendData, 0xffff, 200);
+            memset(recvData, 0x0000, 200);
+			times = 0;
         }
 		
 		void deinit(void) {
@@ -31,18 +32,26 @@ class EcsSimObject : public Trick::SimObject {
 			free(recvData);
 		}
 		void data_process(void) {
+			int i = 0;
+			int fail = 0;
+			for(i=0;i<200;i++) {
+				sendData[i] = (uint8_t) (((uint32_t)sendData[i]+1)%256);
+				if(sendData[i] != recvData[i]) {
+					fail++;	
+				}
+				sendData[i] = (uint8_t) (((uint32_t)recvData[i]+1)%256);
+			}
+
+			//printf(" %.12lu Master -> slave number of error byte = %d\n",times,fail);
+			times++;
+			
 			printf("recv Data\n");
-			printf("%5d %5d %5d %5d\n", recvData[0], recvData[1], recvData[2], recvData[3]);
+			for(i=0;i<200;i++) {			
+				printf("recvData[%3d],%3d\n",i ,recvData[i]);
+			}
+			printf(" %.12lu Master -> slave number of error byte = %d\n",times,fail);
 			printf("=================================\n");
 			
-			sendData[0] = (sendData[0]+1)%256;
-			sendData[1] = (sendData[1]+1)%256;
-			sendData[2] = (sendData[2]+1)%256;
-			sendData[3] = (sendData[3]+1)%256;
-			
-			printf("send Data\n");
-			printf("%5d %5d %5d %5d\n", sendData[0], sendData[1], sendData[2], sendData[3]);
-			printf("=================================\n");
 		}
  		
 		void printer(char *str) {
@@ -55,9 +64,9 @@ class EcsSimObject : public Trick::SimObject {
             ("initialization") icf_ctrlblk_init(ctrlblk, ICF_SYSTEM_TYPE_ECAT_EGSE);
 			("initialization") printer("icf_ctrlblk_init ok!\n");
             P1 (int_step, "scheduled") icf_rx_ctrl_job(ctrlblk, HW_PORTA, 200); 
-            P1 (int_step, "scheduled") icf_rx_dequeue(ctrlblk, EGSE_FC_ECS_RX_SW_QIDX, recvData, 4);
+            P1 (int_step, "scheduled") icf_rx_dequeue(ctrlblk, EGSE_FC_ECS_RX_SW_QIDX, recvData, 200);
 			P2 (int_step, "scheduled") data_process();
-			P3 (int_step, "scheduled") icf_tx_enqueue(ctrlblk, EGSE_FC_ECS_TX_SW_QIDX, sendData, 4);
+			P3 (int_step, "scheduled") icf_tx_enqueue(ctrlblk, EGSE_FC_ECS_TX_SW_QIDX, sendData, 200);
 			P3 (int_step, "scheduled") icf_tx_ctrl_job(ctrlblk, EGSE_FC_ECS_TX_SW_QIDX);
             ("shutdown") icf_ctrlblk_deinit(ctrlblk, ICF_SYSTEM_TYPE_EGSE);
 			("shutdown") deinit();
