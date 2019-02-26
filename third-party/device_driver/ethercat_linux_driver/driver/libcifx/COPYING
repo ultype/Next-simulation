@@ -1,0 +1,12 @@
+This library is a userspace library and an intellectual property of the 
+Hilscher Gesellschaft für Systemautomation mbH. 
+
+The source code and library can be used for internal development, 
+modification and debugging purpose.
+
+Distribution of the original libcifx source code, parts of the libcifx 
+source code or modifications based on it is prohibited.
+
+Binary distribution for use in products is allowed.
+
+Copyright (C) Hilscher Gesellschaft fuer Systemautomation mbH 

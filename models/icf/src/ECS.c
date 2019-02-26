@@ -537,14 +537,6 @@ int32_t ECS_Init(void **priv_data, char* ifname, int ulChannel ) {
 
 	printf("setting Bus state ON...\n");
     tResult = xChannelBusState( hChannel, CIFX_BUS_STATE_ON, NULL, 1000L);
-	/*
-	if (CIFX_NO_ERROR != tResult && CIFX_DEV_NO_COM_FLAG != tResult) {
-		printf("Set Bus state error ! %x hChannel %x\n", tResult, hChannel);		
-		goto CLOSECHANNEL;	
-	}
-	printf("set Bus state ON success !\n");	
-	*/
-
 
 	/* regist cifx notification */
 	printf("regist cifx notification ...");

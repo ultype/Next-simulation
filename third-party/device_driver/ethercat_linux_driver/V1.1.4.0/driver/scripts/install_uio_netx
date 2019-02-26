@@ -1,0 +1,66 @@
+#!/bin/sh
+
+kernel_dir=/lib/modules/$(uname -r)/build/
+
+# do not change
+default_path="../uio_netx"
+cur_dir=$PWD
+
+case "$1" in
+  "build")
+  if [ -e "$default_path/uio_netx.c" ]; then
+    echo "\nTo enable DMA support type 'y' else 'n':"
+    read dma_enable
+    if [ "$dma_enable" != "y" ]; then
+      echo "Compile kernel module uio_netx.ko (DMA disabled)"
+      cd ../uio_netx && make clean; make KDIR=$kernel_dir DMA_DISABLE=1
+    else
+      echo "Compile kernel modules uio.ko/uio_netx.ko  (DMA enabled)"
+      cd ../uio_netx && make clean; make KDIR=$kernel_dir
+    fi
+  else
+    echo "Searching in $default_path! uio_netx.c not found!"
+  fi
+  ;;
+  
+  "install")
+  if 
+  [ -e "$default_path/uio_netx.ko" ]; then
+    echo "Copying kernel module uio_netx.ko to '/lib/modules/$(uname -r)/kernel/drivers/uio/'"
+    cp $default_path/uio_netx.ko /lib/modules/$(uname -r)/kernel/drivers/uio/
+  else
+    echo "Searching in $default_path! uio_netx.ko not found!"
+    echo "A prior call \"install_uio_netx install\" fix this problem!"
+  fi
+  ;;
+
+  "update")
+  echo "Updating kernel module dependencies."
+  depmod
+  ;;
+ 
+  "load")
+  if 
+  [ -e "/lib/modules/$(uname -r)/kernel/drivers/uio/uio_netx.ko" ]; then
+    echo "Loading kernel module uio_netx.ko."
+    modprobe uio_netx
+  else
+    echo "Kernel module uio_netx.ko currently not installed!"
+    echo "First call \"install_uio_netx install\""
+    echo "Then call \"install_uio_netx update\" to fix this problem!"
+  fi
+  ;;
+
+  "unload")
+  echo "Unload kernel module uio_netx!"
+  modprobe -r uio_netx
+  ;;
+
+  *) echo "Unknown parameter!"
+  echo "Valid options:"
+  echo "-> build  : Builds kernel module uio_netx.ko."                  
+  echo "-> install: Copies the kernel modules into the target directory."
+  echo "-> update : Updates the kernel module dependencies."
+  echo "-> load   : Loads the kernel module."
+  echo "-> unload : Unloads the kernel module."
+esac

@@ -1,0 +1,14 @@
+
+1) Create driectory /opt/cifx/
+
+2) Copy the folder "deviceconfig" to /opt/cifx/
+
+3) Copy the latest BSL (../../driver/BSL/*.*) to /opt/cifx/
+
+4) Create the drirectory structure (device/serial number) in /opt/cifx/deviceconfig/[device number]/[serial number]/channel[0...1]
+   see example structure ./deviceconfig/0/0/channel[0...1]
+   
+5) copy the firmware in the appropriate channel directory and update the device configuration file device.conf
+   (/opt/cifx/deviceconfig/[device number]/[serial number]/device.conf)
+   
+For more information of the specific device configuration refer to the latest linux device driver documentation.

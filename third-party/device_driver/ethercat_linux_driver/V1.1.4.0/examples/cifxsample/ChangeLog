@@ -1,0 +1,9 @@
+15.06.2010
+  - Version 1.0.0.0
+  - demonstrate eventhandling, bus-state functions
+  - 64bit support
+  - added std. project for eclipse
+  - removed some warnings
+
+25.11.2008:
+  - Initial version

@@ -1,4 +1,3 @@
-
 MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 HOME_PATH   := $(patsubst %/exe/HIL/ecs_sample_code/S_overrides.mk, %, $(MKFILE_PATH))
 

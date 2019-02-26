@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# build and install user space library
+if [ $? == 0 ] ; then
+  cd ../libcifx
+  echo "To enable build of debug symbols type 'y' else 'n':"
+  read debug_enable
+  if [ "$debug_enable" == "y" ]; then
+    options="$options --enable-dma"
+  fi
+  echo "To enable dma support type 'y' else 'n':"
+  echo "NOTE: This feature requires to build uio_netx also with dma support!"
+  read debug_enable
+  if [ "$debug_enable" == "y" ]; then
+    options="$options --enable-debug"
+  fi
+  echo "To enable ethernet support type 'y' else 'n':"
+  echo "NOTE: This feature requires dedicated hardware and firmware!"
+  read ethernet_enable
+  if [ "$ethernet_enable" == "y" ]; then
+    options="$options --enable-cifxethernet"
+  fi
+  if ! ./configure $options; then
+    echo "Error preparing environment!"
+  elif ! make clean; then
+    echo "Error clean up library libcifx!"
+  elif ! make ; then
+    echo "Error building user space library libcifx!"
+  else
+    if ! sudo make install; then
+      echo "Error installing userspace driver!"
+    else
+      echo "cifX driver successfully installed!"
+    fi
+  fi
+fi
+cd ../scripts

@@ -1,0 +1,69 @@
+#!/bin/bash
+
+cur_path=$PWD
+kernelversion=""
+ret=0
+
+cd scripts
+install_step="uio_netx"
+while [ "$install_step" != "stop" ]
+do
+case $install_step in
+error)
+echo "************************************************************"
+echo "**** An error occured during the installation            ***"
+echo "************************************************************"
+echo "Please check the error message in the previous steps."
+echo "When the problem is fixed restart the installation."
+install_step="stop"
+ret=1
+;;
+uio_netx)
+install_step="firmware"
+echo "************************************************************"
+echo "**** Start building kernel module uio_netx               ***"
+echo "************************************************************"
+if ! ./install_uio_netx build; then  # build module
+  echo "Error building kernel module!"
+  install_step="error"
+fi  
+if ! sudo ./install_uio_netx install ; then          # install module
+  echo "Error installing kernel module!"
+  install_step="error"
+fi
+;;
+firmware)
+install_step="libcifx"
+echo "************************************************************"
+echo "**** Installing kernel module and firmware               ***"
+echo "************************************************************"
+install_step="libcifx"
+if ! sudo ./install_firmware install ; then        # install firmware
+  echo "Error installing firmware!"
+  install_step="error"
+fi
+if ! sudo ./install_uio_netx update ; then         # load driver
+  echo "Error updating module dependencies!"
+  install_step="error"
+fi
+if ! sudo ./install_uio_netx unload ; then
+  echo "Error unloading driver!"
+  install_step="error"
+fi
+if ! sudo ./install_uio_netx load; then
+    echo "Error loading driver!"
+    install_step="error"
+fi
+;;
+libcifx)
+echo "************************************************************"
+echo "**** Building and installing user space library libcifx  ***"
+echo "************************************************************"
+./install_libcifx
+install_step="stop"
+;;
+esac
+done  
+cd ..
+
+exit $ret

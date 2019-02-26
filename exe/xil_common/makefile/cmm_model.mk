@@ -10,4 +10,6 @@ INCLUDES = -I${TRICK_HOME}/trick_models \
            -I$(TOP_DIR)/models/driver/include \
            -I$(TOP_DIR)/models/icf/include \
            -I$(TOP_DIR)/models/equipment_protocol/include \
-           -I$(TOP_DIR)/models/flight_events/include
+           -I$(TOP_DIR)/models/flight_events/include \
+		   -I$(TOP_DIR)/models/icf/include/third_party_header
+

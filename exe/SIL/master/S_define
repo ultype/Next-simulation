@@ -65,6 +65,7 @@ class Rocket_SimObject : public Trick::SimObject {
         refactor_uplink_packet_t dm_ins_db;
         refactor_downlink_packet_t ctl_tvc_db;
         DM_SAVE_decl();
+
         struct icf_ctrlblk_t   icf_ctrl;
         uint64_t egse_flight_event_handler_bitmap = 0xFFFFFFFFFFFFFFFF;
         uint64_t flight_event_code_record = 0;
